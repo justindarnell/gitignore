@@ -120,6 +120,9 @@ for (const x of fitted) {
   const st = stabilityOf(x.c.id);
   out.push({
     id: x.c.id, name: x.c.name, short: x.c.short, code: x.c.code, country: 'ENG', division: x.c.div,
+    // Division in 2025/26 (6 = below the National League). Used to apply the engine's normal
+    // promotion/relegation summer adjustment at world creation, consistently with later seasons.
+    previousDivision: f ? f.dataTier : 6,
     crest: `${x.c.id}.webp`,
     attack: +attack.toFixed(2), midfield: +midfield.toFixed(2), defence: +defence.toFixed(2),
     reputation: +Math.max(20, Math.min(97, rep.rep)).toFixed(2),

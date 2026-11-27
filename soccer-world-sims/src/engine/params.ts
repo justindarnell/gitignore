@@ -2,7 +2,8 @@ import type { Settings } from './types.ts';
 
 /**
  * Engine parameters. DEFAULT_PARAMS holds the calibrated model selected by the
- * calibration framework (tools/calibrate, docs/CALIBRATION.md). User settings act as
+ * calibration framework (tools/calibrate, docs/CALIBRATION.md): finalist 1 of the
+ * second holdout validation (calibration/results/validate.json). User settings act as
  * multipliers on top of these values; 1.0 everywhere reproduces the calibrated model.
  */
 export interface EngineParams {
@@ -19,12 +20,17 @@ export interface EngineParams {
   rotationPenalty: number;  // rating points a much stronger club loses through cup rotation
   // ---- seasonal performance
   seasonSD: number;         // SD of each club's seasonal offset (rating points)
+  seasonPersist: number;    // share of last season's over/under-performance that persists
   formSD: number;           // per-match innovation of in-season form
   formPersist: number;      // AR(1) persistence of form per match
   initialFormWeight: number;// rating points for formEstimate 80 (vs 50) at the start
   // ---- long-term evolution
   revert: number;           // pull toward structural target per season
+  recoverBoost: number;     // multiplier on revert when a club is BELOW its target (recovery)
+  stabilityDamping: number; // how much stability shrinks development swings (0 = none)
+  promoEra: number;         // development momentum gained on promotion / lost on relegation
   repWeight: number;        // weight of reputation (vs division economics) in the target
+  rankEconomics: number;    // 0 = revenue by division only, 1 = by finishing rank (merit/parachute)
   eraPersist: number;       // persistence of multi-year development cycles
   eraSD: number;            // innovation SD of development cycles
   qualityNoise: number;     // idiosyncratic yearly squad change
@@ -33,6 +39,8 @@ export interface EngineParams {
   relegHit: number;         // one-off loss on relegation (scaled down by stability)
   fatigueTitle: number;     // temporary performance penalty after a title
   fatigueDecay: number;     // yearly decay of accumulated fatigue
+  fatigueStreak: number;    // extra fatigue per consecutive title beyond the first (renewal gets harder)
+  promoVar: number;         // variability of promotion investment (0 = every club invests equally)
   fatigueQuality: number;   // permanent squad drain after a title (poaching, renewal)
   ceiling: number;          // rating above which upkeep becomes increasingly costly
   ceilingCost: number;
@@ -46,38 +54,45 @@ export interface EngineParams {
 
 export const DEFAULT_PARAMS: EngineParams = {
   ratingLog: 0.035,
-  strength: 1.0,
+  strength: 1.1011,
   midfieldWeight: 0.25,
-  baseGoals: 0.19,
+  baseGoals: 0.14,
   homeAdv: 0.22,
-  dcRho: -0.06,
-  matchNoise: 0.08,
+  dcRho: -0.1,
+  matchNoise: 0.0373,
   etGoalFactor: 0.3,
   penaltyRate: 0.76,
   rotationPenalty: 6,
-  seasonSD: 1.8,
+  seasonSD: 2.0043,
+  seasonPersist: 0.1385,
   formSD: 0.35,
   formPersist: 0.9,
-  initialFormWeight: 1.0,
-  revert: 0.12,
-  repWeight: 0.5,
-  eraPersist: 0.75,
-  eraSD: 0.9,
-  qualityNoise: 1.0,
-  perfEffect: 1.2,
-  promoBoost: 1.0,
-  relegHit: 1.5,
-  fatigueTitle: 1.5,
+  initialFormWeight: 1,
+  revert: 0.1356,
+  recoverBoost: 1.0272,
+  stabilityDamping: 1.0083,
+  promoEra: 0.3686,
+  repWeight: 0.5822,
+  rankEconomics: 0.8695,
+  eraPersist: 0.7282,
+  eraSD: 0.8359,
+  qualityNoise: 0.3804,
+  perfEffect: 0.0234,
+  promoBoost: 2.1842,
+  relegHit: 4.0939,
+  fatigueTitle: 0.893,
   fatigueDecay: 0.5,
-  fatigueQuality: 0.5,
-  ceiling: 86,
-  ceilingCost: 0.15,
-  repRate: 0.08,
-  repDecayFactor: 0.7,
+  fatigueStreak: 1.4665,
+  promoVar: 0,
+  fatigueQuality: 0.2999,
+  ceiling: 91.2541,
+  ceilingCost: 0.1973,
+  repRate: 0.0388,
+  repDecayFactor: 1,
   repTitleBonus: 3,
   stabRate: 0.08,
-  eventRate: 0.12,
-  eventScale: 1.0,
+  eventRate: 0.1589,
+  eventScale: 1,
 };
 
 export const DEFAULT_SETTINGS: Settings = {

@@ -50,6 +50,7 @@ export function upgradeWorld(raw: any): World {
   w.params = { ...DEFAULT_PARAMS, ...w.params };
   w.settings = { ...DEFAULT_SETTINGS, ...w.settings };
   w.engineVersion = w.engineVersion ?? ENGINE_VERSION;
+  for (const c of w.clubs) c.luck ??= c.seasonOffset ?? 0;
   return w as World;
 }
 

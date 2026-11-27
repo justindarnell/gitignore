@@ -111,8 +111,10 @@ export interface ClubState {
   era: number;
   /** Championship fatigue (rating points removed from next season's performance). */
   fatigue: number;
-  /** Temporary seasonal performance offset (rating points), redrawn each season. */
+  /** Temporary seasonal performance offset (rating points) used this season. */
   seasonOffset: number;
+  /** Underlying seasonal-performance state (AR(1) across seasons, before fatigue/carry). */
+  luck: number;
   /** In-season form (rating points), mean-reverting random walk. */
   form: number;
   /** Slowly moving institutional anchor that stability reverts to. */

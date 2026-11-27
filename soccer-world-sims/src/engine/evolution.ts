@@ -6,7 +6,7 @@ import { addEvent, pushNews } from './history.ts';
 /**
  * End-of-season club development. Squad quality Q (mean of attack/midfield/defence) moves by
  *
- *   dQ = revert * (T - Q)                 pull toward a structural target
+ *   dQ = revert * (T - Q)                 pull toward a structural target (faster when below it)
  *      + era                              persistent multi-year development cycle (AR(1))
  *      + perfEffect * surprise            limited reward for beating expectations
  *      + qualityNoise * N(0,1)            idiosyncratic squad change
@@ -14,8 +14,9 @@ import { addEvent, pushNews } from './history.ts';
  *      - title drain, - ceiling upkeep    championship renewal costs, diminishing returns at the top
  *      + random events
  *
- * where the target T = repWeight * reputation + (1 - repWeight) * divisionLevel(next league).
- * divisionLevel comes from a FIXED economic level curve (the 2026 rating of each pyramid rank),
+ * where the target T = repWeight * reputation + (1 - repWeight) * economics, and economics
+ * blends the next division's average level with the level of the club's own finishing rank.
+ * Both come from a FIXED economic level curve (the 2026 rating of each pyramid rank),
  * so money follows the division a club plays in, while reputation provides slowly-changing
  * institutional pull. Success therefore helps (reputation, revenue) but every channel is
  * bounded and mean-reverting: there is no permanent winner-stays-winner feedback loop.
@@ -57,13 +58,30 @@ export function evolveClubs(world: World, rt: Runtime): void {
     c.reputation = clamp(c.reputation + rate * (achieved - c.reputation), 1, 99);
 
     // ---- Squad quality
-    const T = p.repWeight * c.reputation + (1 - p.repWeight) * divLevel[newL];
-    c.era = p.eraPersist * c.era + p.eraSD * rng.normal();
-    let dQ = p.revert * (T - Q) + c.era + p.perfEffect * surprise + p.qualityNoise * rng.normal();
-    if (promoted) dQ += p.promoBoost;
+    // Revenue level for next season: blend of the division average and the club's own rank
+    // (promoted clubs arrive at the bottom of the new division, relegated clubs at the top
+    // of the lower one, i.e. with parachute money).
+    const newRank = newL === oldL ? offset[oldL] + pos : promoted ? offset[newL] + size[newL] : offset[newL] + 1;
+    const rankLevel = world.levelCurve[Math.min(newRank - 1, world.levelCurve.length - 1)];
+    const econ = (1 - p.rankEconomics) * divLevel[newL] + p.rankEconomics * rankLevel;
+    const T = p.repWeight * c.reputation + (1 - p.repWeight) * econ;
+    // Development cycles: stable institutions swing less; promotion brings momentum.
+    const damp = clamp(1 + p.stabilityDamping * (0.5 - c.stability / 100), 0.3, 1.7);
+    c.era = p.eraPersist * c.era + p.eraSD * damp * rng.normal() + (promoted ? p.promoEra : relegated ? -p.promoEra : 0);
+    // Clubs below their structural level recover faster than over-achievers regress.
+    const pull = p.revert * (Q < T ? p.recoverBoost : 1);
+    let dQ = pull * (T - Q) + c.era + p.perfEffect * surprise + p.qualityNoise * rng.normal();
+    // Promotion investment varies by club (ambitious owners vs. cautious budgets).
+    if (promoted) dQ += p.promoBoost * Math.max(0, 1 + p.promoVar * rng.normal());
     if (relegated) dQ -= p.relegHit * clamp(1.25 - c.stability / 100, 0.3, 1.2);
     c.fatigue *= p.fatigueDecay;
-    if (c.id === championOfTop) { c.fatigue += p.fatigueTitle; dQ -= p.fatigueQuality; }
+    if (c.id === championOfTop) {
+      // Consecutive titles make renewal progressively harder (no hard cap on streaks).
+      let streak = 0;
+      for (let k = world.history.leagues.length - 1; k >= 0 && world.history.leagues[k][0].champion === c.id; k--) streak++;
+      c.fatigue += p.fatigueTitle + p.fatigueStreak * Math.max(0, streak - 1);
+      dQ -= p.fatigueQuality;
+    }
     if (Q > p.ceiling) dQ -= p.ceilingCost * (Q - p.ceiling);
 
     // ---- Random events

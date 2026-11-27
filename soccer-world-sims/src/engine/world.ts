@@ -22,6 +22,9 @@ export interface CreateOptions {
   settings?: Partial<Settings>;
   params?: Partial<EngineParams>;
   startYear?: number;
+  /** Apply the engine's promotion/relegation summer adjustment to clubs that changed division
+   *  for the starting season (default true), so season 1 is treated like every later season. */
+  summerMoves?: boolean;
 }
 
 // =====================================================================================
@@ -40,10 +43,18 @@ export function createWorld(opts: CreateOptions = {}): World {
       id: c.id, league: country.leagues[c.division - 1].id,
       attack: c.attack, midfield: c.midfield, defence: c.defence,
       reputation: c.reputation, stability: c.stability, stabilityAnchor: c.stability,
-      era: 0, fatigue: 0, seasonOffset: 0, form: 0, carry: 0,
+      era: 0, fatigue: 0, seasonOffset: 0, luck: 0, form: 0, carry: 0,
     });
   }
   const params = { ...DEFAULT_PARAMS, ...opts.params };
+  if (opts.summerMoves !== false) {
+    for (const c of db.clubs) {
+      const st = clubs.find(x => x.id === c.id)!;
+      const prev = c.previousDivision ?? c.division;
+      const d = prev > c.division ? params.promoBoost : prev < c.division ? -params.relegHit * Math.max(0.3, Math.min(1.2, 1.25 - c.stability / 100)) : 0;
+      st.attack += d; st.midfield += d; st.defence += d;
+    }
+  }
   // The fixed economic "level curve": the rating a club at each pyramid rank typically has.
   const levelCurve = clubs.map(overall).sort((a, b) => b - a);
   const world: World = {
@@ -67,6 +78,7 @@ export function createWorld(opts: CreateOptions = {}): World {
 interface DbClub {
   id: string; name: string; short: string; code: string; country: string; division: number; crest: string;
   attack: number; midfield: number; defence: number; reputation: number; stability: number; formEstimate: number;
+  previousDivision?: number;
 }
 
 export const overall = (c: { attack: number; midfield: number; defence: number }) => (c.attack + c.midfield + c.defence) / 3;
@@ -94,7 +106,9 @@ function startSeason(world: World, year: number, rng: Rng, initialForm?: (id: st
   // Seasonal performance draws: squad quality persists; this season's over/under-performance
   // does not. Championship fatigue and event carry-over shift the mean.
   for (const c of world.clubs) {
-    c.seasonOffset = p.seasonSD * rng.normal() - c.fatigue + c.carry;
+    const rho = p.seasonPersist;
+    c.luck = rho * (c.luck ?? 0) + Math.sqrt(1 - rho * rho) * p.seasonSD * rng.normal();
+    c.seasonOffset = c.luck - c.fatigue + c.carry;
     c.carry = 0;
     c.form = initialForm ? initialForm(c.id) : 0.3 * c.form;
   }
