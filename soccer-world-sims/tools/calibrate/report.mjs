@@ -17,6 +17,8 @@ const adopted = amb?.adopted ? amb.finalists.find(f => f.rank === amb.adopted) :
 const own = has('own-validate.json') ? R('own-validate.json') : null;
 const ownRounds = ['own-refine-round1.json', 'own-refine-round2.json', 'own-refine-round3.json', 'own-refine-round4.json', 'own-refine-round5.json', 'own-refine.json'].filter(has).map(R);
 const ownAdopted = own?.adopted ? own.finalists.find(f => f.rank === own.adopted) : null;
+const adm = has('admin-check.json') ? R('admin-check.json') : null;
+const admHist = existsSync(join(root, 'data/history/derived/administrations.json')) ? JSON.parse(readFileSync(join(root, 'data/history/derived/administrations.json'), 'utf8')) : null;
 const s92 = has('start92-validate.json') ? R('start92-validate.json') : null;
 const s92Rounds = ['start92-grid-round1.json', 'start92-grid-round2.json', 'start92-grid-round3.json', 'start92-grid-round4.json', 'start92-grid.json'].filter(has).map(R);
 const v05 = [...v.finalists].sort((a, b) => a.score - b.score)[0];
@@ -44,6 +46,7 @@ if (own) { const per = Number(own.seeds.first.split('..')[1]) + 1 + (Number(own.
 // 0.7 1992/93 start: grid rounds + validation (33 seasons per run)
 seasons += s92Rounds.reduce((a, r) => a + r.results.length * r.runsPerConfig * 33, 0);
 if (s92) seasons += (s92.finalists.length + 1) * s92.runs * 33;
+if (adm) { const per = Number(adm.seeds.first.split('..')[1]) + 1 + (Number(adm.seeds.l50.split('..')[1]) + 1) * 50 + (Number(adm.seeds.l100.split('..')[1]) + 1) * 100; seasons += 2 * per; }
 if (sensUsed) { seasons += sensUsed.rows.length * (8 * 60 + 100) + 8 * 60 + 100; sens = sensUsed; }
 const EARLIER = 96 * 150 + 3 * 120 * 6 * 60 + 2 * 300 * 6 * 60; // earlier short grid + superseded long searches (see log)
 
@@ -301,6 +304,23 @@ ${rowsFor('B')}
 * One real history is a small sample: the club-level coverage (about 86% inside the 80% range) suggests the ensembles are,
   if anything, slightly wide.
 `; })() : ''}
+${adm ? `## 0.7: administration and points deductions
+
+**Frequency target** (\`tools/history/administrations.mjs\` → \`data/history/derived/administrations.json\`, from the table of English
+clubs on Wikipedia's "Administration (British football)"): ${admHist ? `${admHist.events} administrations in 1992/93–2024/25, ${admHist.knownTier} of them in tiers 1–5 (by tier: ${admHist.byTier.join(' / ')}); per season ${n(admHist.perSeason['1992-2024'], 2)} overall, ${n(admHist.perSeason['2000-2009'], 2)} in the 2000s and ${n(admHist.perSeason['2010-2024'], 2)} since 2010` : ''}.
+The engine aims at about one per season (a blend of the long-run and recent rates), with relative risk per club by tier from the historical shares.
+The base rate (\`adminRate\` ${adm.adminRate}) was set by simulation to that frequency; it was not searched against the calibration targets.
+
+**Check and rule.** Fixed before running: *${adm.rule}*. Fresh seeds \`${adm.holdout}\`:
+
+| Model | Combined | Short | 50-year | 100-year |
+|---|---|---|---|---|
+| Without administration | ${n(adm.off.score, 3)} | ${n(adm.off.short, 3)} | ${n(adm.off.long50, 3)} | ${n(adm.off.long100, 3)} |
+| With administration (100%) | ${n(adm.on.score, 3)} | ${n(adm.on.short, 3)} | ${n(adm.on.long50, 3)} | ${n(adm.on.long100, 3)} |
+
+**Decision: ${adm.keep ? 'on by default' : 'off by default'}.** ${adm.keep ? '' : 'The combined score and the 50-year group improve, but the 100-year group is worse by more than the allowed 0.02: over a century, administrations add turnover among each era\'s giants and new top-four clubs. The mechanism is available as the *Financial crises (administration)* setting (100% = the historical frequency), and the Dynamic and Chaotic presets switch it on.'}
+The short-term group is unchanged because administrations start from the second season.
+` : ''}
 ## Why this model was chosen
 
 * Lowest combined holdout score of all finalists, with **no group sacrificed**: short-term and both
@@ -411,6 +431,8 @@ node tools/calibrate/run.mjs start92-grid --runs 24
 node tools/calibrate/run.mjs start92-grid --runs 40 --amounts 0.75,0.9,1 --shapes 0.15,0.25,0.35,0.5
 node tools/calibrate/run.mjs start92-grid --runs 40 --amounts 0.9,1 --shapes 0,0.05,0.1,0.15
 node tools/calibrate/run.mjs start92-validate --finalists 3 --runs 60 --holdout holdout92-
+node tools/history/administrations.mjs
+node tools/calibrate/run.mjs admin-check --holdout holdout5-
 node tools/calibrate/report.mjs
 \`\`\`
 `;

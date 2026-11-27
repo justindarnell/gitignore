@@ -10,7 +10,7 @@ import { STARTS } from '../../data/england/starts.ts';
 export const newsPage: Page = ({ world, args, state }) => {
   const kind = args[0] ?? state.newsKind;
   state.newsKind = kind;
-  const kinds = [['all', 'All'], ['title', 'Titles'], ['cup', 'Cups'], ['promotion', 'Promotions'], ['relegation', 'Relegations'], ['event', 'Club events'], ['owner', 'Ownership'], ['story', 'Stories'], ['derby', 'Derbies'], ['intervention', 'Interventions'], ['rules', 'Rule changes'], ['milestone', 'Milestones']];
+  const kinds = [['all', 'All'], ['title', 'Titles'], ['cup', 'Cups'], ['promotion', 'Promotions'], ['relegation', 'Relegations'], ['event', 'Club events'], ['owner', 'Ownership'], ['story', 'Stories'], ['derby', 'Derbies'], ['intervention', 'Interventions'], ['admin', 'Administrations'], ['rules', 'Rule changes'], ['milestone', 'Milestones']];
   const items = world.news.filter(n => kind === 'all' || n.kind === kind).slice(-400).reverse();
   const bySeason = new Map<number, typeof items>();
   for (const n of items) { if (!bySeason.has(n.season)) bySeason.set(n.season, []); bySeason.get(n.season)!.push(n); }
@@ -38,6 +38,7 @@ const SETTINGS: { key: keyof Settings; label: string; help: string; max?: number
   { key: 'reputationProtection', label: 'Reputation protection', help: 'How strongly institutional standing pulls clubs back to their level.' },
   { key: 'championshipFatigue', label: 'Championship fatigue', help: 'Difficulty of sustaining title-winning performance.' },
   { key: 'ownership', label: 'Ownership dynamics', help: 'Takeovers, sell-offs and how far owners push a club above or below its standing. Established giants are shielded. 0% = owners never matter; 100% = calibrated.' },
+  { key: 'administration', label: 'Financial crises (administration)', help: 'Clubs entering administration: points deductions (rules of the season), a fire sale and new owners. Likelier under asset-strippers, with low stability and after relegation. 100% = the historical frequency (about one club per season); 0% (default) = off, because calibration did not adopt it.', max: 3 },
 ];
 
 export const settingsPage: Page = ({ world }) => {

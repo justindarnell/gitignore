@@ -67,6 +67,13 @@ export interface EngineParams {
   ambRepRef: number;        // reputation at and above which ownership no longer shifts the target (headroom 0)
   // ---- 0.7 economic path of historical starts (only for worlds with a levelPath, e.g. the 1992/93 start)
   levelPathAmount: number;  // share of the way from the start's economic curve to the target curve reached at the end
+  // ---- 0.7 administration (src/engine/administration.ts)
+  adminRate: number;        // base probability per club-season (tier 3, average risk): ~1 administration per season at setting 100%
+  adminAmb: number;         // log-risk per unit of negative ownership ambition (asset-stripping)
+  adminStab: number;        // log-risk per 20 points of stability below 45
+  adminReleg: number;       // log-risk added in the season after a relegation
+  adminSquad: number;       // mean rating points lost in the fire sale (uniform 0.5x..1.5x)
+  adminStability: number;   // stability lost
   levelPathShape: number;   // timing exponent: 1 = linear, >1 = late divergence, <1 = early divergence, 0 = from the first season
 }
 
@@ -125,6 +132,12 @@ export const DEFAULT_PARAMS: EngineParams = {
   // structure from their first season (amount 1, shape 0); the timing could not be identified from 1992-2008.
   levelPathAmount: 1,
   levelPathShape: 0,
+  adminRate: 0.0112,
+  adminAmb: 1.5,
+  adminStab: 1,
+  adminReleg: 0.7,
+  adminSquad: 3,
+  adminStability: 12,
 };
 
 /**
@@ -152,7 +165,7 @@ export function ambitionLabel(a: number): 'Wealthy & ambitious' | 'Steady' | 'Ca
 
 export const DEFAULT_SETTINGS: Settings = {
   realism: 1, upsets: 1, homeAdvantage: 1, seasonalVariability: 1, growth: 1,
-  events: 1, relegationImpact: 1, reputationProtection: 1, championshipFatigue: 1, ownership: 1,
+  events: 1, relegationImpact: 1, reputationProtection: 1, championshipFatigue: 1, ownership: 1, administration: 0,
   storage: 'standard',
 };
 
@@ -173,6 +186,7 @@ export function effectiveParams(base: EngineParams, s: Settings): EngineParams {
     repDecayFactor: Math.min(1, base.repDecayFactor / Math.max(0.25, s.reputationProtection)),
     fatigueTitle: base.fatigueTitle * s.championshipFatigue,
     fatigueQuality: base.fatigueQuality * s.championshipFatigue,
+    adminRate: base.adminRate * (s.administration ?? 1),
     ...ownershipParams(base, s.ownership ?? 1),
   };
 }
@@ -189,7 +203,7 @@ function ownershipParams(base: EngineParams, k: number): Partial<EngineParams> {
 /** Named presets offered in the UI. */
 export const PRESETS: Record<string, { label: string; description: string; settings: Partial<Settings> }> = {
   historical: { label: 'Historical (default)', description: 'Calibrated against English football history.', settings: {} },
-  dynamic: { label: 'Dynamic', description: 'More movement: faster rises and falls, more upsets.', settings: { upsets: 1.3, seasonalVariability: 1.25, growth: 1.3, events: 1.5, reputationProtection: 0.8 } },
-  chaotic: { label: 'Chaotic', description: 'Anything can happen. Not historically realistic.', settings: { realism: 0.6, upsets: 1.8, seasonalVariability: 1.8, growth: 1.8, events: 2.5, reputationProtection: 0.5, relegationImpact: 1.5 } },
+  dynamic: { label: 'Dynamic', description: 'More movement: faster rises and falls, more upsets, and clubs going into administration.', settings: { upsets: 1.3, seasonalVariability: 1.25, growth: 1.3, events: 1.5, reputationProtection: 0.8, administration: 1 } },
+  chaotic: { label: 'Chaotic', description: 'Anything can happen. Not historically realistic.', settings: { realism: 0.6, upsets: 1.8, seasonalVariability: 1.8, growth: 1.8, events: 2.5, reputationProtection: 0.5, relegationImpact: 1.5, administration: 2 } },
   stable: { label: 'Stable', description: 'Established clubs stay strong for longer.', settings: { growth: 0.7, events: 0.6, reputationProtection: 1.4, seasonalVariability: 0.85 } },
 };

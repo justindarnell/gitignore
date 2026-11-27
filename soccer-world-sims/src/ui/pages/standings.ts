@@ -15,9 +15,9 @@ export function leagueTable(world: World, lid: string, rows: TableRow[], showFor
     <tbody>${rows.map((r, i) => {
       const z = zoneOf(l, i + 1, l.tier);
       const next = zoneOf(l, i + 2, l.tier);
-      return `<tr class="zone-row-${z}${z !== next && i < rows.length - 1 ? ' zone-break' : ''}"><td class="num"><span class="pos zone-${z}">${i + 1}</span></td><td>${club(world, r.club, { crest: 'sm' })}</td><td class="num">${r.p}</td><td class="num">${r.w}</td><td class="num">${r.d}</td><td class="num">${r.l}</td><td class="num">${r.gf}</td><td class="num">${r.ga}</td><td class="num">${signed(r.gf - r.ga)}</td><td class="num strong">${r.pts}</td>${showForm ? `<td class="hide-sm">${form(world, r.club).map(x => `<span class="form form-${x}">${x}</span>`).join('')}</td>` : ''}</tr>`;
+      return `<tr class="zone-row-${z}${z !== next && i < rows.length - 1 ? ' zone-break' : ''}"><td class="num"><span class="pos zone-${z}">${i + 1}</span></td><td>${club(world, r.club, { crest: 'sm' })}</td><td class="num">${r.p}</td><td class="num">${r.w}</td><td class="num">${r.d}</td><td class="num">${r.l}</td><td class="num">${r.gf}</td><td class="num">${r.ga}</td><td class="num">${signed(r.gf - r.ga)}</td><td class="num strong">${r.pts}${r.ded ? ` <span class="ded" title="${r.ded} points deducted (administration)">−${r.ded}</span>` : ''}</td>${showForm ? `<td class="hide-sm">${form(world, r.club).map(x => `<span class="form form-${x}">${x}</span>`).join('')}</td>` : ''}</tr>`;
     }).join('')}</tbody></table></div>
-    <div class="legend">${[...zones].map(z => `<span><span class="pos zone-${z}"> </span>${ZONE_LABEL[z as keyof typeof ZONE_LABEL]}</span>`).join('')}<span class="muted small">Tiebreakers: points, goal difference, goals scored, head-to-head.</span></div>`;
+    <div class="legend">${[...zones].map(z => `<span><span class="pos zone-${z}"> </span>${ZONE_LABEL[z as keyof typeof ZONE_LABEL]}</span>`).join('')}<span class="muted small">Tiebreakers: points, goal difference, goals scored, head-to-head.${rows.some(r => r.ded) ? ' <span class="ded">−n</span>: points deducted (administration), already taken off Pts.' : ''}</span></div>`;
 }
 
 export const standingsPage: Page = ({ world, args, state }) => {

@@ -17,6 +17,7 @@
             │ sandbox.ts    what-if interventions, forks (deterministic, no RNG)         │
             │ experiments.ts multi-fork experiments: re-seeded forks, outcome odds      │
             │ rules.ts      dated rule changes: the config in force in a given season   │
+            │ administration.ts  insolvency risk, points deductions (optional)          │
             │ sim.ts        simulation targets (matchday … N seasons), bulk loop        │
             │ runtime.ts    non-serialised caches + live RNG                             │
             └───────────────────────────────────────────────────────────────────────────┘
@@ -180,6 +181,33 @@ across eras; sizes, promotion and relegation counts, play-off formats, names and
   Conference, renamings and the later play-off formats (COMPETITIONS.md). The 2026/27 configuration has no changes.
 * The UI shows past tables with their own season's zones and lists the changes on the standings page.
 
+## Administration and points deductions (0.7, off by default)
+
+`src/engine/administration.ts`. At each season start (after the rollover, before any match) every club may enter
+administration with probability
+
+```
+p = min(0.4, adminRate · setting · tierWeight[tier] · exp(adminAmb · max(0, −A) + adminStab · (45 − stability)/20 + adminReleg · relegatedLastSeason))
+```
+
+Tier weights (top flight 0.14, second tier 0.76, third 1, fourth 0.71, fifth 0.41) are the historical shares of English
+administrations per club, 1992/93–2024/25. `adminRate` (0.0112) gives about one administration per season at 100%.
+Asset-stripping owners (A = −1: ×4.5), low stability (20 points below 45: ×2.7) and a relegation just suffered (×2)
+raise the risk; these risk weights are judgements. A club in administration:
+
+* has the league's `adminDeduction` subtracted from this season's points (`TableRow.ded` records it; tables and history
+  show it). This is dated configuration: 2026/27 has 9 in the Premier League, 12 in the EFL and 10 in the National
+  League. A 1992 world has none until 2004/05, then 9 and 10, 10 in the Conference from 2008/09 and 12 in the Football
+  League from 2015/16;
+* sells players (squad −`adminSquad` × U(0.5, 1.5) rating points), loses `adminStability` (12) stability, a point of
+  reputation and some development momentum, and passes to new owners (ambition reset to −0.1…+0.3);
+* gets a timeline entry (kind `admin`) and a news item (filter "Administrations").
+
+The draws come from a sub-stream seeded from the world's random state at that moment, so the main stream is never
+consumed: at 0% the model is bit-identical to the model without the mechanism (tested), and experiment runs get their own
+draws. The check against the calibration targets did not adopt it as the default (CALIBRATION.md), so the setting
+*Financial crises (administration)* defaults to 0%.
+
 ## Economic path of historical starts (0.7)
 
 The economic level curve (rating level by pyramid rank) drives clubs' structural targets. A start can declare a
@@ -268,7 +296,8 @@ more goals conceded, then home defeats ahead of away defeats, then the earlier m
   store holds slot metadata (name, seed, season, date, size). Autosave writes after every simulation.
 * Export downloads `.sws.json.gz` (gzip via `CompressionStream`, or plain JSON when that is
   unavailable). Import accepts both.
-* Every save has `schema` (currently 7). Migration 6 → 7 (0.7) adds `levelPath: null` (a fixed economic curve). Migration 5 → 6 (0.7) points 1992 worlds saved before the playable Conference
+* Every save has `schema` (currently 8). Migration 7 → 8 (0.7) sets `adminRate` 0 and the administration setting to 0%
+  for earlier saves. Migration 6 → 7 (0.7) adds `levelPath: null` (a fixed economic curve). Migration 5 → 6 (0.7) points 1992 worlds saved before the playable Conference
   (92 clubs) at the frozen 1992/93 configuration (`ENG1992-0.6`, `config1992-frozen.ts`), so they continue exactly as
   before. Migration 4 → 5 (0.7) keeps a save's model: it sets the new
   relative-ownership parameters to 0 and writes the old experimental *Ownership dynamics* setting (k × the 0.6
@@ -331,12 +360,12 @@ min/max decimation, so matchday-level histories (~4,600 points per century) rend
 
 ## Testing
 
-* `npm test`: 66 engine tests covering database integrity, fixture counts and uniqueness, home/away
+* `npm test`: 71 engine tests covering database integrity, fixture counts and uniqueness, home/away
   balance, clash-free calendar, scoring, tiebreakers, promotion/relegation counts, play-off brackets
   (including the six-team Championship format), FA Cup and EFL Cup structure, single winners,
   history consistency, graph data, best/worst ranking rules, attribute bounds, determinism,
   save/load equivalence, bulk vs step-by-step equivalence, and pause/resume equivalence.
-* `node tools/browser-test.mjs`: 63 end-to-end checks in headless Chromium against `dist/` opened via
+* `node tools/browser-test.mjs`: 65 end-to-end checks in headless Chromium against `dist/` opened via
   `file://`, with all network requests blocked. Covers navigation, club links, graph hover and tooltips,
   decimal formatting, badge loading, matchday controls, competitions, history pages, settings, saves
   and reload, a 100-season bulk run with pause/resume and cancel, responsiveness, memory, phone-width

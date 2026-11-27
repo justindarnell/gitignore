@@ -58,6 +58,18 @@
 * The 2026/27 start is unchanged (no path). Save schema 7 (earlier saves keep a fixed curve).
 * Calibration phases `start92-grid`, `start92-validate`; `tools/history/real1992.mjs`.
 
+### Goal 5: administration and points deductions (optional)
+* Clubs can enter **administration** at the start of a season: likelier under asset-stripping owners, with low stability
+  and after relegation, weighted by tier from the historical shares of English administrations 1992/93–2024/25 (Wikipedia;
+  `tools/history/administrations.mjs`). Effects: the league's points deduction, a fire sale, lost stability and new owners.
+  Timelines, news (filter "Administrations") and standings (−n next to the points) show it.
+* Deductions are dated configuration: 9/12/10 points (Premier League/EFL/National League) for 2026/27; in a 1992 world none
+  until 2004/05, then 9 and 10, 10 in the Conference from 2008/09 and 12 in the Football League from 2015/16.
+* Rate set to the historical frequency (about one per season at 100%). Checked on fresh `holdout5-` seeds under a
+  pre-registered rule: the combined and 50-year scores improved but the 100-year group got worse, so the new setting
+  **Financial crises (administration)** defaults to 0% (the Dynamic and Chaotic presets switch it on).
+* Draws come from a sub-stream, so at 0% results are bit-identical to the model without it. Save schema 8.
+
 ## 0.6.0 (2026-11-27)
 
 ### Goal 1: ownership ambition (realism experiment, not adopted)

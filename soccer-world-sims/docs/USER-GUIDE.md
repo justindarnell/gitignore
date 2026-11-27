@@ -102,6 +102,11 @@ below) what its standing supports. Clubs whose reputation is already elite are s
 calibrated model (adopted in 0.7, see CALIBRATION.md, "0.7: relative ownership"); 0% means owners never
 matter. Saves from earlier versions keep the model they were created with.
 
+**Financial crises (administration)** (default 0%): clubs can go into administration, with the points deduction of the
+season's rules (shown as a red −n next to their points), a fire sale and new owners. Asset-stripped, unstable and
+recently relegated clubs are most at risk. 100% is the historical frequency (about one club per season); the Dynamic and
+Chaotic presets switch it on. It is off by default because the calibration check did not adopt it (CALIBRATION.md).
+
 **Historical storage** controls how much detail is kept: Essential, Standard (default) or Full.
 See TECHNICAL.md for sizes.
 

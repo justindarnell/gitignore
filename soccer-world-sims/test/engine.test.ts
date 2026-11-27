@@ -11,7 +11,7 @@ import { ENGLAND_1992 } from '../src/data/england/config1992.ts';
 import { configFor, validateChanges } from '../src/engine/rules.ts';
 import { Rng } from '../src/engine/rng.ts';
 import { shootout } from '../src/engine/match.ts';
-import { DEFAULT_PARAMS } from '../src/engine/params.ts';
+import { DEFAULT_PARAMS, DEFAULT_SETTINGS } from '../src/engine/params.ts';
 import { titleEras, goldenAge, decadeRankings } from '../src/engine/eras.ts';
 import type { Match, TableRow, World } from '../src/engine/types.ts';
 import clubsDb from '../src/data/england/clubs.json' with { type: 'json' };
@@ -831,5 +831,57 @@ describe('economic path of the 1992/93 start (0.7)', () => {
     const up = importWorld(JSON.stringify(raw));
     assert.equal(up.schema, SAVE_SCHEMA); assert.equal(up.levelPath, null);
     simulate(up, { kind: 'seasons', n: 1 });
+  });
+});
+
+describe('administration and points deductions (0.7)', () => {
+  const run = (settings: object, n = 30, start?: string) => { const w = createWorld({ seed: 'adm-test', start, settings: { storage: 'essential', ...settings } }); simulate(w, { kind: 'seasons', n }); return w; };
+  const admins = (w: World) => Object.entries(w.history.clubs).flatMap(([id, h]) => h.events.filter(e => e.kind === 'admin').map(e => ({ id, ...e })));
+  test('off by default, and switching it off reproduces the model without it exactly (no main-stream draws)', () => {
+    assert.equal(DEFAULT_SETTINGS.administration, 0);
+    const def = run({}, 12), off = createWorld({ seed: 'adm-test', params: { adminRate: 0 }, settings: { storage: 'essential' } });
+    simulate(off, { kind: 'seasons', n: 12 });
+    assert.equal(admins(def).length, 0);
+    assert.deepEqual(def.history.leagues.map(s => s.map(l => l.champion)), off.history.leagues.map(s => s.map(l => l.champion)));
+  });
+  test('at 100% clubs enter administration at about the historical rate, with the league deduction applied', () => {
+    const w = run({ administration: 1 }, 30);
+    const a = admins(w);
+    assert.ok(a.length >= 10 && a.length <= 60, `${a.length} administrations in 30 seasons`);
+    let checked = 0;
+    for (const e of a) {
+      const k = w.history.snapshots.findIndex(s => s.year === e.season);
+      if (k < 0) continue;
+      const lid = w.history.snapshots[k].league[w.clubs.findIndex(c => c.id === e.id)];
+      const row = w.history.leagues[k].find(l => l.league === lid)!.table.find(r => r.club === e.id)!;
+      const expected = { ENG1: 9, ENG2: 12, ENG3: 12, ENG4: 12, ENG5: 10 }[lid];
+      assert.equal(row.ded, expected, `${e.id} ${e.season} ${lid}`);
+      checked++;
+    }
+    assert.ok(checked > 0);
+    assert.ok(w.news.some(n => n.kind === 'admin'));
+  });
+  test('asset-stripped, unstable and relegated clubs are at higher risk; giants rarely', async () => {
+    const { adminRisk } = await import('../src/engine/administration.ts');
+    const p = DEFAULT_PARAMS;
+    assert.ok(adminRisk(p, 3, -0.9, 45, false) > 3 * adminRisk(p, 3, 0, 45, false));
+    assert.ok(adminRisk(p, 3, 0, 20, false) > adminRisk(p, 3, 0, 60, false));
+    assert.ok(adminRisk(p, 3, 0, 45, true) > adminRisk(p, 3, 0, 45, false));
+    assert.ok(adminRisk(p, 1, 0, 45, false) < 0.2 * adminRisk(p, 3, 0, 45, false));
+  });
+  test('a 1992 world follows the dated rules: no deduction before 2004/05, 10 points from then on', () => {
+    const w = run({ administration: 3 }, 16, '1992');
+    const a = admins(w);
+    const before = a.filter(e => e.season < 2004), after = a.filter(e => e.season >= 2004 && e.season < 2008);
+    assert.ok(before.length > 0 && after.length > 0, `${before.length} before 2004, ${after.length} in 2004-07`);
+    for (const e of before) assert.match(e.text, /no points deduction/);
+    for (const e of after) assert.match(e.text, /(10|9)-point deduction|no points deduction/);
+    assert.ok(after.some(e => /10-point/.test(e.text)));
+  });
+  test('schema 7 saves migrate with administration off', () => {
+    const raw = JSON.parse(exportWorld(createWorld({ seed: 'mig8' })));
+    raw.schema = 7; delete raw.params.adminRate; delete raw.settings.administration;
+    const up = importWorld(JSON.stringify(raw));
+    assert.equal(up.schema, SAVE_SCHEMA); assert.equal(up.params.adminRate, 0); assert.equal(up.settings.administration, 0);
   });
 });

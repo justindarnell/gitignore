@@ -35,12 +35,12 @@ See [docs/USER-GUIDE.md](docs/USER-GUIDE.md) for the full guide.
 | Sandbox | What-if editing and injected events (recorded as interventions), fork a world, compare two timelines side by side, multi-fork experiments (outcome probabilities from many alternative futures) |
 | Match engine | Poisson goals from attack/midfield/defence powers, home advantage, Dixon–Coles low-score correction, per-match upset noise, seasonal form, cup squad rotation, extra time, penalties |
 | Competitions | Double round-robin leagues with full tiebreakers; the new six-team Championship play-off; League One/Two/National League play-offs; FA Cup (incl. 4th qualifying round with non-playable qualifiers) and EFL Cup (regional rounds, two-legged semis) |
-| Club evolution | Reputation, stability, development cycles, rank-based economics, promotion/relegation effects, title fatigue, ten kinds of random events, ownership (takeovers and sell-offs that shift smaller clubs; established giants shielded) |
+| Club evolution | Reputation, stability, development cycles, rank-based economics, promotion/relegation effects, title fatigue, ten kinds of random events, ownership (takeovers and sell-offs that shift smaller clubs; established giants shielded), optional administration with era-correct points deductions |
 | History | Rolls of honour, trophy totals, historical tables, movements, records, most improved/declined, best/worst matches, timelines, news |
 | Stories | Story of the season (final-day races, collapses, great escapes, runs, records, giant-killings), eras and dynasties, golden ages, decades bump chart, title-race charts, derbies and head-to-head records |
 | Saves | IndexedDB slots, autosave, export/import (gzip), schema versioning, three storage levels |
 | Calibration | ~1.9M simulated seasons across grid, Latin-hypercube and local searches, holdout validation and sensitivity analysis; the 1992/93 start tested out of sample against real 1992–2024 outcomes — [report](docs/CALIBRATION.md) |
-| Tests | 66 engine tests (`npm test`) + 63 end-to-end browser checks from `file://` |
+| Tests | 71 engine tests (`npm test`) + 65 end-to-end browser checks from `file://` |
 
 ## Develop
 

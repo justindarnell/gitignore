@@ -1,5 +1,6 @@
 import { Rng } from './rng.ts';
 import { configFor } from './rules.ts';
+import { seasonAdministrations } from './administration.ts';
 import { DEFAULT_PARAMS, DEFAULT_SETTINGS, effectiveParams, type EngineParams } from './params.ts';
 import { expectedGoals, sampleExtraTime, sampleScore, shootout, type Side } from './match.ts';
 import { buildCalendar, doubleRoundRobin, leagueSlots, slotKey } from './schedule.ts';
@@ -14,7 +15,7 @@ import type {
 import { STARTS } from '../data/england/starts.ts';
 
 export const ENGINE_VERSION = '0.7.0';
-export const SAVE_SCHEMA = 7;
+export const SAVE_SCHEMA = 8;
 
 export interface CreateOptions {
   seed?: string;
@@ -478,10 +479,13 @@ export function rollover(world: World): void {
   const rt = runtime(world);
   if (!world.season.complete) throw new Error('Season not complete');
   evolveClubs(world, rt);
+  const relegated = new Set((world.history.leagues.at(-1) ?? []).flatMap(l => l.relegated));
   for (const c of world.clubs) c.league = world.season.movements![c.id];
   startSeason(world, world.season.year + 1, rt.rng);
   reindexSeason(world, rt);
   syncRng(world);
+  // Administrations and points deductions (sub-stream from the current state; the main stream is untouched).
+  seasonAdministrations(world, rt, relegated);
   // Dated rule changes taking effect this season are announced (no randomness involved).
   for (const ch of COUNTRIES[world.country].changes ?? []) if (ch.from === world.season.year) {
     pushNews(world, { date: world.season.calendar[0].date, kind: 'rules', clubs: [], importance: 4, text: `New rules from ${seasonLabel(ch.from)}: ${ch.note}` });

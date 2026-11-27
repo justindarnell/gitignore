@@ -37,6 +37,8 @@ export interface LeagueConfig {
   autoPromotion: number;   // automatic promotion places (to tier-1)
   playoff?: PlayoffConfig; // promotion play-off (to tier-1)
   relegation: number;      // relegation places (to tier+1); 0 at the bottom of the playable pyramid
+  /** (0.7) Points deducted from a club entering administration (0 or absent: no automatic deduction). */
+  adminDeduction?: number;
   tiebreakers: Tiebreaker[];
   startWeek: number;
   endWeek: number;
@@ -154,6 +156,8 @@ export interface Match {
 
 export interface TableRow {
   club: string; p: number; w: number; d: number; l: number; gf: number; ga: number; pts: number;
+  /** (0.7) Points deducted this season (already subtracted from pts). */
+  ded?: number;
 }
 
 export interface Tie {
@@ -222,6 +226,8 @@ export interface Settings {
   championshipFatigue: number;  // 0..2
   /** 0..2 multiplier on every ownership effect (1 = calibrated, 0 = owners never matter). */
   ownership: number;
+  /** 0..3 multiplier on the administration rate (1 = historical frequency; default 0, not adopted by calibration). */
+  administration: number;
   storage: 'essential' | 'standard' | 'full';
 }
 
@@ -265,7 +271,7 @@ export interface MatchRecord {
   home: string; away: string; hg: number; ag: number; et?: boolean; pens?: [number, number];
 }
 
-export type TimelineKind = 'event' | 'honour' | 'move' | 'milestone' | 'owner' | 'intervention';
+export type TimelineKind = 'event' | 'honour' | 'move' | 'milestone' | 'owner' | 'intervention' | 'admin';
 
 export interface ClubHistory {
   best: MatchRecord[];   // biggest wins, ranked

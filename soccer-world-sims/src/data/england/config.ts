@@ -15,6 +15,7 @@ const tue = (week: number): SlotRef => ({ week, day: 3 });
 //  - League Two: top 3 + play-offs (4th-7th); bottom 2 relegated to the National League.
 //  - National League: champions + play-offs (2nd-7th: eliminators 4v7, 5v6; single-leg
 //    semi-finals hosted by 2nd and 3rd; final). No relegation in the playable pyramid.
+// Administration (0.7): 9 points deducted in the Premier League, 12 in the EFL, 10 in the National League.
 // Tiebreakers: points, goal difference, goals scored, then head-to-head (points, goal
 // difference, away goals), then wins, then a drawing of lots (seeded random).
 const TIEBREAKERS: Tiebreaker[] = ['points', 'goalDifference', 'goalsFor', 'h2hPoints', 'h2hGoalDifference', 'h2hAwayGoals', 'wins', 'lots'];
@@ -53,15 +54,15 @@ const nationalLeaguePlayoff: PlayoffConfig = {
 };
 
 const leagues: LeagueConfig[] = [
-  { id: 'ENG1', name: 'Premier League', short: 'PL', tier: 1, size: 20, autoPromotion: 0, relegation: 3, tiebreakers: TIEBREAKERS,
+  { id: 'ENG1', adminDeduction: 9, name: 'Premier League', short: 'PL', tier: 1, size: 20, autoPromotion: 0, relegation: 3, tiebreakers: TIEBREAKERS,
     startWeek: 3, endWeek: 42, reservedWeeks: [22, 25, 29, 32, 36, 41], midweeks: [9, 18, 31, 34, 21, 38].map(tue), colour: '#8b5cf6' },
-  { id: 'ENG2', name: 'Championship', short: 'CH', tier: 2, size: 24, autoPromotion: 2, playoff: championshipPlayoff, relegation: 3, tiebreakers: TIEBREAKERS,
+  { id: 'ENG2', adminDeduction: 12, name: 'Championship', short: 'CH', tier: 2, size: 24, autoPromotion: 2, playoff: championshipPlayoff, relegation: 3, tiebreakers: TIEBREAKERS,
     startWeek: 1, endWeek: 39, reservedWeeks: [22, 25, 29, 32, 36], midweeks: LEAGUE_MIDWEEKS, colour: '#3b82f6' },
-  { id: 'ENG3', name: 'League One', short: 'L1', tier: 3, size: 24, autoPromotion: 2, playoff: leagueOnePlayoff, relegation: 4, tiebreakers: TIEBREAKERS,
+  { id: 'ENG3', adminDeduction: 12, name: 'League One', short: 'L1', tier: 3, size: 24, autoPromotion: 2, playoff: leagueOnePlayoff, relegation: 4, tiebreakers: TIEBREAKERS,
     startWeek: 1, endWeek: 39, reservedWeeks: [13, 17, 22, 25, 29, 32, 36], midweeks: LEAGUE_MIDWEEKS, colour: '#10b981' },
-  { id: 'ENG4', name: 'League Two', short: 'L2', tier: 4, size: 24, autoPromotion: 3, playoff: leagueTwoPlayoff, relegation: 2, tiebreakers: TIEBREAKERS,
+  { id: 'ENG4', adminDeduction: 12, name: 'League Two', short: 'L2', tier: 4, size: 24, autoPromotion: 3, playoff: leagueTwoPlayoff, relegation: 2, tiebreakers: TIEBREAKERS,
     startWeek: 1, endWeek: 39, reservedWeeks: [13, 17, 22, 25, 29, 32, 36], midweeks: LEAGUE_MIDWEEKS, colour: '#f59e0b' },
-  { id: 'ENG5', name: 'National League', short: 'NL', tier: 5, size: 24, autoPromotion: 1, playoff: nationalLeaguePlayoff, relegation: 0, tiebreakers: TIEBREAKERS,
+  { id: 'ENG5', adminDeduction: 10, name: 'National League', short: 'NL', tier: 5, size: 24, autoPromotion: 1, playoff: nationalLeaguePlayoff, relegation: 0, tiebreakers: TIEBREAKERS,
     startWeek: 1, endWeek: 39, reservedWeeks: [10, 13, 17, 22, 25, 29, 32, 36], midweeks: LEAGUE_MIDWEEKS, colour: '#ef4444' },
 ];
 

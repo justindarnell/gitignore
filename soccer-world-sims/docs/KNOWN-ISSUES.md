@@ -28,6 +28,17 @@
   the model. Midfield is derived (mean of attack and defence) because goal data cannot identify it.
 * Several modern-era targets are explicit judgements (documented in `tools/calibrate/targets.mjs`).
 
+## Administration (0.7, optional)
+
+* Off by default: on fresh holdout seeds it improved the combined and 50-year scores but worsened the 100-year group
+  (more turnover among each era's giants), which failed the pre-registered rule.
+* The frequency target blends eras (about one per season; real: 3.5 per season in the 2000s, 0.7 since 2010). The rate does
+  not change over time.
+* Risk weights for ownership, stability and relegation are judgements. Deductions apply in the season of administration
+  only; CVA sanctions, expulsions, liquidations and profit-and-sustainability deductions are not modelled. The 12-point EFL
+  rule's start date (2015/16) is not confirmed by the downloaded source.
+* Clubs that were in administration at the 2026/27 start (e.g. Sheffield Wednesday) start without a pending deduction.
+
 ## Stories and rivalries
 
 * In-season positions used by stories (lead changes, collapses, great escapes) rank by points, goal difference
@@ -65,8 +76,8 @@
 ## Rules
 
 * Simplifications are documented in COMPETITIONS.md: European entrants are approximated as the
-  previous top 7; FA Cup qualifiers are generic and earlier qualifying rounds are not simulated; there
-  are no points deductions and no deciding play-off matches for level points.
+  previous top 7; FA Cup qualifiers are generic and earlier qualifying rounds are not simulated; points
+  deductions exist only for administration (optional); there are no deciding play-off matches for level points.
 * The six-team Championship play-off format follows reporting from before its final ratification.
 * Regions for the EFL Cup regional draw are approximate.
 

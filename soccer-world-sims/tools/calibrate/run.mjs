@@ -35,15 +35,15 @@ const log = (...a) => console.log(new Date().toISOString().slice(11, 19), ...a);
 const sarg = (name, def) => { const i = process.argv.indexOf('--' + name); return i > 0 ? process.argv[i + 1] : def; };
 const SCREEN_FIRST = 'screen-first-', SCREEN_LONG = 'screen-long-', HOLDOUT = sarg('holdout', 'holdout-');
 
-async function evalShort(params, n, seedPrefix = SCREEN_FIRST) {
-  const res = await pool.run(Array.from({ length: n }, (_, i) => ({ seed: seedPrefix + i, seasons: 1, params })));
+async function evalShort(params, n, seedPrefix = SCREEN_FIRST, settings) {
+  const res = await pool.run(Array.from({ length: n }, (_, i) => ({ seed: seedPrefix + i, seasons: 1, params, settings })));
   const agg = aggregate(res);
   const m = means(agg);
   m['pl.championPtsSD'] = agg['pl.pts1'].sd;
   return { agg, m, score: scoreGroup(m, SHORT) };
 }
-async function evalLong(params, runs, seasons, seedPrefix = SCREEN_LONG) {
-  const res = await pool.run(Array.from({ length: runs }, (_, i) => ({ seed: seedPrefix + i, seasons, params, keepChampions: true })));
+async function evalLong(params, runs, seasons, seedPrefix = SCREEN_LONG, settings) {
+  const res = await pool.run(Array.from({ length: runs }, (_, i) => ({ seed: seedPrefix + i, seasons, params, keepChampions: true, settings })));
   const agg = aggregate(res);
   return { agg, m: means(agg), score: scoreGroup(means(agg), LONG), champions: res.map(r => r.champions) };
 }
@@ -364,6 +364,29 @@ if (phase === 'start92-validate') {
   log(ok.length ? `ADOPT finalist ${ok[0].rank}` : 'NO finalist satisfies the adoption rule');
 }
 function WINDOWS92() { return REAL92?.windows; }
+
+// ---------------------------------------------------------------------------------- 0.7: administration
+// The administration rate is set from history (about 1 per season, tools/calibrate report), not searched. Rule,
+// fixed before running: administration is on by default only if, on fresh holdout seeds, the combined score with
+// it is not worse than without it and no group (short, 50-year, 100-year) is worse by more than 0.02.
+if (phase === 'admin-check') {
+  const firsts = arg('firsts', 500), r50 = arg('r50', 12), r100 = arg('r100', 10);
+  // The setting multiplies adminRate (default 0%), so both runs set it explicitly.
+  const evalAll = async (params, settings) => {
+    const S = await evalShort(params, firsts, HOLDOUT + 'first-', settings);
+    const L50 = await evalLong(params, r50, 50, HOLDOUT + '50-', settings);
+    const L100 = await evalLong(params, r100, 100, HOLDOUT + '100-', settings);
+    return { score: 0.5 * S.score.score + 0.25 * L50.score.score + 0.25 * L100.score.score, short: S.score.score, long50: L50.score.score, long100: L100.score.score,
+      shortAgg: S.agg, long50Agg: L50.agg, long100Agg: L100.agg };
+  };
+  const off = await evalAll({ ...DEFAULT_PARAMS }, { administration: 0 });
+  const on = await evalAll({ ...DEFAULT_PARAMS }, { administration: 1 });
+  const keep = on.score <= off.score && on.short <= off.short + 0.02 && on.long50 <= off.long50 + 0.02 && on.long100 <= off.long100 + 0.02;
+  save('admin-check.json', { phase, holdout: HOLDOUT, seeds: { first: `${HOLDOUT}first-0..${firsts - 1}`, l50: `${HOLDOUT}50-0..${r50 - 1}`, l100: `${HOLDOUT}100-0..${r100 - 1}` },
+    rule: 'on by default only if the combined holdout score is not worse than without administration and no group is worse by more than 0.02', adminRate: DEFAULT_PARAMS.adminRate, off, on, keep });
+  log('without', off.score.toFixed(3), 'S', off.short.toFixed(3), 'L50', off.long50.toFixed(3), 'L100', off.long100.toFixed(3));
+  log('with   ', on.score.toFixed(3), 'S', on.short.toFixed(3), 'L50', on.long50.toFixed(3), 'L100', on.long100.toFixed(3), keep ? 'KEEP ON' : 'switch OFF by default');
+}
 
 function prefix(o, p) { return Object.fromEntries(Object.entries(o).map(([k, v]) => [p + k, v])); }
 await pool.close();

@@ -21,7 +21,7 @@
   league-phase formats and coefficients. This replaces the EFL Cup "top 7" stand-in.
 * **Additional English divisions** (National League North/South) with real relegation from the
   National League.
-* Points deductions and administration events.
+* Financial-rule (profit and sustainability) deductions; time-varying administration rates.
 
 ## Long term
 

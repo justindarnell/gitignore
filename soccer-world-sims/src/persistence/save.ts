@@ -73,6 +73,9 @@ const MIGRATIONS: Record<number, (w: any) => any> = {
   },
   // 6 -> 7 (0.7.0): optional economic path of historical starts. Earlier worlds keep a fixed curve.
   6: w => { w.levelPath ??= null; return w; },
+  // 7 -> 8 (0.7.0): administration and points deductions. Earlier saves keep their model (no administrations);
+  // the setting can switch them on.
+  7: w => { w.params.adminRate ??= 0; w.settings = { administration: 0, ...w.settings }; return w; },
 };
 
 export class SaveError extends Error {}

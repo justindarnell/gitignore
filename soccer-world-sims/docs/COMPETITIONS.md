@@ -78,6 +78,27 @@ Cup rounds have fixed weekends or midweeks, and leagues skip cup weekends for th
 Play-offs follow the end of the regular season: National League in early May, EFL semi-finals in
 mid-May, finals in late May, and the FA Cup final in mid-May.
 
+## Administration and points deductions (0.7, optional)
+
+With the *Financial crises (administration)* setting above 0%, clubs can enter administration at the start of a season
+(TECHNICAL.md). The deduction is configuration per league and season:
+
+| Competition | 2026/27 start | 1992/93 start |
+|---|---|---|
+| Premier League | 9 points | none until 2003/04; 9 from 2004/05 |
+| Football League / EFL | 12 points | none until 2003/04; 10 from 2004/05; 12 from 2015/16 |
+| Conference / National League | 10 points | none until 2007/08; 10 from 2008/09 |
+
+Sources: Wikipedia, "Administration (British football)": the 10- and 9-point rules were ratified in 2004 for 2004/05; Conference
+clubs were "subject to the automatic 10-point deduction" from the 2008/09 cases; the page documents 12-point EFL deductions
+from 2018/19 (Bolton, Bury, Wigan, Derby). The configuration applies 12 points from 2015/16, the season the EFL is understood
+to have raised the penalty; that date is not confirmed by the downloaded page.
+
+**Simplifications:** deductions apply in the season a club enters administration (in reality a late-season administration
+of a relegated club carried the deduction into the next season, and later rules suspended it after late March); extra
+sanctions for failing to exit administration through a CVA (e.g. Leeds −15, Luton −20 in 2008/09), expulsions and
+liquidations are not modelled; no other financial-rule deductions (e.g. profit and sustainability breaches).
+
 ## Historical start: 1992/93
 
 A world can start from **1992/93**, the first Premier League season (`src/data/england/config1992.ts`,

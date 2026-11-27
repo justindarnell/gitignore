@@ -102,7 +102,9 @@ whole period. The same code (`tools/calibrate/real92.mjs`) measures simulated wo
 
 ### Source: English Wikipedia (1992/93 fifth tier)
 
-`npm run history:fetch` also downloads the 1988/89–1992/93 Football Conference pages and the 1988/89–1991/92
+`npm run history:fetch` also downloads "Administration (British football)" (its table of English clubs gives the
+historical frequency of administrations, `tools/history/administrations.mjs` → `data/history/derived/administrations.json`),
+the 1988/89–1992/93 Football Conference pages and the 1988/89–1991/92
 Isthmian, Southern and Northern Premier League pages from English Wikipedia (text under CC BY-SA 4.0; attribution:
 the Wikipedia contributors of each page). Only results, club names and tables are used; the raw pages are not
 committed (`data/history/raw/`). Parser: `tools/history/wikitable.mjs`. In a sandbox whose proxy is only honoured

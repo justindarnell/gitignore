@@ -17,8 +17,8 @@ produced by `tools/history/benchmarks.mjs`).
 * **Uncalibrated starting model** (0.5 search) on the `holdout2-*` seeds: short-term 0.643, 100-year 2.132.
 * A score of 1.0 means a metric is on average one tolerance away from its historical target; scores are
   weighted means of squared z-values capped at 3σ (see `tools/calibrate/targets.mjs`).
-* About **1860k simulated seasons** in total across all phases
-  (1500k recorded in the result files plus ~360k from earlier screening runs that were superseded when the model structure changed).
+* About **1864k simulated seasons** in total across all phases
+  (1504k recorded in the result files plus ~360k from earlier screening runs that were superseded when the model structure changed).
 
 ## Method
 
@@ -285,6 +285,23 @@ Later window 2009/10–2024/25 (not used by the search):
 * Wimbledon FC (dissolved in 2004) counts as relegated in real history; simulated clubs never dissolve.
 * One real history is a small sample: the club-level coverage (about 86% inside the 80% range) suggests the ensembles are,
   if anything, slightly wide.
+
+## 0.7: administration and points deductions
+
+**Frequency target** (`tools/history/administrations.mjs` → `data/history/derived/administrations.json`, from the table of English
+clubs on Wikipedia's "Administration (British football)"): 66 administrations in 1992/93–2024/25, 51 of them in tiers 1–5 (by tier: 2 / 13 / 17 / 12 / 7); per season 1.55 overall, 3.50 in the 2000s and 0.73 since 2010.
+The engine aims at about one per season (a blend of the long-run and recent rates), with relative risk per club by tier from the historical shares.
+The base rate (`adminRate` 0.0112) was set by simulation to that frequency; it was not searched against the calibration targets.
+
+**Check and rule.** Fixed before running: *on by default only if the combined holdout score is not worse than without administration and no group is worse by more than 0.02*. Fresh seeds `holdout5-`:
+
+| Model | Combined | Short | 50-year | 100-year |
+|---|---|---|---|---|
+| Without administration | 0.283 | 0.214 | 0.429 | 0.274 |
+| With administration (100%) | 0.273 | 0.214 | 0.297 | 0.367 |
+
+**Decision: off by default.** The combined score and the 50-year group improve, but the 100-year group is worse by more than the allowed 0.02: over a century, administrations add turnover among each era's giants and new top-four clubs. The mechanism is available as the *Financial crises (administration)* setting (100% = the historical frequency), and the Dynamic and Chaotic presets switch it on.
+The short-term group is unchanged because administrations start from the second season.
 
 ## Why this model was chosen
 
@@ -608,5 +625,7 @@ node tools/calibrate/run.mjs start92-grid --runs 24
 node tools/calibrate/run.mjs start92-grid --runs 40 --amounts 0.75,0.9,1 --shapes 0.15,0.25,0.35,0.5
 node tools/calibrate/run.mjs start92-grid --runs 40 --amounts 0.9,1 --shapes 0,0.05,0.1,0.15
 node tools/calibrate/run.mjs start92-validate --finalists 3 --runs 60 --holdout holdout92-
+node tools/history/administrations.mjs
+node tools/calibrate/run.mjs admin-check --holdout holdout5-
 node tools/calibrate/report.mjs
 ```

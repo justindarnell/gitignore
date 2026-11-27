@@ -338,6 +338,18 @@ await page.goto(url + '#/news/rules');
 await page.waitForSelector('.page-head');
 const rulesNews = await page.textContent('#main');
 check('dated rules: the 1992 world cuts to a 20-club Premier League in 1995/96 (four relegated in 1994/95) and reports it in the news', rows95 === 20 && rel94 === 4 && rulesNews.includes('New rules from 1995/96'), `${rows95} clubs in 1995/96, ${rel94} relegation places shown for 1994/95`);
+// ---- administration (0.7, off by default): switch it on and play two seasons
+await page.goto(url + '#/settings');
+await page.waitForSelector('[data-key="administration"]');
+check('settings: financial crises (administration) are off by default', (await page.inputValue('[data-key="administration"]')) === '0');
+await page.$eval('[data-key="administration"]', el => { el.value = '300'; el.dispatchEvent(new Event('change', { bubbles: true })); });
+await page.fill('#sim-years', '2');
+await page.click('[data-sim="years"]');
+await page.waitForFunction(() => document.querySelector('#progress').hidden && document.querySelector('#season-label').textContent === '1997/98', null, { timeout: 120000 });
+await page.goto(url + '#/news/admin');
+await page.waitForSelector('.page-head');
+const adminNews = await page.$$eval('.news-list li', l => l.filter(x => /administration/.test(x.textContent)).length);
+check('administration: at 300% clubs enter administration and it is reported (no deduction before 2004 in a 1992 world)', adminNews > 0, `${adminNews} news items`);
 check('no console errors after the sandbox and 1992 checks', errors.length === 0, errors.slice(0, 3).join(' | '));
 
 await browser.close();

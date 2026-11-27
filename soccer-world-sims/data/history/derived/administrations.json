@@ -1,0 +1,490 @@
+{
+ "source": "en.wikipedia.org/wiki/Administration_(British_football), table of English clubs (CC BY-SA 4.0)",
+ "seasons": "1992/93-2024/25",
+ "events": 66,
+ "knownTier": 51,
+ "byTier": [
+  2,
+  13,
+  17,
+  12,
+  7
+ ],
+ "perSeason": {
+  "1992-2024": 1.5454545454545454,
+  "1992-1999": 0.625,
+  "2000-2009": 3.5,
+  "2010-2024": 0.7333333333333333
+ },
+ "tierWeight": [
+  0.14,
+  0.76,
+  1,
+  0.71,
+  0.41
+ ],
+ "list": [
+  {
+   "club": "Chelsea",
+   "season": 1992,
+   "tier": 1,
+   "league": "Premier League",
+   "deduction": "None"
+  },
+  {
+   "club": "Northampton Town",
+   "season": 1992,
+   "tier": 0,
+   "league": "−",
+   "deduction": "None"
+  },
+  {
+   "club": "Kettering Town",
+   "season": 1992,
+   "tier": 0,
+   "league": "−",
+   "deduction": "None"
+  },
+  {
+   "club": "Aldershot",
+   "season": 1992,
+   "tier": 0,
+   "league": "−",
+   "deduction": "None"
+  },
+  {
+   "club": "Maidstone United",
+   "season": 1992,
+   "tier": 0,
+   "league": "−",
+   "deduction": "None"
+  },
+  {
+   "club": "Hartlepool United",
+   "season": 1994,
+   "tier": 0,
+   "league": "−",
+   "deduction": "None"
+  },
+  {
+   "club": "Barnet",
+   "season": 1994,
+   "tier": 0,
+   "league": "−",
+   "deduction": "None"
+  },
+  {
+   "club": "Exeter City",
+   "season": 1994,
+   "tier": 0,
+   "league": "−",
+   "deduction": "None"
+  },
+  {
+   "club": "Gillingham",
+   "season": 1995,
+   "tier": 0,
+   "league": "−",
+   "deduction": "None"
+  },
+  {
+   "club": "Doncaster Rovers",
+   "season": 1997,
+   "tier": 0,
+   "league": "−",
+   "deduction": "None"
+  },
+  {
+   "club": "Millwall",
+   "season": 1996,
+   "tier": 3,
+   "league": "Second Division",
+   "deduction": "None"
+  },
+  {
+   "club": "Bournemouth",
+   "season": 1997,
+   "tier": 0,
+   "league": "−",
+   "deduction": "None"
+  },
+  {
+   "club": "Crystal Palace",
+   "season": 1998,
+   "tier": 3,
+   "league": "Second Division",
+   "deduction": "None"
+  },
+  {
+   "club": "Chester City",
+   "season": 1998,
+   "tier": 4,
+   "league": "Third Division",
+   "deduction": "None"
+  },
+  {
+   "club": "Portsmouth",
+   "season": 1998,
+   "tier": 3,
+   "league": "Second Division",
+   "deduction": "None"
+  },
+  {
+   "club": "Hull City",
+   "season": 2000,
+   "tier": 4,
+   "league": "Third Division",
+   "deduction": "None"
+  },
+  {
+   "club": "Queens Park Rangers",
+   "season": 2000,
+   "tier": 2,
+   "league": "First Division",
+   "deduction": "None"
+  },
+  {
+   "club": "Bury",
+   "season": 2001,
+   "tier": 3,
+   "league": "Second DivisionThird Division",
+   "deduction": "None"
+  },
+  {
+   "club": "Halifax Town",
+   "season": 2001,
+   "tier": 4,
+   "league": "Third DivisionFootball Conference",
+   "deduction": "None"
+  },
+  {
+   "club": "Bradford City",
+   "season": 2001,
+   "tier": 2,
+   "league": "First Division",
+   "deduction": "None"
+  },
+  {
+   "club": "Notts County",
+   "season": 2001,
+   "tier": 4,
+   "league": "Third Division",
+   "deduction": "None"
+  },
+  {
+   "club": "Barnsley",
+   "season": 2002,
+   "tier": 3,
+   "league": "Second Division",
+   "deduction": "None"
+  },
+  {
+   "club": "Leicester City",
+   "season": 2002,
+   "tier": 2,
+   "league": "First Division",
+   "deduction": "None"
+  },
+  {
+   "club": "Port Vale",
+   "season": 2002,
+   "tier": 3,
+   "league": "Second Division",
+   "deduction": "None"
+  },
+  {
+   "club": "York City",
+   "season": 2002,
+   "tier": 4,
+   "league": "Third Division",
+   "deduction": "None"
+  },
+  {
+   "club": "Luton Town",
+   "season": 2003,
+   "tier": 3,
+   "league": "Second Division",
+   "deduction": "None"
+  },
+  {
+   "club": "Derby County",
+   "season": 2003,
+   "tier": 2,
+   "league": "Championship",
+   "deduction": "None"
+  },
+  {
+   "club": "Ipswich Town",
+   "season": 2002,
+   "tier": 2,
+   "league": "First Division",
+   "deduction": "None"
+  },
+  {
+   "club": "Wimbledon",
+   "season": 2002,
+   "tier": 2,
+   "league": "First Division",
+   "deduction": "None"
+  },
+  {
+   "club": "Oldham Athletic",
+   "season": 2003,
+   "tier": 3,
+   "league": "Second Division",
+   "deduction": "None"
+  },
+  {
+   "club": "Darlington",
+   "season": 2003,
+   "tier": 4,
+   "league": "Third Division",
+   "deduction": "None"
+  },
+  {
+   "club": "Bradford City",
+   "season": 2003,
+   "tier": 3,
+   "league": "First DivisionLeague One",
+   "deduction": "None"
+  },
+  {
+   "club": "Wrexham",
+   "season": 2004,
+   "tier": 3,
+   "league": "League OneLeague Two",
+   "deduction": "−10 pts"
+  },
+  {
+   "club": "Cambridge United",
+   "season": 2004,
+   "tier": 4,
+   "league": "League Two",
+   "deduction": "−10 pts"
+  },
+  {
+   "club": "Rotherham United",
+   "season": 2005,
+   "tier": 3,
+   "league": "League One",
+   "deduction": "−10 pts"
+  },
+  {
+   "club": "Crawley Town",
+   "season": 2005,
+   "tier": 5,
+   "league": "Conference National",
+   "deduction": "−6 pts"
+  },
+  {
+   "club": "Boston United",
+   "season": 2006,
+   "tier": 4,
+   "league": "League Two",
+   "deduction": "−10 pts"
+  },
+  {
+   "club": "Leeds United",
+   "season": 2006,
+   "tier": 2,
+   "league": "ChampionshipLeague One",
+   "deduction": "−10 pts−15 pts"
+  },
+  {
+   "club": "Luton Town",
+   "season": 2007,
+   "tier": 3,
+   "league": "League OneLeague Two",
+   "deduction": "−10 pts−20 pts"
+  },
+  {
+   "club": "Bournemouth",
+   "season": 2007,
+   "tier": 3,
+   "league": "League OneLeague Two",
+   "deduction": "−10 pts−17 pts"
+  },
+  {
+   "club": "Rotherham United",
+   "season": 2007,
+   "tier": 4,
+   "league": "League Two",
+   "deduction": "−10 pts−17 pts"
+  },
+  {
+   "club": "Halifax Town",
+   "season": 2007,
+   "tier": 5,
+   "league": "Conference National",
+   "deduction": "−10 pts"
+  },
+  {
+   "club": "Darlington",
+   "season": 2008,
+   "tier": 4,
+   "league": "League Two",
+   "deduction": "−10 pts"
+  },
+  {
+   "club": "Southampton",
+   "season": 2008,
+   "tier": 2,
+   "league": "ChampionshipLeague One",
+   "deduction": "N/A−10 pts"
+  },
+  {
+   "club": "Stockport County",
+   "season": 2008,
+   "tier": 3,
+   "league": "League One",
+   "deduction": "−10 pts"
+  },
+  {
+   "club": "Chester City",
+   "season": 2008,
+   "tier": 5,
+   "league": "Conference National",
+   "deduction": "−25 pts"
+  },
+  {
+   "club": "Northwich Victoria",
+   "season": 2008,
+   "tier": 5,
+   "league": "Conference National",
+   "deduction": "−10 pts"
+  },
+  {
+   "club": "Farsley Celtic",
+   "season": 2008,
+   "tier": 0,
+   "league": "Conference North",
+   "deduction": "−10 pts"
+  },
+  {
+   "club": "Salisbury City",
+   "season": 2009,
+   "tier": 5,
+   "league": "Conference National",
+   "deduction": "−10 pts"
+  },
+  {
+   "club": "Weymouth",
+   "season": 2009,
+   "tier": 0,
+   "league": "Conference South",
+   "deduction": "None"
+  },
+  {
+   "club": "Crystal Palace",
+   "season": 2009,
+   "tier": 2,
+   "league": "Championship",
+   "deduction": "−10 pts"
+  },
+  {
+   "club": "Portsmouth",
+   "season": 2009,
+   "tier": 1,
+   "league": "Premier League",
+   "deduction": "−9 pts"
+  },
+  {
+   "club": "Plymouth Argyle",
+   "season": 2010,
+   "tier": 3,
+   "league": "League One",
+   "deduction": "−10 pts"
+  },
+  {
+   "club": "Rushden and Diamonds",
+   "season": 2010,
+   "tier": 5,
+   "league": "Conference National",
+   "deduction": "None"
+  },
+  {
+   "club": "Darlington",
+   "season": 2011,
+   "tier": 5,
+   "league": "Conference National",
+   "deduction": "−10 pts"
+  },
+  {
+   "club": "Portsmouth",
+   "season": 2011,
+   "tier": 2,
+   "league": "Championship",
+   "deduction": "−10 pts"
+  },
+  {
+   "club": "Port Vale",
+   "season": 2011,
+   "tier": 4,
+   "league": "League Two",
+   "deduction": "−10 pts"
+  },
+  {
+   "club": "Coventry City",
+   "season": 2012,
+   "tier": 3,
+   "league": "League OneLeague One",
+   "deduction": "−10 pts−10 pts"
+  },
+  {
+   "club": "Aldershot Town",
+   "season": 2012,
+   "tier": 4,
+   "league": "League TwoConference National",
+   "deduction": "N/A-10 pts"
+  },
+  {
+   "club": "Bolton Wanderers",
+   "season": 2018,
+   "tier": 2,
+   "league": "ChampionshipLeague One",
+   "deduction": "N/A−12 pts"
+  },
+  {
+   "club": "Bury",
+   "season": 2018,
+   "tier": 3,
+   "league": "League One",
+   "deduction": "−12 pts"
+  },
+  {
+   "club": "Rhyl",
+   "season": 2019,
+   "tier": 0,
+   "league": "Cymru North",
+   "deduction": "None"
+  },
+  {
+   "club": "Wigan Athletic",
+   "season": 2019,
+   "tier": 2,
+   "league": "ChampionshipLeague One",
+   "deduction": "−12 ptsN/A"
+  },
+  {
+   "club": "Bury",
+   "season": 2020,
+   "tier": 0,
+   "league": "N/A",
+   "deduction": "N/A"
+  },
+  {
+   "club": "Derby County",
+   "season": 2021,
+   "tier": 2,
+   "league": "Championship",
+   "deduction": "−12 pts"
+  },
+  {
+   "club": "Torquay United",
+   "season": 2023,
+   "tier": 0,
+   "league": "National League South",
+   "deduction": "−10 pts"
+  }
+ ]
+}
