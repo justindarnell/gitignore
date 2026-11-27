@@ -1,0 +1,63 @@
+# Data sources, club database and licensing
+
+## 2026/27 division membership (verified 27 Nov 2026)
+
+The previous database's memberships were **not** taken on trust. Evidence used:
+
+| Division | Evidence |
+|---|---|
+| Premier League | openfootball `2026-27/1-premierleague.txt` (real fixtures and results); [Premier League: season start](https://www.premierleague.com/en/news/4673099/the-202627-premier-league-season-officially-starts); [Liverpool FC: promoted teams Coventry, Hull, Ipswich](https://www.liverpoolfc.com/news/promoted-teams-depth-look-coventry-city-hull-city-and-ipswich-town) (relegated: Wolves, Burnley, West Ham) |
+| Championship | openfootball `2026-27/2-championship.txt` (24 clubs); [WBA: 2026/27 Championship line-up](https://www.wba.co.uk/news/202627-sky-bet-championship-line-confirmed) |
+| League One | [ESPN: EFL promotions and relegations](https://www.espn.com/soccer/story/_/id/48548480/championship-league-one-league-two-promotions-relegations-efl-going-going-down); [Opta League One 2026/27 predictions](https://theanalyst.com/articles/league-one-predictions-opta-supercomputer-2026-27): Leicester, Oxford and Sheffield Wednesday down; Bromley, MK Dons, Cambridge and Notts County up; Northampton, Rotherham, Port Vale and Exeter relegated |
+| League Two | [Barrow relegated](https://www.hellorayo.co.uk/hits-radio/cumbria/news/barrow-relegated-to-the-national-league), [Harrogate relegated](https://thestrayferret.co.uk/harrogate-town-relegated-to-national-league/); York City (National League champions) and Rochdale (play-off winners) promoted |
+| National League | [Scunthorpe United: 2026/27 line-up confirmed](https://scunthorpe-united.co.uk/news/2026/may/enterprise-national-league-line-up-confirmed-for-the-2026-27-season), [The FA: 2026/27 allocations](https://www.thefa.com/news/2026/may/14/nls-club-allocations-2026-27): AFC Fylde and Kidderminster up from the North, Worthing and Hornchurch up from the South |
+
+All 116 clubs also match the FootyLogos "2026-27" competition packs supplied with the project.
+
+**Rule change found:** the Championship play-offs expanded from four to six clubs (3rd–8th) from
+2026/27 ([Sky Sports](https://www.skysports.com/football/news/12040/13515549/championship-play-offs-efl-confirms-expansion-from-four-to-six-teams-from-2026-27-season-onwards)).
+Reports describe one-leg eliminators (5th v 8th, 6th v 7th at the higher seed), then two-legged
+semi-finals with 3rd facing the lowest remaining seed. Some reports called the final format "still to
+be agreed", so it is implemented in config and easy to change. League One and League Two keep
+four-team play-offs.
+
+## Historical datasets
+
+| Source | Use | Licence notes |
+|---|---|---|
+| [engsoccerdata](https://github.com/jalapic/engsoccerdata) (J. Curley et al.): England league results 1888/89–2024/25 (missing 2022/23), FA Cup and League Cup to 2018/19 | Calibration benchmarks, club pedigree, rating fit | Distributed with an R package under its own licence (GPL). Raw files are **not** committed; `npm run history:fetch` downloads them. Only derived aggregate statistics and tables are included. Check the terms before redistributing them. |
+| [openfootball/england](https://github.com/openfootball/england): 2022/23 and 2025/26 season files, 2024/25 and 2025/26 National League, 2026/27 fixtures | Fills engsoccerdata's gaps; 2025/26 results for ratings | Public domain (CC0) |
+
+`data/history/derived/season-tables.csv` contains final tables rebuilt from results: 3 points per win in
+every era, points deductions **not** applied. `benchmarks.json` holds every calibration target with
+its date range. The 2025/26 League One, League Two and National League files in openfootball were
+only complete to mid-season, so they are used for ratings and membership but not for season benchmarks.
+
+## Club ratings: what is researched and what is estimated
+
+| Field | Status | Method |
+|---|---|---|
+| attack, defence | **Researched** | Weighted Poisson model of 2022/23–2025/26 league goals across all five tiers (season weights 0.15/0.3/0.55/1.0), opposition-adjusted, ridge-shrunk toward the club's division mean. Tier levels are identified by clubs moving between divisions. A club that dominated a weaker division is therefore **not** rated like an established top-flight side (Coventry, Ipswich and Hull rate well below the Premier League elite and below relegated West Ham). The style split (attack minus defence) is shrunk by 30% because goal data separate it noisily. |
+| midfield | **Derived** | Mean of attack and defence. Goal data cannot identify midfield separately; it is kept as an attribute that evolves independently from season two on. |
+| overall | **Derived** | Mean of attack, midfield and defence, computed by the engine. |
+| reputation | **Researched** | Recency-weighted (8-year half-life) pyramid level over 1996/97–2025/26, plus a pedigree bonus from all-time top-flight seasons and titles (capped at +6). |
+| stability | **Mixed** | Researched: volatility of pyramid rank and number of division changes, 2012–2024. Subjective, documented adjustments for: Sheffield Wednesday (−22, 2025/26 ownership crisis and deduction), Leicester (−8), Reading (−8), Derby (−4), Oldham (−3), Wrexham (+6), Birmingham (+5). |
+| formEstimate | **Researched** | Opposition-adjusted points residual over each club's last 12 league games of 2025/26, mapped to 0–100 (50 = as expected) and capped. Applied as at most ±1.5 rating points that decay in-season. |
+| Hornchurch, Kidderminster, Worthing | **Estimates** | No usable National League data in the fit window. Set slightly below the National League mean (documented in `build-db.mjs`). |
+
+Each club's `provenance` field in `src/data/england/clubs.json` records these details.
+Ratings use results only. Transfer spending, wages and injuries are not modelled. Clubs that changed
+division for 2026/27 receive the engine's normal promotion or relegation summer adjustment at world
+creation, so season one is treated like every later season.
+
+## Club crests
+
+* Source: FootyLogos.com 2026-27 competition packs (SVG), supplied by the project owner.
+  FootyLogos asks for credit ("Crests via FootyLogos.com"), shown in the app footer. Club marks belong
+  to their respective owners.
+* Converted to 96×96 WebP (lists) and 192×192 WebP (profile headers) by `tools/assets/convert-crests.mjs`
+  with headless Chromium. 5.6 MB of SVG became 568 KB of 96 px WebP.
+* **Licensing:** permission to use crests in a private prototype does not grant permission to
+  redistribute them. This repository is public, so the generated images are git-ignored and must be
+  built locally. A public release needs explicit permission from the rights holders, or should ship
+  with the built-in initials badges only.

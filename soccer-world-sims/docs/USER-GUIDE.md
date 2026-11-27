@@ -1,0 +1,78 @@
+# User guide
+
+## Starting
+
+Open `dist/index.html`. The first time, a new world starts at the beginning of 2026/27 with empty
+tables and a random seed. After that, the game reopens your autosaved world.
+
+## Simulating
+
+The bar below the navigation controls time:
+
+| Button | Advances |
+|---|---|
+| Next matchday | the next calendar date with matches (league, cup or play-off) |
+| Month | to the next calendar month |
+| Rest of season | to the end of the current season, including play-offs and cup finals |
+| One year | to the same point in the calendar one season later |
+| N Seasons | N complete seasons (type a number, up to 500) |
+| 100 seasons | a century |
+
+When a season is complete, the Overview shows a season review. The next advance applies club
+development (squad changes, reputation, events) and starts the new season.
+
+Long runs happen in the background with a progress bar:
+* **Pause** stops at the next safe point. You can **Resume** or **Stop here**; progress so far is kept.
+* **Cancel** throws the run away, and the world returns to exactly where it was.
+
+The same seed and settings always produce the same history, however you split the simulation.
+
+## Pages
+
+* **Overview**: top-flight table, fixtures, division leaders, cups, news and form guide.
+* **Standings**: every division with zones (champions, automatic promotion, play-offs, relegation),
+  form and tiebreakers. Use the season selector to view past tables.
+* **Fixtures**: by division and matchday (‹ › to move), cup and play-off ties, or everything around today.
+* **Cups**: FA Cup and EFL Cup round by round (ties, aggregates, extra time, penalties), recent winners,
+  and the play-off brackets. Clubs marked **Q** are non-playable FA Cup qualifiers.
+* **Clubs**: searchable, sortable directory of all 116 clubs.
+* **Club profile**: attributes, season statistics, honours, achievements, promotions and relegations,
+  biggest wins, heaviest defeats and the club timeline. Two interactive graphs:
+  * *Overall rating, reputation and stability* by season.
+  * *Combined pyramid position* (1 = top of the Premier League, 116 = bottom of the National League),
+    by season or by matchday.
+  Move the mouse across a graph (or focus it and use the arrow keys) for a crosshair and details.
+  Range buttons zoom to the last 10, 25 or 50 seasons.
+* **History**: rolls of honour for every competition, trophy totals, historical tables, promotions and
+  relegations, records (streaks, biggest wins, notable achievements) and Rise & fall rankings (most
+  improved and declined by rating, reputation, pyramid position or stability, for all time, the last
+  5 or 10 seasons, or a custom period).
+* **News**: the world news feed, filterable by type.
+* **Settings**: see below.
+* **Saves**: save slots, autosave, export/import, and starting a new world (optionally from a seed).
+
+## Settings
+
+All sliders default to **100%**, the calibrated, historically realistic model. Presets:
+
+* **Dynamic**: more upsets, bigger swings and more events.
+* **Chaotic**: anything can happen; not realistic.
+* **Stable**: established clubs hold their status longer.
+
+Changes apply from the next match onward and are logged. Recorded history is never changed.
+**Random event frequency** at 0% disables events.
+
+**Historical storage** controls how much detail is kept: Essential, Standard (default) or Full.
+See TECHNICAL.md for sizes.
+
+## Saving
+
+Your world is autosaved in the browser after every simulation (you can turn this off). Use **Save as
+new slot** for named saves. **Export file** downloads a compressed backup that you can **Import** in
+any browser. Exporting is also the reliable option if your browser blocks storage for files opened
+from disk.
+
+## Crests
+
+If you see two-letter badges instead of crests, the crest images have not been generated. See
+README.md → *Play*.

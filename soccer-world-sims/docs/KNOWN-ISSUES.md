@@ -1,0 +1,36 @@
+# Known issues and limitations
+
+## Statistical (from the holdout validation; see CALIBRATION.md)
+
+* Promoted Premier League clubs finish in the top half about 10% of the time (history: 19%). Their
+  survival rate (≈52%) is right, but promoted clubs are too uniform.
+* Lower-league clubs reach the top flight within 25 years less often than in 1960–95 history
+  (≈12% vs 19.6%). That historical cohort was unusually mobile, so the modern-era target is uncertain.
+* Long-run champions average ≈85 points (1995–2025 average: 87.5; the last two real seasons: 84–85).
+* Top-5 clubs are relegated within 30 years in ≈49% of cases (target 35%, post-war history 52%).
+* Five-goal margins are slightly more common than in history (≈2.35% vs 2.1–2.3%), and 9+-goal margins remain about twice as common as in 1995–2024 (still extremely rare: under 1 per 10,000 league games).
+* Initial ratings are fitted from results only. Summer transfers, wages and injuries are invisible to
+  the model. Midfield is derived (mean of attack and defence) because goal data cannot identify it.
+* Several modern-era targets are explicit judgements (documented in `tools/calibrate/targets.mjs`).
+
+## Rules
+
+* Simplifications are documented in COMPETITIONS.md: European entrants are approximated as the
+  previous top 7; FA Cup qualifiers are generic and earlier qualifying rounds are not simulated; there
+  are no points deductions and no deciding play-off matches for level points.
+* The six-team Championship play-off format follows reporting from before its final ratification.
+* Regions for the EFL Cup regional draw are approximate.
+
+## Technical
+
+* `file://` storage: Chromium keeps IndexedDB for local files. Some browsers or privacy modes block
+  it; the Saves page then shows a notice, and export/import still works.
+* Pausing a bulk run shows a modal; the rest of the interface is available after choosing
+  Resume or Stop here.
+* Save files from Full storage over very long simulations can reach tens of MB uncompressed (exports
+  are gzipped).
+* Adding clubs to an existing world (future expansions) will need a save migration, because history
+  snapshots are stored as arrays parallel to the club list.
+* Crest images are not in the repository for licensing reasons (see README).
+* The UI is designed desktop-first. It works at phone width, but dense tables scroll horizontally
+  inside their cards.

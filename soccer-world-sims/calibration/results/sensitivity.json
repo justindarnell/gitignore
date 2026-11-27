@@ -329,74 +329,6 @@
    }
   },
   {
-   "key": "strength",
-   "factor": 0.75,
-   "long": 1.0122234495951103,
-   "short": 1.785911331678509,
-   "effects": {
-    "lt.titleRetentionPct": -6.1440677966101624,
-    "lt.uniqueChampionsIn25": 0.8923611111111107,
-    "lt.top6NewEntrants": 0.2902542372881358,
-    "lt.promotedSurvivalPct": -0.933908045977013,
-    "lt.giants30RelegatedPct": 1,
-    "lt.initialGiantsTier3Before50Pct": 0,
-    "lt.lowerReachPL50Pct": 2.604166666666668,
-    "pl.pts1": -5.747916666666654,
-    "pl.withinSeasonSD": -2.4712904393956983
-   }
-  },
-  {
-   "key": "strength",
-   "factor": 1.25,
-   "long": 0.4871530275152757,
-   "short": 1.562560458288977,
-   "effects": {
-    "lt.titleRetentionPct": -0.42372881355931824,
-    "lt.uniqueChampionsIn25": 0.3611111111111134,
-    "lt.top6NewEntrants": -0.20338983050847426,
-    "lt.promotedSurvivalPct": -2.801724137931039,
-    "lt.giants30RelegatedPct": 0,
-    "lt.initialGiantsTier3Before50Pct": 6.25,
-    "lt.lowerReachPL50Pct": -0.5208333333333321,
-    "pl.pts1": 3.6750000000000114,
-    "pl.withinSeasonSD": 2.3545571674399497
-   }
-  },
-  {
-   "key": "seasonSD",
-   "factor": 0.75,
-   "long": 0.5707827519007045,
-   "short": 0.21265835769013955,
-   "effects": {
-    "lt.titleRetentionPct": -0.6355932203389791,
-    "lt.uniqueChampionsIn25": 0.6736111111111125,
-    "lt.top6NewEntrants": -0.1737288135593218,
-    "lt.promotedSurvivalPct": -1.9396551724137936,
-    "lt.giants30RelegatedPct": -5.5,
-    "lt.initialGiantsTier3Before50Pct": 6.25,
-    "lt.lowerReachPL50Pct": -1.0416666666666679,
-    "pl.pts1": -1.5416666666666572,
-    "pl.withinSeasonSD": -0.18378247181351526
-   }
-  },
-  {
-   "key": "seasonSD",
-   "factor": 1.25,
-   "long": 0.46223516499198863,
-   "short": 0.26602875270651305,
-   "effects": {
-    "lt.titleRetentionPct": -2.33050847457627,
-    "lt.uniqueChampionsIn25": 1.2951388888888893,
-    "lt.top6NewEntrants": 0.10381355932203373,
-    "lt.promotedSurvivalPct": 2.7298850574712574,
-    "lt.giants30RelegatedPct": 3.5,
-    "lt.initialGiantsTier3Before50Pct": 6.25,
-    "lt.lowerReachPL50Pct": 3.9930555555555536,
-    "pl.pts1": 0.2666666666666657,
-    "pl.withinSeasonSD": 0.6394409317990082
-   }
-  },
-  {
    "key": "seasonPersist",
    "factor": 0.75,
    "long": 0.498015929207057,
@@ -428,40 +360,6 @@
     "lt.lowerReachPL50Pct": 1.2152777777777821,
     "pl.pts1": -1.0270833333333371,
     "pl.withinSeasonSD": 0.06828029932993118
-   }
-  },
-  {
-   "key": "matchNoise",
-   "factor": 0.75,
-   "long": 0.5784868978189703,
-   "short": 0.23928745117260616,
-   "effects": {
-    "lt.titleRetentionPct": -1.2711864406779618,
-    "lt.uniqueChampionsIn25": 0.7881944444444464,
-    "lt.top6NewEntrants": 0.09533898305084776,
-    "lt.promotedSurvivalPct": 0.6465517241379217,
-    "lt.giants30RelegatedPct": 0.5,
-    "lt.initialGiantsTier3Before50Pct": 0,
-    "lt.lowerReachPL50Pct": 0.6944444444444464,
-    "pl.pts1": -1.7999999999999972,
-    "pl.withinSeasonSD": -0.4864362963967075
-   }
-  },
-  {
-   "key": "matchNoise",
-   "factor": 1.25,
-   "long": 0.36489266112068286,
-   "short": 0.20496552658417463,
-   "effects": {
-    "lt.titleRetentionPct": 2.3305084745762734,
-    "lt.uniqueChampionsIn25": -0.22222222222222054,
-    "lt.top6NewEntrants": -0.11228813559321993,
-    "lt.promotedSurvivalPct": -0.7902298850574709,
-    "lt.giants30RelegatedPct": -12,
-    "lt.initialGiantsTier3Before50Pct": 9.375,
-    "lt.lowerReachPL50Pct": 2.777777777777775,
-    "pl.pts1": -0.2458333333333229,
-    "pl.withinSeasonSD": 0.1820358047401811
    }
   },
   {

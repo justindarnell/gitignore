@@ -161,6 +161,17 @@ if (phase === 'validate') {
     baseline: { params: DEFAULT_PARAMS, short: S0.score.score, long100: L0.score.score, shortAgg: S0.agg, long100Agg: L0.agg } });
 }
 
+// ---------------------------------------------------------------------------------- check
+// Evaluate the current DEFAULT_PARAMS on a holdout seed set (used after model changes).
+if (phase === 'check') {
+  const firsts = arg('firsts', 500), r100 = arg('r100', 10);
+  const S = await evalShort(DEFAULT_PARAMS, firsts, HOLDOUT + 'first-');
+  const L = await evalLong(DEFAULT_PARAMS, r100, 100, HOLDOUT + '100-');
+  log('check short', S.score.score.toFixed(3), 'long100', L.score.score.toFixed(3));
+  for (const d of [...S.score.detail, ...L.score.detail]) if (d.z !== null && Math.abs(d.z) > 0.6) log('  ', d.m, d.v.toFixed(2), 'target', d.t, 'z', d.z.toFixed(2));
+  save(`check-${HOLDOUT.replace(/-$/, '')}.json`, { params: DEFAULT_PARAMS, short: S.score.score, long100: L.score.score, shortAgg: S.agg, long100Agg: L.agg, shortDetail: S.score.detail, long100Detail: L.score.detail });
+}
+
 // ---------------------------------------------------------------------------------- sensitivity
 if (phase === 'sensitivity') {
   const v = load('validate.json');

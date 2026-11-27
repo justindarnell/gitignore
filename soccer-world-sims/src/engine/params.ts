@@ -14,6 +14,8 @@ export interface EngineParams {
   baseGoals: number;        // log expected goals of an away side at equal ratings
   homeAdv: number;          // log home advantage
   dcRho: number;            // Dixon-Coles low-score dependence (negative = more 0-0/1-1)
+  lambdaSoft: number;       // expected goals above which returns diminish (score effects)
+  lambdaSpan: number;       // extra expected goals possible beyond lambdaSoft (asymptote = soft + span)
   matchNoise: number;       // SD of per-match log-lambda shock (upsets)
   etGoalFactor: number;     // expected goals in 30 min extra time relative to 90 min
   penaltyRate: number;      // shoot-out conversion probability
@@ -59,6 +61,8 @@ export const DEFAULT_PARAMS: EngineParams = {
   baseGoals: 0.14,
   homeAdv: 0.22,
   dcRho: -0.1,
+  lambdaSoft: 2.5,
+  lambdaSpan: 2.0,
   matchNoise: 0.0373,
   etGoalFactor: 0.3,
   penaltyRate: 0.76,

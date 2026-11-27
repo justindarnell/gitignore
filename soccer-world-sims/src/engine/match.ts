@@ -23,7 +23,18 @@ export function expectedGoals(home: Side, away: Side, p: EngineParams, neutral =
   const w = p.midfieldWeight, k = p.strength * p.ratingLog;
   const lh = Math.exp(p.baseGoals + (neutral ? 0 : p.homeAdv) + k * (attackPower(home, w) - defencePower(away, w)));
   const la = Math.exp(p.baseGoals + k * (attackPower(away, w) - defencePower(home, w)));
-  return [Math.min(lh, 7), Math.min(la, 7)];
+  return [softCap(lh, p), softCap(la, p)];
+}
+
+/**
+ * Diminishing returns for very high expected goals: in heavy mismatches the favourite eases off
+ * once the game is won and the underdog defends deep, so goals do not grow exponentially with
+ * the rating gap. Leaves typical matches (lambda <= lambdaSoft) untouched.
+ */
+export function softCap(l: number, p: EngineParams): number {
+  if (l <= p.lambdaSoft) return l;
+  const x = l - p.lambdaSoft;
+  return p.lambdaSoft + p.lambdaSpan * x / (p.lambdaSpan + x);
 }
 
 /**

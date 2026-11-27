@@ -1,7 +1,7 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { createWorld, step, standings, rollover, pyramidRank } from '../src/engine/world.ts';
-import { simulate } from '../src/engine/sim.ts';
+import { simulate, absoluteTarget } from '../src/engine/sim.ts';
 import { runtime } from '../src/engine/runtime.ts';
 import { sortTable, emptyRow } from '../src/engine/table.ts';
 import { compareBest, compareWorst } from '../src/engine/history.ts';
@@ -294,6 +294,19 @@ describe('determinism, saves and bulk consistency', () => {
     const strip = (w: World) => { const x = JSON.parse(exportWorld(w)); delete x.created; delete x.news; return JSON.stringify({ h: x.history, c: x.clubs, r: x.rng }); };
     assert.equal(strip(daily), strip(bulk));
     assert.equal(strip(monthly), strip(bulk));
+  });
+  test('a bulk run paused mid-way and resumed equals an uninterrupted run (absolute targets)', () => {
+    const a = createWorld({ seed: 'pause' }), b = createWorld({ seed: 'pause' });
+    simulate(a, absoluteTarget(a, { kind: 'seasons', n: 3 }));
+    const target = absoluteTarget(b, { kind: 'seasons', n: 3 });
+    let k = 0;
+    const r = simulate(b, target, { shouldStop: () => ++k > 120 });
+    assert.equal(r.stopped, true);
+    const b2 = importWorld(exportWorld(b)); // pause hands the world back through serialisation
+    simulate(b2, target);
+    const strip = (w: World) => { const x = JSON.parse(exportWorld(w)); delete x.created; return JSON.stringify(x); };
+    assert.equal(strip(b2), strip(a));
+    assert.equal(a.history.leagues.length, 3);
   });
   test('fixtures are never simulated twice (re-stepping a played slot is a no-op)', () => {
     const v = cloneWorld(worldAfterOne);
