@@ -65,6 +65,12 @@ const MIGRATIONS: Record<number, (w: any) => any> = {
     w.settings = { ...w.settings, ownership: 1 };
     return w;
   },
+  // 5 -> 6 (0.7.0): the 1992/93 start gained a playable Conference and dated rule changes. Earlier 1992 worlds
+  // (92 clubs) keep the frozen 1992/93 rules they were created with.
+  5: w => {
+    if (w.country === 'ENG1992' && !w.clubs.some((c: { league: string }) => c.league === 'ENG5')) w.country = 'ENG1992-0.6';
+    return w;
+  },
 };
 
 export class SaveError extends Error {}

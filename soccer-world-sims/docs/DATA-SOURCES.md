@@ -59,7 +59,11 @@ database, using only data available before the season:
 node tools/ratings/fit.mjs --start 1992 && node tools/ratings/build-db.mjs --start 1992
 ```
 
-* **Membership** (verified): the 92 clubs of engsoccerdata's 1992/93 season (`tools/ratings/master1992.mjs`).
+* **Membership** (verified): the 92 clubs of engsoccerdata's 1992/93 season (`tools/ratings/master1992.mjs`),
+  plus (0.7) the 22 clubs of the **1992/93 Football Conference** from its English Wikipedia season page (names only).
+  These are the 1991/92 members minus Colchester (promoted), Cheltenham and Barrow (relegated), with Redbridge
+  Forest's place taken by Dagenham & Redbridge after the merger, plus Bromsgrove Rovers, Stalybridge Celtic and
+  Woking (promoted from the Southern League, Northern Premier League and Isthmian League). Engine tests assert these.
   The Premier League's 22 founder members; Colchester United promoted from the Conference; Aldershot
   (folded March 1992) and Maidstone United (folded August 1992) absent; 1991/92 promotions and relegations
   (e.g. Blackburn via the play-offs; Luton, Notts County, West Ham relegated). Engine tests assert these.
@@ -67,15 +71,33 @@ node tools/ratings/fit.mjs --start 1992 && node tools/ratings/build-db.mjs --sta
   Chester City, Bury, Darlington, Hereford United, Scarborough, Torquay United). Halifax Town uses the
   FC Halifax Town id, as the 2026 database does.
 * **Ratings**: the same weighted Poisson fit over **1988/89–1991/92** (season weights 0.15/0.3/0.55/1.0,
-  ridge toward the division mean, style shrink 30%). The fitted divisional gaps are about half of today's,
+  ridge toward the division mean, style shrink 30%). For the fifth tier (0.7) the fit also uses the Football
+  Conference's full **results matrices** for those four seasons (tier 5) and the top divisions of its feeder
+  leagues (tier 6). The Northern Premier League pages have results matrices too. The Isthmian and Southern League
+  pages have final tables only, so each club enters once per season with its goals for and against per game against
+  a virtual league-average opponent, without home advantage (in a double round robin these carry most of what the
+  individual results would). Clubs keep one strength across seasons, so promotions and relegations between these
+  leagues and the Fourth Division link the levels. The fitted Fourth Division–Conference gap is somewhat larger than
+  the gaps between Football League divisions; Conference clubs rate 50–62 overall (Fourth Division about 55–66).
+  The parsed matrices reproduce the pages' own goal totals to within 10 goals per season. Dagenham & Redbridge's
+  pre-1992 record is Redbridge Forest's. Matrix games carry no dates, so Conference clubs start with neutral form. The fitted divisional gaps are about half of today's,
   so 1992 divisions are much closer in strength than 2026 ones.
-* **Reputation**: weighted pyramid level **1962–1991** plus pedigree from all seasons up to 1991/92.
+* **Reputation**: weighted pyramid level **1962–1991** plus pedigree from all seasons up to 1991/92. The 1988/89–1991/92
+  Conference positions count as tier 5 (0.7); other non-league seasons count as below the playable pyramid.
   **Stability**: rank volatility **1978–1990** (no subjective adjustments). **Form**: last 12 league games
   of 1991/92.
 * **Ownership seeds** (documented takeovers before the season): Blackburn (Jack Walker, 1991), Newcastle
   (Sir John Hall, 1991–92), Derby (Lionel Pickering, 1991), Wolves (Sir Jack Hayward, 1990). Everyone
   else is neutral.
 * The bundle strips `provenance` (the UI does not show it); the JSON file keeps it for every club.
+
+### Source: English Wikipedia (1992/93 fifth tier)
+
+`npm run history:fetch` also downloads the 1988/89–1992/93 Football Conference pages and the 1988/89–1991/92
+Isthmian, Southern and Northern Premier League pages from English Wikipedia (text under CC BY-SA 4.0; attribution:
+the Wikipedia contributors of each page). Only results, club names and tables are used; the raw pages are not
+committed (`data/history/raw/`). Parser: `tools/history/wikitable.mjs`. In a sandbox whose proxy is only honoured
+when asked, run the fetch with `NODE_USE_ENV_PROXY=1`.
 
 ## Club crests
 

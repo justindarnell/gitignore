@@ -1,11 +1,17 @@
 // Derived, read-only views of the world used by the UI pages.
 import { standings, country, seasonLabel, overall } from '../engine/world.ts';
 import { competitionLabel } from '../engine/history.ts';
+import { COUNTRIES } from '../engine/runtime.ts';
+import { configFor, ruleTimeline } from '../engine/rules.ts';
 import type { LeagueConfig, Match, TableRow, World } from '../engine/types.ts';
 
 export { seasonLabel, overall, standings, country };
 
 export function leagues(world: World): LeagueConfig[] { return country(world).leagues; }
+/** Leagues as configured in a given season (dated rule changes applied). */
+export function leaguesAt(world: World, year: number): LeagueConfig[] { return configFor(COUNTRIES[world.country], year).leagues; }
+/** Rule changes of the world's country that have taken effect, and the next one, as of the current season. */
+export function rulesTimeline(world: World) { return ruleTimeline(COUNTRIES[world.country], world.season.year); }
 /** Number of clubs in the playable pyramid (116 for 2026/27, 92 for 1992/93). */
 export function pyramidSize(world: World): number { return leagues(world).reduce((a, l) => a + l.size, 0); }
 export function pyramidNote(world: World): string { const ls = leagues(world); return `1 = top of the ${ls[0].name}, ${pyramidSize(world)} = bottom of the ${ls[ls.length - 1].name}`; }
@@ -13,7 +19,7 @@ export function league(world: World, id: string): LeagueConfig { return leagues(
 export function compLabel(world: World, comp: string, stage?: string): string {
   const l = leagues(world).find(x => x.id === comp);
   if (l) return l.name; // league matches: the competition name only ("Premier League")
-  return competitionLabel(world.country, comp, stage);
+  return competitionLabel(world.country, comp, stage, world.season.year);
 }
 
 export type Zone = 'champion' | 'promoted' | 'playoff' | 'relegated' | '';

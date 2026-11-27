@@ -8,6 +8,7 @@ import { compareBest, compareWorst } from '../src/engine/history.ts';
 import { exportWorld, importWorld, cloneWorld } from '../src/persistence/save.ts';
 import { ENGLAND } from '../src/data/england/config.ts';
 import { ENGLAND_1992 } from '../src/data/england/config1992.ts';
+import { configFor, validateChanges } from '../src/engine/rules.ts';
 import { Rng } from '../src/engine/rng.ts';
 import { shootout } from '../src/engine/match.ts';
 import { DEFAULT_PARAMS } from '../src/engine/params.ts';
@@ -603,16 +604,20 @@ describe('historical start: 1992/93 (0.6)', () => {
   const w = createWorld({ seed: 'start-1992', start: '1992' });
   simulate(w, { kind: 'seasons', n: 1 });
   const rec = w.history.leagues[0];
-  test('database: 92 clubs in verified 1992/93 divisions, rated only from data before the season', () => {
+  test('database: 114 clubs in verified 1992/93 divisions (incl. the Conference), rated only from data before the season', () => {
     const db = clubs1992.clubs as any[];
-    assert.equal(db.length, 92);
-    assert.deepEqual([1, 2, 3, 4].map(d => db.filter(c => c.division === d).length), [22, 24, 24, 22]);
+    assert.equal(db.length, 114);
+    assert.deepEqual([1, 2, 3, 4, 5].map(d => db.filter(c => c.division === d).length), [22, 24, 24, 22, 22]);
+    const conf = db.filter(c => c.division === 5).map(c => c.id);
+    for (const id of ['wycombe-wanderers', 'woking', 'bromsgrove-rovers', 'stalybridge-celtic', 'dagenham-and-redbridge', 'yeovil-town', 'kidderminster-harriers']) assert.ok(conf.includes(id), id);
+    for (const id of ['colchester-united', 'cheltenham-town', 'barrow']) assert.ok(!conf.includes(id), `${id} not in the 1992/93 Conference`);
+    for (const id of ['woking', 'bromsgrove-rovers', 'stalybridge-celtic']) assert.equal(db.find(c => c.id === id).previousDivision, 6, `${id} promoted from a feeder league`);
     const pl = db.filter(c => c.division === 1).map(c => c.id).sort();
     assert.deepEqual(pl, ['arsenal', 'aston-villa', 'blackburn-rovers', 'chelsea', 'coventry-city', 'crystal-palace', 'everton', 'ipswich-town', 'leeds-united', 'liverpool',
       'manchester-city', 'manchester-united', 'middlesbrough', 'norwich-city', 'nottingham-forest', 'oldham-athletic', 'queens-park-rangers', 'sheffield-united',
       'sheffield-wednesday', 'southampton', 'tottenham-hotspur', 'wimbledon'].sort(), 'the 22 founder members of the Premier League');
     assert.equal(db.find(c => c.id === 'colchester-united').division, 4, 'Colchester promoted from the Conference in 1992');
-    assert.equal(db.find(c => c.id === 'colchester-united').previousDivision, 6);
+    assert.equal(db.find(c => c.id === 'colchester-united').previousDivision, 5);
     assert.ok(!db.some(c => c.id.startsWith('aldershot') || c.id.startsWith('maidstone')), 'Aldershot and Maidstone folded in 1992');
     for (const c of db) {
       assert.match(c.provenance.ratings, /1988\/89-1991\/92|no data/);
@@ -622,21 +627,22 @@ describe('historical start: 1992/93 (0.6)', () => {
   });
   test('era rules from config: 22-club Premier League, promotion and relegation counts, play-offs', () => {
     assert.equal(w.country, 'ENG1992');
-    const [pl, d1, d2, d3] = rec;
+    const [pl, d1, d2, d3, conf] = rec;
     assert.equal(pl.table.length, 22); assert.equal(pl.table[0].p, 42);
     assert.equal(pl.relegated.length, 3);
     assert.equal(d1.promoted.length, 3); assert.equal(d1.relegated.length, 3);
     assert.equal(d2.promoted.length, 3); assert.equal(d2.relegated.length, 4);
-    assert.equal(d3.promoted.length, 4); assert.equal(d3.relegated.length, 0, 'no playable Conference');
+    assert.equal(d3.promoted.length, 4); assert.equal(d3.relegated.length, 1, 'bottom club down to the Conference');
+    assert.equal(conf.promoted.length, 1); assert.equal(conf.promoted[0], conf.table[0].club, 'Conference champions promoted');
     for (const [lr, a, b] of [[d1, 3, 6], [d2, 3, 6], [d3, 4, 7]] as const) {
       const pos = lr.table.findIndex(r => r.club === lr.promotedViaPlayoff) + 1;
       assert.ok(pos >= a && pos <= b);
     }
     const v = createWorld({ seed: 'start-1992b', start: '1992', settings: { storage: 'essential' } });
-    simulate(v, { kind: 'seasons', n: 4 });
+    simulate(v, { kind: 'seasons', n: 2 });
     const counts: Record<string, number> = {};
     for (const c of v.clubs) counts[c.league] = (counts[c.league] ?? 0) + 1;
-    assert.deepEqual(counts, { ENG1: 22, ENG2: 24, ENG3: 24, ENG4: 22 });
+    assert.deepEqual(counts, { ENG1: 22, ENG2: 24, ENG3: 24, ENG4: 22, ENG5: 22 });
   });
   test('cups: FA Cup with non-league qualifiers, League Cup two-legged rounds with away goals', () => {
     const fa = w.season.cups.FAC, lc = w.season.cups.LC;
@@ -726,5 +732,79 @@ describe('multi-fork experiments (0.7)', () => {
     assert.equal(S.interventions, 1);
     const arsenalEnd = (o: typeof outs) => o.reduce((a, r) => a + r.pyramid[2 * base.clubs.length + base.clubs.findIndex(c => c.id === 'arsenal')], 0);
     assert.ok(arsenalEnd(after) > arsenalEnd(outs), 'a crisis lowers the expected final position');
+  });
+});
+
+describe('dated rule changes (0.7)', () => {
+  test('every change keeps the pyramid closed (sizes add up every season to 2040)', () => {
+    assert.deepEqual(validateChanges(ENGLAND_1992, 1992, 2040), []);
+    assert.deepEqual(validateChanges(ENGLAND, 2026, 2040), []);
+  });
+  test('rules by season: 1995 cut to 20, 2002 two down to the Conference, 2004 and 2015 names, 2026 six-team play-off', () => {
+    const at = (y: number) => configFor(ENGLAND_1992, y).leagues;
+    assert.deepEqual(at(1992).map(l => l.size), [22, 24, 24, 22, 22]);
+    assert.deepEqual(at(1995).map(l => l.size), [20, 24, 24, 24, 22]);
+    assert.equal(at(2001)[3].relegation, 1); assert.equal(at(2002)[3].relegation, 2); assert.ok(at(2002)[4].playoff && !at(2001)[4].playoff);
+    assert.deepEqual(at(2004).map(l => l.name), ['Premier League', 'Championship', 'League One', 'League Two', 'Conference National']);
+    assert.equal(at(2015)[4].name, 'National League');
+    assert.equal(at(2025)[1].playoff!.rounds[0].newSeeds.length, 4, 'four-team Championship play-off before 2026');
+    assert.deepEqual(at(2026)[1].playoff!.rounds[0].newSeeds, [5, 6, 7, 8]);
+    assert.equal(configFor(ENGLAND, 2030), ENGLAND, 'configs without changes are unchanged');
+  });
+  const w = createWorld({ seed: 'eras-1992', start: '1992', settings: { storage: 'essential' } });
+  simulate(w, { kind: 'seasons', n: 11 }); // 1992/93 .. 2002/03
+  const H = w.history.leagues, year = (y: number) => H[y - 1992];
+  test('the 1994/95 transition season and the 20-club Premier League from 1995/96', () => {
+    const t = year(1994);
+    assert.deepEqual(t.map(l => l.table.length), [22, 24, 24, 22, 22]);
+    assert.deepEqual(t.map(l => l.relegated.length), [4, 4, 5, 1, 0]);
+    assert.deepEqual(t.map(l => l.promoted.length), [0, 2, 2, 3, 1]);
+    const po = t[1].table.findIndex(r => r.club === t[1].promotedViaPlayoff) + 1;
+    assert.ok(po >= 2 && po <= 5, 'First Division play-offs 2nd-5th in 1994/95');
+    assert.deepEqual(year(1995).map(l => l.table.length), [20, 24, 24, 24, 22]);
+    assert.equal(year(1995)[0].table[0].p, 38);
+    assert.deepEqual(year(1995).map(l => l.relegated.length), [3, 3, 4, 1, 0]);
+  });
+  test('two up, two down with the Conference from 2002/03 (champions + play-off winners)', () => {
+    const t = year(2002);
+    assert.equal(t[3].relegated.length, 2); assert.equal(t[4].promoted.length, 2);
+    const po = t[4].table.findIndex(r => r.club === t[4].promotedViaPlayoff) + 1;
+    assert.ok(po >= 2 && po <= 5);
+  });
+  test('cups follow the era: FA Cup First Round of 80 from 1995/96, League Cup Round One of 56', () => {
+    const v = createWorld({ seed: 'cups-1995', start: '1992', settings: { storage: 'essential' } });
+    simulate(v, { kind: 'seasons', n: 3 }); simulate(v, { kind: 'season' }); // 1995/96 complete
+    assert.equal(v.season.year, 1995);
+    const fa = v.season.cups.FAC, lc = v.season.cups.LC;
+    assert.deepEqual([0, 1, 2].map(i => fa.ties.filter(t => t.roundIndex === i).length), [40, 20, 32]);
+    assert.deepEqual([0, 1].map(i => lc.ties.filter(t => t.roundIndex === i).length), [28, 32]);
+    const seen = new Set<string>();
+    for (const m of v.season.matches) for (const c of [m.home, m.away]) { const k = `${c}@${m.slot}`; assert.ok(!seen.has(k), `clash ${k}`); seen.add(k); }
+  });
+  test('a 1992 world reaches the six-team Championship play-off in 2026/27 without calendar clashes', () => {
+    const v = createWorld({ seed: 'to-2026', start: '1992', settings: { storage: 'essential' } });
+    simulate(v, { kind: 'seasons', n: 34 }); simulate(v, { kind: 'season' }); // 2026/27 complete
+    assert.equal(v.season.year, 2026);
+    assert.deepEqual(v.season.playoffs['ENG2-PO'].ties.map(t => t.roundIndex).sort(), [0, 0, 1, 1, 2]);
+    const seen = new Set<string>();
+    for (const m of v.season.matches) for (const c of [m.home, m.away]) { const k = `${c}@${m.slot}`; assert.ok(!seen.has(k), `clash ${k}`); seen.add(k); }
+    const counts: Record<string, number> = {};
+    for (const c of v.clubs) counts[c.league] = (counts[c.league] ?? 0) + 1;
+    assert.deepEqual(counts, { ENG1: 20, ENG2: 24, ENG3: 24, ENG4: 24, ENG5: 22 });
+  });
+  test('1992 worlds saved before 0.7 (92 clubs) keep the frozen 1992/93 rules', () => {
+    const old = JSON.parse(exportWorld(createWorld({ seed: 'old92', start: '1992' })));
+    old.schema = 5;
+    old.clubs = old.clubs.filter((c: { league: string }) => c.league !== 'ENG5');
+    const keep = new Set(old.clubs.map((c: { id: string }) => c.id));
+    for (const k of Object.keys(old.info)) if (!keep.has(k)) delete old.info[k];
+    old.season.matches = old.season.matches.filter((m: { comp: string }) => m.comp !== 'ENG5');
+    delete old.season.tables.ENG5; delete old.season.leagueClubs.ENG5; delete old.season.expected.ENG5; delete old.season.positionTrack.ENG5;
+    old.season.cups = { FAC: { id: 'FAC', roundIndex: 0, alive: [], ties: [], drawnRounds: [] }, LC: { id: 'LC', roundIndex: 0, alive: [], ties: [], drawnRounds: [] } };
+    old.levelCurve = old.levelCurve.slice(0, 92);
+    const up = importWorld(JSON.stringify(old));
+    assert.equal(up.country, 'ENG1992-0.6');
+    simulate(up, { kind: 'seasons', n: 2 });
+    assert.equal(up.history.leagues[1][3].relegated.length, 0, 'frozen rules: no Conference relegation');
   });
 });

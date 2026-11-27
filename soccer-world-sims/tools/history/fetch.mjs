@@ -6,6 +6,9 @@
 //    FA Cup, League Cup and EFL play-off results. https://github.com/jalapic/engsoccerdata
 //  - openfootball/england (public domain): 2025/26 and 2026/27 season files.
 //    https://github.com/openfootball/england
+//  - English Wikipedia (CC BY-SA 4.0): 1988/89-1992/93 Football Conference and 1988/89-1991/92 feeder
+//    league season pages (final tables and full results matrices) for the 1992/93 start's fifth tier.
+//    Only the results and membership are used (tools/history/wikitable.mjs).
 import { mkdir, writeFile, stat } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -34,6 +37,12 @@ const files = [
   [OF + '2026-27/1-premierleague.txt', 'openfootball/2026-27/1-premierleague.txt'],
   [OF + '2026-27/2-championship.txt', 'openfootball/2026-27/2-championship.txt'],
 ];
+
+// Wikipedia season pages (titles use an en dash, e.g. "1991–92 Football Conference").
+const WP = 'https://en.wikipedia.org/wiki/';
+const season = y => `${y}%E2%80%93${String(y + 1).slice(2)}`;
+for (const y of [1988, 1989, 1990, 1991, 1992]) files.push([`${WP}${season(y)}_Football_Conference`, `wikipedia/conference-${y}.html`]);
+for (const y of [1988, 1989, 1990, 1991]) for (const [lg, slug] of [['isthmian', 'Isthmian_League'], ['southern', 'Southern_Football_League'], ['npl', 'Northern_Premier_League']]) files.push([`${WP}${season(y)}_${slug}`, `wikipedia/${lg}-${y}.html`]);
 
 const force = process.argv.includes('--force');
 for (const [url, rel] of files) {

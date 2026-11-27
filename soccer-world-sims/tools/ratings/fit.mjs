@@ -14,6 +14,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseCsv, parseOpenfootball, clubKey } from '../history/lib.mjs';
+import { leagueTable, matrixMatches } from '../history/wikitable.mjs';
 import { master as master2026 } from './master.mjs';
 import { members } from './master1992.mjs';
 
@@ -41,13 +42,33 @@ if (START === 2026) {
   of(2024, 5, 'openfootball/2024-25/5-nationalleague.txt');
 }
 
+if (START === 1992) {
+  // 0.7: the fifth tier. Football Conference results matrices 1988/89-1991/92 (tier 5) and the top divisions
+  // of its three feeder leagues (tier 6): the Northern Premier League has results matrices; the Isthmian and
+  // Southern League pages have final tables only, which enter as one season aggregate per club against a
+  // virtual league-average opponent ("avg:<league>-<year>"), without home advantage. In a double round robin a
+  // club's goals for and against per game carry most of what the individual results would tell the fit. Clubs
+  // keep one strength across seasons, so promotions and relegations between these leagues (and between the
+  // Conference and the Fourth Division) link the levels, as for the Football League tiers. Matrix games have
+  // no dates, so they are excluded from the form estimate.
+  const wp = f => join(root, 'data', 'history', 'raw', 'wikipedia', f);
+  for (const y of [START - 4, START - 3, START - 2, START - 1]) {
+    for (const g of matrixMatches(wp(`conference-${y}.html`))) matches.push({ s: y, tier: 5, h: key(g.home), a: key(g.away), hg: g.hg, ag: g.ag, undated: true });
+    for (const g of matrixMatches(wp(`npl-${y}.html`))) matches.push({ s: y, tier: 6, h: key(g.home), a: key(g.away), hg: g.hg, ag: g.ag, undated: true });
+    for (const lg of ['isthmian', 'southern']) {
+      const avg = `avg:${lg}-${y}`;
+      for (const r of leagueTable(wp(`${lg}-${y}.html`))) if (r.P > 0) matches.push({ s: y, tier: 6, h: key(r.team), a: avg, hg: r.GF / r.P, ag: r.GA / r.P, n: r.P, neutral: true, undated: true });
+    }
+  }
+}
+
 // Map dataset keys -> our club ids.
 const idOf = new Map();
 for (const c of master) for (const k of c.keys) idOf.set(k, c.id);
 idOf.set('leicester', 'leicester-city');
 // Clubs outside our 116 still need parameters (they are opponents); give them their own ids.
 const clubIds = new Set();
-for (const m of matches) { m.h = idOf.get(m.h) ?? 'x:' + m.h; m.a = idOf.get(m.a) ?? 'x:' + m.a; clubIds.add(m.h); clubIds.add(m.a); }
+for (const m of matches) { m.h = idOf.get(m.h) ?? (m.h.startsWith('avg:') ? m.h : 'x:' + m.h); m.a = idOf.get(m.a) ?? (m.a.startsWith('avg:') ? m.a : 'x:' + m.a); clubIds.add(m.h); clubIds.add(m.a); }
 
 // Each club's "division" for the prior = the tier of its most recent season in the data.
 const lastTier = new Map();
@@ -60,22 +81,23 @@ const n = ids.length;
 const A = new Float64Array(n), D = new Float64Array(n);
 let mu = 0.2, H = 0.25;
 const RIDGE = 4; // prior strength toward the tier mean, in weighted-match equivalents
-const games = matches.map(m => ({ h: idx.get(m.h), a: idx.get(m.a), hg: m.hg, ag: m.ag, w: SEASON_WEIGHT[m.s] }));
+// A season aggregate (n games, goals per game) has the same Poisson score as n games at that rate.
+const games = matches.map(m => ({ h: idx.get(m.h), a: idx.get(m.a), hg: m.hg, ag: m.ag, w: SEASON_WEIGHT[m.s] * (m.n ?? 1), hh: m.neutral ? 0 : 1 }));
 const tierIdx = ids.map(c => lastTier.get(c));
 const att = i => A[i];
 const def = i => D[i];
-const tierMean = arr => { const s = new Float64Array(6), c = new Float64Array(6); for (let i = 0; i < n; i++) { s[tierIdx[i]] += arr[i]; c[tierIdx[i]]++; } return [...s].map((x, t) => c[t] ? x / c[t] : 0); };
+const tierMean = arr => { const s = new Float64Array(8), c = new Float64Array(8); for (let i = 0; i < n; i++) { s[tierIdx[i]] += arr[i]; c[tierIdx[i]]++; } return [...s].map((x, t) => c[t] ? x / c[t] : 0); };
 
 for (let iter = 0; iter < 600; iter++) {
   const gA = new Float64Array(n), hA = new Float64Array(n), gD = new Float64Array(n), hD = new Float64Array(n);
   let gMu = 0, hMu = 0, gH = 0, hH = 0;
   for (const g of games) {
-    const lh = Math.exp(mu + H + A[g.h] - D[g.a]);
+    const lh = Math.exp(mu + g.hh * H + A[g.h] - D[g.a]);
     const la = Math.exp(mu + A[g.a] - D[g.h]);
     const rh = g.w * (g.hg - lh), ra = g.w * (g.ag - la);
     gA[g.h] += rh; hA[g.h] += g.w * lh; gA[g.a] += ra; hA[g.a] += g.w * la;
     gD[g.a] -= rh; hD[g.a] += g.w * lh; gD[g.h] -= ra; hD[g.h] += g.w * la;
-    gMu += rh + ra; hMu += g.w * (lh + la); gH += rh; hH += g.w * lh;
+    gMu += rh + ra; hMu += g.w * (lh + la); if (g.hh) { gH += rh; hH += g.w * lh; }
   }
   const mA = tierMean(A), mD = tierMean(D);
   const step = 0.5;
@@ -104,7 +126,7 @@ function expPts(lh, la) {
   return [3 * w + d, 3 * (1 - w - d) + d];
 }
 const recent = new Map();
-const m2025 = matches.map((m, i) => ({ ...m, gi: i })).filter(m => m.s === START - 1);
+const m2025 = matches.map((m, i) => ({ ...m, gi: i })).filter(m => m.s === START - 1 && !m.undated);
 for (const m of m2025) {
   const g = games[m.gi];
   const lh = Math.exp(mu + H + att(g.h) - def(g.a)), la = Math.exp(mu + att(g.a) - def(g.h));

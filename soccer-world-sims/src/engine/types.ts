@@ -1,3 +1,4 @@
+import type { RuleChange } from './rules.ts';
 import type { RngState } from './rng.ts';
 import type { EngineParams } from './params.ts';
 
@@ -100,6 +101,8 @@ export interface CountryConfig {
   regions: Record<string, 'N' | 'S'>;
   /** Named derbies/rivalries (tracked when both clubs exist in the world). */
   derbies?: DerbyConfig[];
+  /** Dated rule changes (src/engine/rules.ts): patches applied from a season onwards. */
+  changes?: RuleChange[];
 }
 
 // =====================================================================================

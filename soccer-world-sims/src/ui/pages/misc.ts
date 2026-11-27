@@ -10,7 +10,7 @@ import { STARTS } from '../../data/england/starts.ts';
 export const newsPage: Page = ({ world, args, state }) => {
   const kind = args[0] ?? state.newsKind;
   state.newsKind = kind;
-  const kinds = [['all', 'All'], ['title', 'Titles'], ['cup', 'Cups'], ['promotion', 'Promotions'], ['relegation', 'Relegations'], ['event', 'Club events'], ['owner', 'Ownership'], ['story', 'Stories'], ['derby', 'Derbies'], ['intervention', 'Interventions'], ['milestone', 'Milestones']];
+  const kinds = [['all', 'All'], ['title', 'Titles'], ['cup', 'Cups'], ['promotion', 'Promotions'], ['relegation', 'Relegations'], ['event', 'Club events'], ['owner', 'Ownership'], ['story', 'Stories'], ['derby', 'Derbies'], ['intervention', 'Interventions'], ['rules', 'Rule changes'], ['milestone', 'Milestones']];
   const items = world.news.filter(n => kind === 'all' || n.kind === kind).slice(-400).reverse();
   const bySeason = new Map<number, typeof items>();
   for (const n of items) { if (!bySeason.has(n.season)) bySeason.set(n.season, []); bySeason.get(n.season)!.push(n); }

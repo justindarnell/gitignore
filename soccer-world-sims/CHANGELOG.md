@@ -31,6 +31,20 @@
   inlined it at every use).
 * Toasts no longer exceed the viewport at phone width; experiment tables scroll inside their cards.
 
+### Goal 3: dated rule changes
+* Country configs can list **dated rule changes** (`changes`, `src/engine/rules.ts`): patches to league sizes,
+  promotion/relegation, play-offs, names and cup rounds that apply from a season on. A validator checks that the
+  pyramid stays closed every season.
+* The 1992/93 start gains a playable **Football Conference** (22 real clubs, rated from 1988/89–1991/92 Conference
+  results and feeder-league data on Wikipedia) and Conference relegation, then follows history: the 1994/95
+  transition and the 20-club Premier League from 1995/96, two up/two down with the Conference from 2002/03, the 2004
+  and 2015 renamings, the six-team National League play-off from 2017/18 and the six-team Championship play-off
+  from 2026/27. FA Cup and League Cup entry adapt to the division sizes. Counts were checked against engsoccerdata.
+* Standings show each season's rules (past tables with their own zones) and the list of changes; changes are
+  announced in the news (new filter "Rule changes").
+* Save schema 6: 1992 worlds saved earlier keep the frozen 1992/93 rules (`ENG1992-0.6`).
+* `npm run history:fetch` also downloads the Wikipedia season pages; `tools/history/wikitable.mjs` parses them.
+
 ## 0.6.0 (2026-11-27)
 
 ### Goal 1: ownership ambition (realism experiment, not adopted)

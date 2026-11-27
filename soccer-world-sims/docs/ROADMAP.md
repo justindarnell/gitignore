@@ -6,8 +6,8 @@
   points, era giants over 100 years). 0.7 adopted relative ownership (CALIBRATION.md), which helped mobility and
   champion points but not promoted-club variety.
 * A data-table view for every graph, plus CSV export of history tables.
-* More historical start seasons (any year with complete data in tiers 1–4), and era rule changes over
-  time (e.g. the 1995 cut to a 20-club Premier League) as dated config.
+* More historical start seasons (any year with complete data in tiers 1–4; the dated-rules mechanism from 0.7
+  makes each one a config plus a database).
 * FA Cup replays as a config option for historical eras.
 * Optional historical season replays (watch a season's table evolve matchday by matchday).
 * Additional languages and number formats.

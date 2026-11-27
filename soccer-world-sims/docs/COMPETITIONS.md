@@ -81,36 +81,61 @@ mid-May, finals in late May, and the FA Cup final in mid-May.
 ## Historical start: 1992/93
 
 A world can start from **1992/93**, the first Premier League season (`src/data/england/config1992.ts`,
-country id `ENG1992`). The era's rules are configuration, with no engine special cases. Two generic
-config options were added for it: `rating` on non-playable qualifiers and `awayGoals` on two-legged
-cup rounds.
+country id `ENG1992`). The era's rules are configuration, with no engine special cases. Generic config
+options added for it: `rating` on non-playable qualifiers, `awayGoals` on two-legged cup rounds and (0.7)
+**dated rule changes** (`changes`, `src/engine/rules.ts`).
+
+### Starting rules (1992/93)
 
 | Division | Clubs | Games | Promotion | Play-offs | Relegation |
 |---|---:|---:|---|---|---|
 | Premier League | 22 | 42 | — | — | bottom 3 |
 | First Division | 24 | 46 | top 2 | 3rd–6th (two-legged semis, neutral final) | bottom 3 |
 | Second Division | 24 | 46 | top 2 | 3rd–6th | bottom 4 |
-| Third Division | 22 | 42 | top 3 | 4th–7th | **none** (see below) |
+| Third Division | 22 | 42 | top 3 | 4th–7th | bottom 1, to the Conference |
+| Football Conference | 22 | 42 | champions | — | none (bottom of the playable pyramid) |
 
-* **FA Cup**: the 46 Second and Third Division clubs enter the First Round with 26 non-playable
-  non-league qualifiers (16 "Conference", rated 57; 10 "Non-league", rated 52). The Premier League and
-  First Division enter in the Third Round (64 clubs). Qualifier ratings extrapolate the fitted 1992 tier gap
-  one and two steps below the Third Division.
-* **League Cup (Coca-Cola Cup)**: two-legged First Round (Second and Third Division plus the ten First
-  Division clubs with the lowest previous standing: 56 clubs) and Second Round (plus the other 14 First
-  Division clubs and the Premier League: 64 clubs); single-leg Third and Fourth Rounds and quarter-finals;
-  two-legged semi-finals; neutral final. **Away goals** decide level two-legged ties, before and after
-  extra time (away goals in extra time count).
+* **FA Cup**: the Second and Third Division and Conference clubs enter the First Round with non-playable
+  non-league qualifiers (marked Q, rated 47, the fitted level of the Conference's feeder leagues): 4 while the top two
+  divisions have 46 clubs, 10 from 1995/96 (80 First Round clubs, as in reality). The Premier League and First
+  Division enter in the Third Round (64 clubs).
+* **League Cup (Coca-Cola Cup)**: two-legged First Round of 56 clubs (Second and Third Division plus the First
+  Division clubs with the lowest previous standing: ten in 1992/93, eight once the Third Division has 24 clubs)
+  and Second Round (plus the other First Division clubs and the Premier League: 64 clubs); single-leg Third and
+  Fourth Rounds and quarter-finals; two-legged semi-finals; neutral final. **Away goals** decide level two-legged
+  ties, before and after extra time (away goals in extra time count). The Conference does not enter.
 * Cup squad-rotation values are the same as in the 2026/27 configuration.
 
+### Dated rule changes (0.7)
+
+Each change applies from the season that starts in that year. The counts for 1994/95 and 2002/03 were checked
+against engsoccerdata's tables.
+
+| From | Change |
+|---|---|
+| 1994/95 | Transition to a 20-club Premier League: 4 relegated from the Premier League; First Division 2 up (champions + play-off 2nd–5th) and 4 down; Second Division 2 up (champions + play-off 2nd–5th) and 5 down; Third Division 3 up (2 automatic + play-off 3rd–6th) and grows to 24 |
+| 1995/96 | Premier League of 20 (3 down); First Division 3 up/3 down; Second Division 3 up/4 down; Third Division of 24 (3 automatic + play-off 4th–7th); FA Cup First Round of 80 |
+| 2002/03 | Two up, two down between the Third Division and the Conference (Conference champions + play-off winners, 2nd–5th) |
+| 2004/05 | Renamed Championship, League One, League Two; the Conference becomes the Conference National |
+| 2015/16 | The Conference National becomes the National League |
+| 2017/18 | Six-team National League play-off (2nd–7th) |
+| 2026/27 | Six-team Championship play-off (3rd–8th), as in the 2026/27 start |
+
+The standings page shows each season's rules and the list of changes, and every change appears in the news
+(filter "Rule changes"). Past tables use the rules of their own season (for example, four relegation places
+in the 1994/95 Premier League).
+
 **Differences from reality (documented simplifications):**
-* The Conference is not playable, so the Third Division's bottom club is **not relegated** (in 1992/93
-  one club went down to the Conference, and promotion from it depended on ground criteria).
-* FA Cup **replays** existed in 1992/93. Here drawn ties go to extra time and penalties. The number of
-  non-league clubs in the First Round (26) is chosen to give 64 clubs in the Third Round, because the engine
-  does not model the qualifying rounds.
+* Promotion from the Conference depended on ground criteria: no club went up in 1993/94–1995/96 (Kidderminster,
+  Macclesfield and Stevenage were refused). The engine always promotes the Conference champions.
+* The Conference grew from 22 to 24 clubs in 2006/07 and, from 2004/05, sat above a new sixth tier (Conference
+  North/South). The sixth tier is not playable, so the Conference stays at 22 clubs with no relegation, and a 1992
+  world reaching 2026 has 114 clubs rather than the 2026 start's 116.
+* FA Cup **replays** existed in 1992/93 (abolished from the First Round in 2024/25). Here drawn ties go to extra
+  time and penalties. The engine does not model the qualifying rounds.
+* League Cup format changes after 1992/93 (single-leg early rounds, the end of away goals) are not applied.
 * The League Cup Round One/Two split is approximated by previous standing.
 * Tiebreakers are kept as in 2026/27 (goal difference first). The early-1990s Football League order has
   not been verified.
-* The rules stay as in 1992/93 for the whole simulation. The Premier League's cut to 20 clubs (1995), the
-  later three-up/three-down changes and the six-team Championship play-off are not applied over time.
+* Worlds saved before 0.7 keep the frozen 1992/93 rules they were created with (country id `ENG1992-0.6`:
+  92 clubs, no Conference, no rule changes).

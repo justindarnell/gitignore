@@ -81,9 +81,11 @@ The same seed and settings always produce the same history, however you split th
   fan chart of any club's possible paths. Run it again after a what-if change: the runs reuse the same random
   streams, and Δ columns show how much your change moved the odds. Results last until you reload the page.
 * **Start season** (Saves → New world): the present day (2026/27, 116 clubs) or **1992/93**, the first
-  Premier League season: 92 clubs rated from 1988–92 results and that era's rules (22-club Premier League,
-  First/Second/Third Division, League Cup with away goals). See COMPETITIONS.md for what differs from
-  reality.
+  Premier League season: 114 clubs (the Football League and the Football Conference) rated from 1988–92 results
+  and that era's rules (22-club Premier League, First/Second/Third Division, League Cup with away goals). The rules
+  then change as they did in reality: the cut to a 20-club Premier League in 1995, two up/two down with the
+  Conference from 2002, the 2004 renamings, and the six-team Championship play-off in 2026. The standings page shows
+  each season's rules; changes appear in the news. See COMPETITIONS.md for what differs from reality.
 
 ## Settings
 

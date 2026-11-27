@@ -16,6 +16,7 @@
             │ eras.ts       eras, dynasties, golden ages, decade rankings (derived)      │
             │ sandbox.ts    what-if interventions, forks (deterministic, no RNG)         │
             │ experiments.ts multi-fork experiments: re-seeded forks, outcome odds      │
+            │ rules.ts      dated rule changes: the config in force in a given season   │
             │ sim.ts        simulation targets (matchday … N seasons), bulk loop        │
             │ runtime.ts    non-serialised caches + live RNG                             │
             └───────────────────────────────────────────────────────────────────────────┘
@@ -148,7 +149,7 @@ toward reputation and asymmetric reversion stop irreversible collapse.
 
 * **Start seasons** (`src/data/england/starts.ts`): `createWorld({ start: '1992' })` selects a club
   database and a `CountryConfig` (`ENG` for 2026/27, `ENG1992` for 1992/93). The engine and UI read league
-  sizes and names from the config; the pyramid size (116 or 92) is derived.
+  sizes and names from the config in force (dated changes applied); the pyramid size (116 or 114) is derived.
 * **Interventions** (`applyIntervention`): attribute edits (clamped to valid ranges) and injected events
   (wealthy takeover, sell-off to asset-strippers, institutional crisis, investment windfall) with fixed
   effects. They are applied between steps, consume no randomness and are recorded in `world.interventions`,
@@ -161,6 +162,23 @@ toward reputation and asymmetric reversion stop irreversible collapse.
   champions per season, final tables, a club's pyramid position in both timelines, settings differences,
   interventions and the first season where the final tables differ. If the saved timeline is behind, it can be
   simulated to the same date in a separate worker and saved back to its slot.
+
+## Dated rule changes (0.7)
+
+A `CountryConfig` may list `changes`: `{ from, note, leagues?, cups? }` patches (`src/engine/rules.ts`). The rules
+for a season are the base configuration with every change up to that season applied in order (`configFor`,
+memoised). League ids and their order never change, so history, snapshots, head-to-head and club ids stay comparable
+across eras; sizes, promotion and relegation counts, play-off formats, names and cup rounds can change.
+
+* The runtime holds the config of the current season (`rt.country`, refreshed with the season), so the season's
+  calendar, fixtures, play-offs, cups, end-of-season movements and club evolution all use the rules in force. A
+  change takes effect at the rollover into its season, and is announced in the news (kind `rules`; no randomness).
+* `validateChanges(config, from, to)` checks that the pyramid stays closed: in every season, the clubs leaving and
+  entering each league leave it at the next season's size. A test runs it for both configurations to 2040, and
+  `startSeason` still throws if a league's membership does not match its size.
+* The 1992/93 configuration uses it for the 1994/95 transition, the 20-club Premier League, two-up/two-down with the
+  Conference, renamings and the later play-off formats (COMPETITIONS.md). The 2026/27 configuration has no changes.
+* The UI shows past tables with their own season's zones and lists the changes on the standings page.
 
 ## Experiments (0.7)
 
@@ -240,7 +258,9 @@ more goals conceded, then home defeats ahead of away defeats, then the earlier m
   store holds slot metadata (name, seed, season, date, size). Autosave writes after every simulation.
 * Export downloads `.sws.json.gz` (gzip via `CompressionStream`, or plain JSON when that is
   unavailable). Import accepts both.
-* Every save has `schema` (currently 5). Migration 4 → 5 (0.7) keeps a save's model: it sets the new
+* Every save has `schema` (currently 6). Migration 5 → 6 (0.7) points 1992 worlds saved before the playable Conference
+  (92 clubs) at the frozen 1992/93 configuration (`ENG1992-0.6`, `config1992-frozen.ts`), so they continue exactly as
+  before. Migration 4 → 5 (0.7) keeps a save's model: it sets the new
   relative-ownership parameters to 0 and writes the old experimental *Ownership dynamics* setting (k × the 0.6
   finalist, added on top) into the stored parameters, then sets the setting to 100%. Migration 3 → 4 (0.6)
   sets `start` '2026', no interventions and a root lineage.
@@ -277,6 +297,10 @@ container. 0.5 and 0.6 were measured on the same machine so they are directly co
 | Standard | 1.99 s · 5.51 MB (0.94 MB gz) | 2.07 s · 5.53 MB (0.95 MB gz) | 2.27 s · 6.82 MB (1.17 MB gz) |
 | Full | 1.93 s · 15.25 MB (2.15 MB gz) | 1.80 s · 15.26 MB (2.15 MB gz) | 2.40 s · 16.56 MB (2.37 MB gz) |
 
+0.7 goal 3: a 1992/93 world (114 clubs, through every rule change) simulates 100 seasons in 1.07 s at Essential
+(3.59 MB) and 2.04 s at Standard (6.91 MB). `dist/app.js` is 295 KB (the larger 1992 database and the frozen 0.6
+configuration).
+
 0.7 relative ownership (goal 1) measured 0.75 s · 3.64 MB (0.55 MB gz) at Essential, 1.83 s · 6.91 MB (1.18 MB gz) at
 Standard and 1.94 s · 16.66 MB (2.38 MB gz) at Full: no measurable cost; the saves are about 0.1 MB larger (more
 ownership news).
@@ -297,12 +321,12 @@ min/max decimation, so matchday-level histories (~4,600 points per century) rend
 
 ## Testing
 
-* `npm test`: 57 engine tests covering database integrity, fixture counts and uniqueness, home/away
+* `npm test`: 64 engine tests covering database integrity, fixture counts and uniqueness, home/away
   balance, clash-free calendar, scoring, tiebreakers, promotion/relegation counts, play-off brackets
   (including the six-team Championship format), FA Cup and EFL Cup structure, single winners,
   history consistency, graph data, best/worst ranking rules, attribute bounds, determinism,
   save/load equivalence, bulk vs step-by-step equivalence, and pause/resume equivalence.
-* `node tools/browser-test.mjs`: 61 end-to-end checks in headless Chromium against `dist/` opened via
+* `node tools/browser-test.mjs`: 63 end-to-end checks in headless Chromium against `dist/` opened via
   `file://`, with all network requests blocked. Covers navigation, club links, graph hover and tooltips,
   decimal formatting, badge loading, matchday controls, competitions, history pages, settings, saves
   and reload, a 100-season bulk run with pause/resume and cancel, responsiveness, memory, phone-width

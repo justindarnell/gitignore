@@ -1,3 +1,4 @@
+import { configFor } from './rules.ts';
 import type { Runtime } from './runtime.ts';
 import type { ClubHistory, DerbyMeeting, TimelineKind, CompactMatch, CupSeasonRecord, LeagueSeasonRecord, Match, MatchRecord, NewsItem, TableRow, World } from './types.ts';
 import { COUNTRIES, pairKey, pairIndex } from './runtime.ts';
@@ -12,8 +13,9 @@ export function clubHistory(world: World, id: string): ClubHistory {
 }
 
 /** Human-readable competition + stage, e.g. "FA Cup Semi-final", "Championship Play-off Final". */
-export function competitionLabel(countryId: string, comp: string, stage?: string): string {
-  const c = COUNTRIES[countryId];
+export function competitionLabel(countryId: string, comp: string, stage?: string, year?: number): string {
+  // Names as in the given season (dated renamings applied); the base configuration when no year is given.
+  const c = year === undefined ? COUNTRIES[countryId] : configFor(COUNTRIES[countryId], year);
   const league = c.leagues.find(l => l.id === comp);
   if (league) return league.name;
   const cup = c.cups.find(x => x.id === comp);
@@ -107,7 +109,7 @@ export function recordMeeting(world: World, rt: Runtime, m: Match): void {
   const margin = Math.abs(m.hg - m.ag!);
   if (!(tier <= 2 || !isLeague || margin >= 3)) return;
   const nm = (id: string) => world.info[id].short;
-  const comp = competitionLabel(world.country, m.comp, isLeague ? undefined : m.stage);
+  const comp = competitionLabel(world.country, m.comp, isLeague ? undefined : m.stage, world.season.year);
   const score = `${m.hg}–${m.ag}${m.et ? ' a.e.t.' : ''}${m.pens ? ` (${m.pens[0]}–${m.pens[1]} pens)` : ''}`;
   const winner = m.pens ? (m.pens[0] > m.pens[1] ? m.home : m.away) : m.hg > m.ag! ? m.home : m.hg < m.ag! ? m.away : null;
   const text = winner

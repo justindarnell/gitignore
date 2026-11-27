@@ -1,13 +1,14 @@
 import type { Page } from '../types.ts';
 import { club, esc, tabs, scoreText, empty, signed } from '../dom.ts';
-import { leagues, standings, seasonLabel, zoneOf, form, leagueRounds, currentRound, country, compLabel } from '../data.ts';
+import { leagues, leaguesAt, rulesTimeline, standings, seasonLabel, zoneOf, form, leagueRounds, currentRound, country, compLabel } from '../data.ts';
 import type { Match, TableRow, World } from '../../engine/types.ts';
 import { raceCard, mountRace } from './stories.ts';
 
 const ZONE_LABEL = { champion: 'Champions', promoted: 'Automatic promotion', playoff: 'Play-offs', relegated: 'Relegation' } as const;
 
-export function leagueTable(world: World, lid: string, rows: TableRow[], showForm: boolean): string {
-  const l = leagues(world).find(x => x.id === lid)!;
+export function leagueTable(world: World, lid: string, rows: TableRow[], showForm: boolean, year = world.season.year): string {
+  // Zones follow the rules of the season shown (e.g. four relegated from a 22-club Premier League in 1994/95).
+  const l = leaguesAt(world, year).find(x => x.id === lid)!;
   const zones = new Set(rows.map((_, i) => zoneOf(l, i + 1, l.tier)).filter(Boolean));
   return `<div class="table-wrap"><table class="table standings">
     <thead><tr><th class="num">Pos</th><th>Club</th><th class="num">P</th><th class="num">W</th><th class="num">D</th><th class="num">L</th><th class="num">GF</th><th class="num">GA</th><th class="num">GD</th><th class="num">Pts</th>${showForm ? '<th class="hide-sm">Form</th>' : ''}</tr></thead>
@@ -23,10 +24,11 @@ export const standingsPage: Page = ({ world, args, state }) => {
   const lid = args[0] ?? state.standingsLeague;
   state.standingsLeague = lid;
   const yearArg = args[1] ? Number(args[1]) : null;
-  const ls = leagues(world);
+  const current = yearArg === null || yearArg === world.season.year && !world.season.complete;
+  const shownYear = current ? world.season.year : yearArg!;
+  const ls = leaguesAt(world, shownYear);
   const l = ls.find(x => x.id === lid) ?? ls[0];
   const years = world.history.snapshots.map(s => s.year);
-  const current = yearArg === null || yearArg === world.season.year && !world.season.complete;
   let rows: TableRow[];
   let note = '';
   if (current) rows = standings(world, l.id);
@@ -40,10 +42,24 @@ export const standingsPage: Page = ({ world, args, state }) => {
   const html = `<div class="page-head"><h1>Standings</h1>
     <div class="toolbar"><label>Season <select data-change="standings-season" data-league="${l.id}">${seasonOpts.join('')}</select></label></div></div>
     ${tabs(ls.map(x => ({ id: x.id, label: x.name, href: `#/standings/${x.id}${yearArg !== null ? '/' + yearArg : ''}` })), l.id)}
-    <section class="card">${leagueTable(world, l.id, rows, current)}${note}</section>
+    <section class="card">${leagueTable(world, l.id, rows, current, shownYear)}${note}${rulesNote(world, l.id, shownYear)}</section>
     ${raceCard(world, l.id, current ? null : yearArg)}`;
   return { title: `${l.name} standings`, html, mount: root => mountRace(root, world, l.id, current ? null : yearArg) };
 };
+
+/** This league's promotion/relegation rules in the season shown, plus rule changes (dated config). */
+function rulesNote(world: World, lid: string, year: number): string {
+  const l = leaguesAt(world, year).find(x => x.id === lid)!;
+  const ls = leaguesAt(world, year);
+  const up = l.tier > 1 ? l.autoPromotion + (l.playoff ? 1 : 0) : 0;
+  const down = l.tier < ls.length ? l.relegation : 0;
+  const po = l.playoff ? `, play-offs ${l.playoff.rounds[0].newSeeds.length + l.playoff.rounds.slice(1).reduce((a, r) => a + r.newSeeds.length, 0)} clubs` : '';
+  const parts = [`${l.size} clubs`, up ? `${up} promoted (${l.autoPromotion} automatic${po})` : '', down ? `${down} relegated` : l.tier === ls.length ? 'no relegation (bottom of the playable pyramid)' : 'no relegation'].filter(Boolean);
+  const { past, next } = rulesTimeline(world);
+  const changes = past.filter(c => c.leagues?.[lid] || c.cups);
+  const list = changes.length || next ? `<details class="small"><summary>Rule changes in this world</summary><ul class="plain">${changes.map(c => `<li><strong>${esc(seasonLabel(c.from))}</strong>: ${esc(c.note)}</li>`).join('')}${next ? `<li class="muted">Next: <strong>${esc(seasonLabel(next.from))}</strong>: ${esc(next.note)}</li>` : ''}</ul></details>` : '';
+  return `<p class="muted small">${esc(seasonLabel(year))} rules: ${esc(parts.join(', '))}.</p>${list}`;
+}
 
 function matchRow(world: World, m: Match, showComp = false): string {
   const played = m.hg !== undefined;

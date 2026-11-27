@@ -3,9 +3,11 @@ import { effectiveParams, type EngineParams } from './params.ts';
 import type { ClubState, CountryConfig, DerbyConfig, H2H, Match, World } from './types.ts';
 import { ENGLAND } from '../data/england/config.ts';
 import { ENGLAND_1992 } from '../data/england/config1992.ts';
+import { ENGLAND_1992_FROZEN } from '../data/england/config1992-frozen.ts';
+import { configFor } from './rules.ts';
 
 /** Registry of country configurations (add new countries here). */
-export const COUNTRIES: Record<string, CountryConfig> = { ENG: ENGLAND, ENG1992: ENGLAND_1992 };
+export const COUNTRIES: Record<string, CountryConfig> = { ENG: ENGLAND, ENG1992: ENGLAND_1992, 'ENG1992-0.6': ENGLAND_1992_FROZEN };
 
 /**
  * Non-serialised runtime cache for a world: lookup maps, effective parameters and the live
@@ -40,7 +42,8 @@ export function runtime(world: World): Runtime {
   let rt = cache.get(world);
   const key = JSON.stringify(world.settings);
   if (!rt) {
-    const country = COUNTRIES[world.country];
+    // The rules in force this season (dated changes applied); refreshed when the season changes.
+    const country = configFor(COUNTRIES[world.country], world.season.year);
     rt = {
       country,
       clubs: new Map(world.clubs.map(c => [c.id, c])),
@@ -64,6 +67,7 @@ export function runtime(world: World): Runtime {
 
 export function reindexSeason(world: World, rt: Runtime): void {
   const s = world.season;
+  rt.country = configFor(COUNTRIES[world.country], s.year);
   rt.bySlot = s.calendar.map(() => []);
   rt.byId = new Map();
   for (const m of s.matches) { rt.bySlot[m.slot].push(m); rt.byId.set(m.id, m); }

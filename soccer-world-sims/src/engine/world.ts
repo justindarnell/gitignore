@@ -1,4 +1,5 @@
 import { Rng } from './rng.ts';
+import { configFor } from './rules.ts';
 import { DEFAULT_PARAMS, DEFAULT_SETTINGS, effectiveParams, type EngineParams } from './params.ts';
 import { expectedGoals, sampleExtraTime, sampleScore, shootout, type Side } from './match.ts';
 import { buildCalendar, doubleRoundRobin, leagueSlots, slotKey } from './schedule.ts';
@@ -13,7 +14,7 @@ import type {
 import { STARTS } from '../data/england/starts.ts';
 
 export const ENGINE_VERSION = '0.7.0';
-export const SAVE_SCHEMA = 5;
+export const SAVE_SCHEMA = 6;
 
 export interface CreateOptions {
   seed?: string;
@@ -37,7 +38,7 @@ export function createWorld(opts: CreateOptions = {}): World {
   const start = STARTS[opts.start ?? '2026'];
   if (!start) throw new Error(`Unknown start season ${opts.start}`);
   const db = start.db as unknown as { clubs: DbClub[] };
-  const country = COUNTRIES[start.country];
+  const country = configFor(COUNTRIES[start.country], opts.startYear ?? start.year);
   const info: Record<string, ClubInfo> = {};
   const clubs: ClubState[] = [];
   for (const c of db.clubs) {
@@ -89,13 +90,14 @@ interface DbClub {
 
 export const overall = (c: { attack: number; midfield: number; defence: number }) => (c.attack + c.midfield + c.defence) / 3;
 
-export function country(world: World): CountryConfig { return COUNTRIES[world.country]; }
+/** The competition rules in force in the world's current season (dated changes applied). */
+export function country(world: World): CountryConfig { return configFor(COUNTRIES[world.country], world.season.year); }
 
 // =====================================================================================
 // Season start
 // =====================================================================================
 function startSeason(world: World, year: number, rng: Rng, initialForm?: (id: string) => number): void {
-  const ctry = COUNTRIES[world.country];
+  const ctry = configFor(COUNTRIES[world.country], year);
   const p = runtimeParams(world);
   const leagueClubs: Record<string, string[]> = {};
   for (const l of ctry.leagues) leagueClubs[l.id] = world.clubs.filter(c => c.league === l.id).map(c => c.id);
@@ -307,7 +309,7 @@ export function standings(world: World, leagueId: string): TableRow[] {
 /** Combined pyramid rank (1 = top of tier 1) for a club at a league position. */
 export function pyramidRank(world: World, leagueId: string, position: number): number {
   let off = 0;
-  for (const l of COUNTRIES[world.country].leagues) {
+  for (const l of country(world).leagues) {
     if (l.id === leagueId) return off + position;
     off += l.size;
   }
@@ -473,6 +475,10 @@ export function rollover(world: World): void {
   startSeason(world, world.season.year + 1, rt.rng);
   reindexSeason(world, rt);
   syncRng(world);
+  // Dated rule changes taking effect this season are announced (no randomness involved).
+  for (const ch of COUNTRIES[world.country].changes ?? []) if (ch.from === world.season.year) {
+    pushNews(world, { date: world.season.calendar[0].date, kind: 'rules', clubs: [], importance: 4, text: `New rules from ${seasonLabel(ch.from)}: ${ch.note}` });
+  }
 }
 
 // =====================================================================================

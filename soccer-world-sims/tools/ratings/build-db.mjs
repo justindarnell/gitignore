@@ -16,6 +16,8 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { master as master2026 } from './master.mjs';
 import { members } from './master1992.mjs';
+import { leagueTable } from '../history/wikitable.mjs';
+import { clubKey } from '../history/lib.mjs';
 
 // --start <year> builds a historical start database (src/data/england/clubs-<year>.json) with the same
 // method, using only data from before that season.
@@ -94,6 +96,14 @@ const alias = { chester: 'chester-city', 'yeovil': 'yeovil-town', 'accrington': 
 for (const r of rows) r.club = alias[r.club] ?? r.club;
 // Aldershot Town (founded 1992) is a successor club; earlier 'Aldershot' rows belong to Aldershot FC.
 for (const r of rows) if (r.club === 'aldershot' && r.season >= 1992) r.club = 'aldershot-town';
+if (START === 1992) {
+  // 0.7: Football Conference final positions 1988/89-1991/92 (tier 5) from the Wikipedia season pages.
+  const conf = { 'redbridge-forest': 'dagenham-and-redbridge' };
+  for (const y of [1988, 1989, 1990, 1991]) for (const r of leagueTable(join(root, `data/history/raw/wikipedia/conference-${y}.html`))) {
+    const k = clubKey(r.team);
+    rows.push({ season: y, tier: 5, pos: r.pos, club: conf[k] ?? alias[k] ?? k });
+  }
+}
 const sizes = {};
 for (const r of rows) { sizes[r.season] ??= {}; sizes[r.season][r.tier] = Math.max(sizes[r.season][r.tier] ?? 0, r.pos); }
 const rankOf = new Map(); // `${club}|${season}` -> pyramid rank
@@ -117,7 +127,9 @@ const levelCurve = fitted.map(x => x.overall).sort((a, b) => b - a); // index 0 
 const level = rank => rank <= levelCurve.length ? levelCurve[rank - 1] : levelCurve.at(-1) - 4;
 
 const lastSeason = START - 1;
-const NL_RANK = START === 2026 ? 104 : 100; // approximate pyramid rank for a season just below the playable pyramid
+// Approximate pyramid rank for a season outside the known tables. 2026: National League level (its tables are
+// not in the history data). 1992 (Conference playable, 114 clubs): below the playable pyramid.
+const NL_RANK = START === 2026 ? 104 : 110;
 function reputation(id) {
   let wsum = 0, lsum = 0, tfSeasons = 0, titles = 0;
   for (let s = 1888; s <= lastSeason; s++) {
@@ -142,7 +154,7 @@ function stabilityOf(id) {
   const ranks = [];
   // Only seasons inside tiers 1-4 are observable; non-league seasons are treated as unknown.
   const tiersSeen = [];
-  for (let s = START - 14; s <= START - 2; s++) { ranks.push(rankOf.get(`${id}|${s}`)); tiersSeen.push(tierAt.get(`${id}|${s}`) ?? 5); }
+  for (let s = START - 14; s <= START - 2; s++) { ranks.push(rankOf.get(`${id}|${s}`)); tiersSeen.push(tierAt.get(`${id}|${s}`) ?? (START === 1992 ? 6 : 5)); }
   const moves = [], tiers = [];
   for (let i = 1; i < ranks.length; i++) if (ranks[i] !== undefined && ranks[i - 1] !== undefined) moves.push(Math.abs(ranks[i] - ranks[i - 1]));
   for (let i = 1; i < ranks.length; i++) tiers.push(tiersSeen[i] !== tiersSeen[i - 1] ? 1 : 0);
@@ -195,7 +207,7 @@ for (const x of fitted) {
 }
 mkdirSync(join(root, 'src/data/england'), { recursive: true });
 // Final rankings of the season before a historical start (for cup entry rules that use them).
-const previous = START === 2026 ? undefined : Object.fromEntries([1, 2, 3, 4].map(t => [`ENG${t}`, rows.filter(r => r.season === START - 1 && r.tier === t).sort((x, y) => x.pos - y.pos).map(r => r.club)]));
+const previous = START === 2026 ? undefined : Object.fromEntries([1, 2, 3, 4, 5].map(t => [`ENG${t}`, rows.filter(r => r.season === START - 1 && r.tier === t).sort((x, y) => x.pos - y.pos).map(r => r.club)]));
 writeFileSync(join(root, START === 2026 ? 'src/data/england/clubs.json' : `src/data/england/clubs-${START}.json`), JSON.stringify({ schema: 1, season: `${START}/${String(START + 1).slice(2)}`, ratingLog: RATING_LOG, midfieldWeight: W, generated: new Date().toISOString().slice(0, 10), ...(previous ? { previousRankings: previous } : {}), clubs: out }, null, 1));
 for (const d of [1, 2, 3, 4, 5]) {
   console.log('--- tier', d);

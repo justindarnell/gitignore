@@ -44,8 +44,12 @@
   separately. Its fitted divisions are much closer in strength, so it is more open than 2026 worlds (17–21
   different champions in 60 seasons in three test worlds, and mid-sized clubs can build long title runs).
   Treat it as a sandbox, not a validated reconstruction.
-* Rules are frozen at 1992/93: 22 Premier League clubs forever, no Conference relegation, no FA Cup replays
-  (COMPETITIONS.md).
+* Rules change over time as dated configuration (0.7): the 1995 cut to 20 clubs, Conference relegation, two up/two
+  down from 2002/03, renamings and later play-off formats. Not modelled: ground-criteria refusals of Conference
+  promotion (1993/94–1995/96), the Conference's growth to 24 and the sixth tier below it, FA Cup replays, and later
+  League Cup format changes (COMPETITIONS.md). A 1992 world therefore has 114 clubs in 2026, not 116.
+* Conference clubs are rated from 1988/89–1991/92 results and tables on Wikipedia; their starting form is neutral.
+* 1992 worlds saved before 0.7 keep the frozen 1992/93 rules (92 clubs) they were created with.
 * Ownership ambition edited through *What-if* shapes development from the next season end. It has no
   structural effect at clubs whose reputation is above the elite threshold (81). Injected events always
   apply their immediate effects.
