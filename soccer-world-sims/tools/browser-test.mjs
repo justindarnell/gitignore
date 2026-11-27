@@ -55,6 +55,7 @@ const played = await page.$eval('table.standings tbody tr td:nth-child(3)', td =
 check('Premier League table shows 20 clubs with played games', rows === 20 && played > 0, `rows ${rows}, P ${played}`);
 const zones = await page.$$eval('.legend span', s => s.map(x => x.textContent.trim()).filter(Boolean));
 check('zones legend present', zones.some(z => z.includes('Relegation')), zones.join(' | '));
+check('title-race chart renders on the standings page', !!(await page.$('#chart-race canvas')));
 await page.click('a.tab:has-text("Championship")');
 await page.waitForFunction(() => document.querySelectorAll('table.standings tbody tr').length === 24);
 check('Championship tab shows 24 clubs and play-off zone', (await page.$$('.pos.zone-playoff')).length >= 6);
@@ -146,6 +147,7 @@ check('ratings graph tooltip lists overall, reputation and stability', /overall[
 await page.screenshot({ path: shots ? join(shots, '05-profile-hover.png') : '/dev/null' }).catch(() => {});
 
 // ---- club links from tables
+check('club profile lists rivalries', (await page.textContent('#main')).includes('Merseyside derby'));
 await page.goto(url + '#/standings/ENG1');
 await page.waitForSelector('table.standings a.club');
 await page.click('table.standings tbody tr:first-child a.club');
@@ -164,6 +166,33 @@ await page.goto(url + '#/history/records');
 await page.waitForSelector('h2');
 check('records page renders', (await page.textContent('#main')).includes('Longest title streak'));
 await shot('06-history-records');
+
+// ---- stories, eras, rivalries (0.6)
+await page.goto(url + '#/season/2100');
+await page.waitForSelector('h1');
+check('season review shows the story of the season', (await page.$$('.story-list li')).length > 0, `${(await page.$$('.story-list li')).length} stories`);
+check('season review shows a stored title-race chart', !!(await page.$('#chart-race-review canvas')));
+await page.goto(url + '#/history/eras');
+await page.waitForSelector('#chart-bump canvas');
+const eraCount = await page.$$eval('.eras li', l => l.length);
+check('eras & dynasties list eras and draw the decades bump chart', eraCount > 0, `${eraCount} eras`);
+const bump = await page.$('#chart-bump canvas'); await bump.scrollIntoViewIfNeeded(); const bb = await bump.boundingBox();
+await page.mouse.move(bb.x + bb.width * 0.5, bb.y + bb.height * 0.5);
+check('bump chart tooltip lists clubs by decade', /\d{4}s/.test(await page.textContent('#chart-bump .chart-tip')));
+await page.goto(url + '#/history/rivalries');
+await page.waitForSelector('table.rivalries');
+check('rivalries list configured derbies with records', (await page.$$('table.rivalries tbody tr')).length >= 20);
+await page.goto(url + '#/h2h/liverpool/everton');
+await page.waitForSelector('.h2h-summary');
+const meet = Number((await page.textContent('.h2h-summary')).match(/(\d+) meetings/)?.[1] ?? 0);
+check('head-to-head page shows the Merseyside derby record', meet > 0, `${meet} meetings`);
+await page.selectOption('select[data-change="h2h-b"]', 'manchester-united');
+await page.waitForFunction(() => location.hash === '#/h2h/liverpool/manchester-united');
+check('head-to-head club picker changes the pairing', (await page.textContent('.page-head')).includes('North West derby'));
+await page.goto(url + '#/standings/ENG1/2090');
+await page.waitForSelector('#chart-race canvas');
+check('past-season standings show the stored title race', true);
+await shot('08-eras');
 
 // ---- news, settings
 await page.goto(url + '#/news');

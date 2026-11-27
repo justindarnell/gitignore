@@ -2,6 +2,7 @@ import type { Page } from '../types.ts';
 import { club, esc, tabs, scoreText, empty, signed } from '../dom.ts';
 import { leagues, standings, seasonLabel, zoneOf, form, leagueRounds, currentRound, country, compLabel } from '../data.ts';
 import type { Match, TableRow, World } from '../../engine/types.ts';
+import { raceCard, mountRace } from './stories.ts';
 
 const ZONE_LABEL = { champion: 'Champions', promoted: 'Automatic promotion', playoff: 'Play-offs', relegated: 'Relegation' } as const;
 
@@ -39,8 +40,9 @@ export const standingsPage: Page = ({ world, args, state }) => {
   const html = `<div class="page-head"><h1>Standings</h1>
     <div class="toolbar"><label>Season <select data-change="standings-season" data-league="${l.id}">${seasonOpts.join('')}</select></label></div></div>
     ${tabs(ls.map(x => ({ id: x.id, label: x.name, href: `#/standings/${x.id}${yearArg !== null ? '/' + yearArg : ''}` })), l.id)}
-    <section class="card">${leagueTable(world, l.id, rows, current)}${note}</section>`;
-  return { title: `${l.name} standings`, html };
+    <section class="card">${leagueTable(world, l.id, rows, current)}${note}</section>
+    ${raceCard(world, l.id, current ? null : yearArg)}`;
+  return { title: `${l.name} standings`, html, mount: root => mountRace(root, world, l.id, current ? null : yearArg) };
 };
 
 function matchRow(world: World, m: Match, showComp = false): string {

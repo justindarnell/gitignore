@@ -1,0 +1,40 @@
+import type { DerbyConfig } from '../../engine/types.ts';
+
+// English derbies and rivalries between clubs in the database (ids as in clubs.json).
+// Only pairs with a widely used name are listed. A derby is tracked whenever both clubs exist in
+// the world, in any division and any competition.
+export const ENGLAND_DERBIES: DerbyConfig[] = [
+  { id: 'north-london', name: 'North London derby', clubs: ['arsenal', 'tottenham-hotspur'] },
+  { id: 'merseyside', name: 'Merseyside derby', clubs: ['liverpool', 'everton'] },
+  { id: 'manchester', name: 'Manchester derby', clubs: ['manchester-united', 'manchester-city'] },
+  { id: 'tyne-wear', name: 'Tyne–Wear derby', clubs: ['newcastle-united', 'sunderland'] },
+  { id: 'north-west', name: 'North West derby', clubs: ['liverpool', 'manchester-united'] },
+  { id: 'second-city', name: 'Second City derby', clubs: ['aston-villa', 'birmingham-city'] },
+  { id: 'east-midlands', name: 'East Midlands derby', clubs: ['derby-county', 'nottingham-forest'] },
+  { id: 'steel-city', name: 'Steel City derby', clubs: ['sheffield-united', 'sheffield-wednesday'] },
+  { id: 'black-country', name: 'Black Country derby', clubs: ['west-bromwich-albion', 'wolverhampton-wanderers'] },
+  { id: 'south-coast', name: 'South Coast derby', clubs: ['southampton', 'portsmouth'] },
+  { id: 'm23', name: 'M23 derby', clubs: ['brighton-and-hove-albion', 'crystal-palace'] },
+  { id: 'east-anglian', name: 'East Anglian derby', clubs: ['norwich-city', 'ipswich-town'] },
+  { id: 'west-london', name: 'West London derby', clubs: ['chelsea', 'fulham'] },
+  { id: 'dockers', name: 'Dockers derby', clubs: ['millwall', 'west-ham-united'] },
+  { id: 'east-lancashire', name: 'East Lancashire derby', clubs: ['blackburn-rovers', 'burnley'] },
+  { id: 'west-yorkshire', name: 'West Yorkshire derby', clubs: ['leeds-united', 'bradford-city'] },
+  { id: 'tees-wear', name: 'Tees–Wear derby', clubs: ['middlesbrough', 'sunderland'] },
+  { id: 'south-wales', name: 'South Wales derby', clubs: ['cardiff-city', 'swansea-city'] },
+  { id: 'severnside', name: 'Severnside derby', clubs: ['bristol-city', 'cardiff-city'] },
+  { id: 'bristol', name: 'Bristol derby', clubs: ['bristol-city', 'bristol-rovers'] },
+  { id: 'potteries', name: 'Potteries derby', clubs: ['stoke-city', 'port-vale'] },
+  { id: 'west-lancashire', name: 'West Lancashire derby', clubs: ['preston-north-end', 'blackpool'] },
+  { id: 'm69', name: 'M69 derby', clubs: ['coventry-city', 'leicester-city'] },
+  { id: 'beds-herts', name: 'Bedfordshire–Hertfordshire derby', clubs: ['luton-town', 'watford'] },
+  { id: 'a420', name: 'A420 derby', clubs: ['oxford-united', 'swindon-town'] },
+  { id: 'devon', name: 'Devon derby', clubs: ['plymouth-argyle', 'exeter-city'] },
+  { id: 'lincolnshire', name: 'Lincolnshire derby', clubs: ['lincoln-city', 'grimsby-town'] },
+  { id: 'dons', name: 'Dons derby', clubs: ['afc-wimbledon', 'milton-keynes-dons'] },
+  { id: 'north-wales-cheshire', name: 'Cross-border derby', clubs: ['wrexham', 'chester-city'] },
+  { id: 'nottingham', name: 'Nottingham derby', clubs: ['nottingham-forest', 'notts-county'] },
+  { id: 'south-yorkshire', name: 'South Yorkshire derby', clubs: ['barnsley', 'sheffield-wednesday'] },
+  { id: 'essex', name: 'Essex derby', clubs: ['southend-united', 'colchester-united'] },
+  { id: 'cumbria', name: 'Cumbrian derby', clubs: ['carlisle-united', 'barrow'] },
+];

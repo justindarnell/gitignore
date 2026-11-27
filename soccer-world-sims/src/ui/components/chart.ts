@@ -3,6 +3,9 @@
  * single tooltip listing every series at that x. Long histories are min/max-decimated per
  * pixel column for drawing, while hover always reads the original data.
  */
+/** Categorical palette for multi-series charts (distinguishable on the dark surface). */
+export const CATEGORICAL = ['#4e9af1', '#f28e2b', '#e15759', '#59c3b5', '#8cd17d', '#edc948', '#c490d1', '#ff9da7', '#b6997b', '#bab0ac', '#2fb36b', '#86bcb6'];
+
 export interface Series { label: string; color: string; values: (number | null)[]; width?: number }
 export interface Band { from: number; to: number; label: string }
 export interface TooltipRow { label: string; value: string; color?: string }

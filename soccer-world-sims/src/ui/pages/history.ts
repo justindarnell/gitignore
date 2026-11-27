@@ -2,9 +2,10 @@ import type { Page } from '../types.ts';
 import { club, esc, tabs, empty, scoreText, f1, signed } from '../dom.ts';
 import { leagues, league, seasonLabel, compLabel, titleCounts, country } from '../data.ts';
 import { leagueTable } from './standings.ts';
+import { erasSection, rivalriesSection } from './stories.ts';
 import type { World } from '../../engine/types.ts';
 
-const TABS = [['honours', 'Rolls of honour'], ['totals', 'Trophy totals'], ['tables', 'Historical tables'], ['moves', 'Promotion & relegation'], ['records', 'Records'], ['rankings', 'Rise & fall']];
+const TABS = [['honours', 'Rolls of honour'], ['totals', 'Trophy totals'], ['tables', 'Historical tables'], ['moves', 'Promotion & relegation'], ['records', 'Records'], ['rankings', 'Rise & fall'], ['eras', 'Eras & dynasties'], ['rivalries', 'Rivalries'], ['seasons', 'Season reviews']];
 
 function competitions(world: World) {
   return [...leagues(world).map(l => ({ id: l.id, name: l.name })), ...country(world).cups.map(c => ({ id: c.id, name: c.name }))];
@@ -129,16 +130,29 @@ function rankings(world: World, args: string[], state: { rankMetric: string; ran
     <p class="muted small">Values are end-of-season snapshots. Pyramid position: 1 = Premier League champions, 116 = bottom of the National League.</p>`;
 }
 
+function seasonsList(world: World): string {
+  const H = world.history;
+  if (!H.leagues.length) return empty('No completed seasons yet.');
+  return `<section class="card"><div class="table-wrap"><table class="table compact"><thead><tr><th>Season</th><th>Champions</th><th>Headline</th></tr></thead><tbody>${H.snapshots.map((s, k) => {
+    const top = (H.stories[k] ?? [])[0];
+    return `<tr><td class="nowrap"><a href="#/season/${s.year}">${esc(seasonLabel(s.year))}</a></td><td>${club(world, H.leagues[k][0].champion, { crest: 'xs' })}</td><td class="small">${top ? esc(top.text) : '<span class="muted">—</span>'}</td></tr>`;
+  }).reverse().join('')}</tbody></table></div></section>`;
+}
+
 export const historyPage: Page = ({ world, args, state }) => {
   const tab = args[0] ?? state.historyTab;
   state.historyTab = tab;
   let body = '';
+  let mount: ((root: HTMLElement) => (() => void) | void | undefined) | undefined;
   if (tab === 'honours') { const comp = args[1] ?? state.historyComp; state.historyComp = comp; body = honours(world, comp); }
   else if (tab === 'totals') body = totals(world);
   else if (tab === 'tables') body = tables(world, args);
   else if (tab === 'moves') body = moves(world);
   else if (tab === 'records') body = records(world);
+  else if (tab === 'eras') { const e = erasSection(world); body = e.html; mount = e.mount; }
+  else if (tab === 'rivalries') body = rivalriesSection(world);
+  else if (tab === 'seasons') body = seasonsList(world);
   else body = rankings(world, args, state);
   void league;
-  return { title: 'World history', html: `<div class="page-head"><h1>World history</h1><p class="muted">${world.history.leagues.length} completed season${world.history.leagues.length === 1 ? '' : 's'}</p></div>${tabs(TABS.map(([id, label]) => ({ id, label, href: `#/history/${id}` })), tab)}${body}` };
+  return { title: 'World history', html: `<div class="page-head"><h1>World history</h1><p class="muted">${world.history.leagues.length} completed season${world.history.leagues.length === 1 ? '' : 's'}</p></div>${tabs(TABS.map(([id, label]) => ({ id, label, href: `#/history/${id}` })), tab)}${body}`, mount: mount as never };
 };

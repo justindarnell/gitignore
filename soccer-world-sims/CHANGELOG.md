@@ -20,6 +20,19 @@
   errors); the browser check verifies the fallback instead of failing.
 * `tools/perf.mjs` measures speed, heap and save size per storage level.
 
+### Goal 2: stories, eras, title races and rivalries
+* **Story of the season**: final-day title races, runaways, see-saw races, invincibles, unbeaten, winning and
+  losing runs, collapses into relegation, great escapes, points records and cup giant-killings. Detected from
+  data the engine already holds, with no randomness consumed (results are bit-identical to Goal 1). Stories are
+  shown on a new **season review** page, on the overview, in the season list and in the news.
+* **Eras and dynasties**, club **golden ages** and a **decades bump chart** (History → Eras & dynasties).
+* **Title-race chart** on the standings page (live this season; stored at Standard for past seasons).
+* **Rivalries**: 33 configured derbies, head-to-head aggregates for every pair of clubs, a head-to-head
+  page, derby records on club profiles and derby news.
+* Storage: stories and head-to-head at every level; race tracks and the last 10 derby meetings at Standard+.
+  100-season saves: Essential 3.6 MB, Standard 6.8 MB, Full 16.6 MB. Save schema 3 with migration.
+* Charts never overflow their card at phone width, and chart legends wrap.
+
 ## 0.5.0 (2026-11-27): complete rebuild
 
 ### Data

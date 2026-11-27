@@ -1,6 +1,6 @@
 import { Rng } from './rng.ts';
 import { effectiveParams, type EngineParams } from './params.ts';
-import type { ClubState, CountryConfig, Match, World } from './types.ts';
+import type { ClubState, CountryConfig, DerbyConfig, H2H, Match, World } from './types.ts';
 import { ENGLAND } from '../data/england/config.ts';
 
 /** Registry of country configurations (add new countries here). */
@@ -23,7 +23,15 @@ export interface Runtime {
   byId: Map<number, Match>;
   leagueOf: Map<string, string>;
   tierOf: Map<string, number>;
+  /** Derby by pair key "a|b" (a < b), for derbies whose clubs both exist in this world. */
+  derbyOf: Map<string, DerbyConfig>;
+  /** Fast numeric-key views of world.history.h2h and derbyOf (index pair = lo * 4096 + hi). */
+  h2hByIdx: Map<number, H2H>;
+  derbyByIdx: Map<number, DerbyConfig>;
 }
+
+export const pairIndex = (i: number, j: number) => i < j ? i * 4096 + j : j * 4096 + i;
+export const pairKey = (a: string, b: string) => a < b ? `${a}|${b}` : `${b}|${a}`;
 
 const cache = new WeakMap<World, Runtime>();
 
@@ -41,7 +49,11 @@ export function runtime(world: World): Runtime {
       rng: new Rng(world.rng),
       seasonYear: -1,
       bySlot: [], byId: new Map(), leagueOf: new Map(), tierOf: new Map(),
+      derbyOf: new Map((country.derbies ?? []).filter(d => world.info[d.clubs[0]] && world.info[d.clubs[1]]).map(d => [pairKey(d.clubs[0], d.clubs[1]), d])),
+      h2hByIdx: new Map(), derbyByIdx: new Map(),
     };
+    const ci = rt.clubIndex;
+    for (const d of rt.derbyOf.values()) rt.derbyByIdx.set(pairIndex(ci.get(d.clubs[0])!, ci.get(d.clubs[1])!), d);
     cache.set(world, rt);
   }
   if (rt.settingsKey !== key) { rt.params = effectiveParams(world.params, world.settings); rt.settingsKey = key; }

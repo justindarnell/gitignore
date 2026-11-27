@@ -2,11 +2,10 @@
 
 ## Near term (0.5.x)
 
-* Address the reported calibration weaknesses: variable promotion investment linked to reputation
-  and ownership events; lower-league mobility; champion points.
+* Address the reported calibration weaknesses (promoted-club variety, lower-league mobility, champion
+  points). The 0.6 ownership-ambition attempt was not adopted (CALIBRATION.md); next idea: ownership acting
+  on squad quality relative to reputation so giants are not over-relegated.
 * A data-table view for every graph, plus CSV export of history tables.
-* A season-review screen with a "story of the season" (biggest upsets, streaks, collapses).
-* Head-to-head records between two clubs.
 * Optional historical season replays (watch a season's table evolve matchday by matchday).
 * Additional languages and number formats.
 

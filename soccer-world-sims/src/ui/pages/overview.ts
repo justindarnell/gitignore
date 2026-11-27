@@ -3,6 +3,7 @@ import { club, esc, scoreText, empty } from '../dom.ts';
 import { leagues, standings, seasonLabel, compLabel, zoneOf, form, currentRound, country } from '../data.ts';
 import type { World } from '../../engine/types.ts';
 import { cupAlive } from '../../engine/world.ts';
+import { storyList } from './stories.ts';
 
 function miniTable(world: World, lid: string, rows = 6): string {
   const l = leagues(world).find(x => x.id === lid)!;
@@ -24,7 +25,8 @@ function seasonSummary(world: World): string {
       ${lr.promoted.length ? `<div class="mini-list"><span class="tag up">Up</span> ${lr.promoted.map(c => club(world, c, { crest: 'xs' })).join(' ')}</div>` : ''}
       ${lr.relegated.length ? `<div class="mini-list"><span class="tag down">Down</span> ${lr.relegated.map(c => club(world, c, { crest: 'xs' })).join(' ')}</div>` : ''}</div>`).join('')}
       ${cs.map(c => `<div class="summary-item"><div class="eyebrow">${esc(compLabel(world, c.cup))}</div><div class="summary-champ">${club(world, c.winner, { crest: 'md', bold: true })}</div><div class="muted small">Final: ${esc(world.info[c.final.home]?.short ?? '')} ${scoreText(c.final.hg, c.final.ag, c.final.et, c.final.pens)} ${esc(world.info[c.final.away]?.short ?? '')}</div></div>`).join('')}
-    </div><p class="muted small">Advance once more to apply club development and start ${esc(seasonLabel(world.season.year + 1))}.</p></section>`;
+    </div>${(world.history.stories[k] ?? []).length ? `<h3>Story of the season</h3>${storyList(world, world.history.stories[k].slice(0, 5))}` : ''}
+    <p class="small"><a href="#/season/${world.season.year}" class="link">Full season review →</a></p><p class="muted small">Advance once more to apply club development and start ${esc(seasonLabel(world.season.year + 1))}.</p></section>`;
 }
 
 export const overviewPage: Page = ({ world }) => {

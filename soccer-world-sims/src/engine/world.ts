@@ -5,7 +5,7 @@ import { buildCalendar, doubleRoundRobin, leagueSlots, slotKey } from './schedul
 import { applyResult, emptyRow, sortTable } from './table.ts';
 import { addMatch, COUNTRIES, reindexSeason, runtime, syncRng, type Runtime } from './runtime.ts';
 import { evolveClubs } from './evolution.ts';
-import { recordMatch, recordSeasonEnd, pushNews, clubHistory } from './history.ts';
+import { recordMatch, recordMeeting, recordSeasonEnd, pushNews, clubHistory } from './history.ts';
 import type {
   ClubInfo, ClubState, CountryConfig, CupConfig, CupContext, CupState, LeagueConfig, Match, PlayoffState,
   SeasonState, Settings, TableRow, Tie, World,
@@ -14,7 +14,7 @@ import clubsDb from '../data/england/clubs.json' with { type: 'json' };
 import { ENGLAND_PREVIOUS } from '../data/england/config.ts';
 
 export const ENGINE_VERSION = '0.6.0';
-export const SAVE_SCHEMA = 2;
+export const SAVE_SCHEMA = 3;
 
 export interface CreateOptions {
   seed?: string;
@@ -64,7 +64,7 @@ export function createWorld(opts: CreateOptions = {}): World {
     rng: rng.state(), params, settings: { ...DEFAULT_SETTINGS, ...opts.settings }, settingsLog: [],
     info, clubs, levelCurve,
     season: undefined as unknown as SeasonState,
-    history: { snapshots: [], leagues: [], cups: [], clubs: {}, matches: {}, records: { biggestWins: [] } },
+    history: { snapshots: [], leagues: [], cups: [], clubs: {}, matches: {}, records: { biggestWins: [] }, stories: [], h2h: {}, h2hSince: opts.startYear ?? 2026, derbyMeetings: {} },
     news: [],
     previousRankings: { ...ENGLAND_PREVIOUS.rankings },
     previousRelegated: { ...ENGLAND_PREVIOUS.relegated },
@@ -234,6 +234,7 @@ function playMatch(world: World, rt: Runtime, m: Match): void {
   if (table) applyResult(table, m.home, m.away, hg, ag);
   else resolveKnockout(world, rt, m, lh, la, comp.extraTime(m.stage));
   if (world.settings.storage !== 'essential') recordMatch(world, m);
+  recordMeeting(world, rt, m); // head-to-head, derbies (no randomness)
 }
 
 interface CompInfo { rotation(stage: string): number; extraTime(stage: string): boolean }

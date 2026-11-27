@@ -11,7 +11,9 @@
             │ table.ts      standings + tiebreakers                                      │
             │ evolution.ts  end-of-season club development                               │
             │ events.ts     random club events                                           │
-            │ history.ts    snapshots, records, honours, timelines, news                 │
+            │ history.ts    snapshots, records, honours, timelines, news, head-to-head   │
+            │ stories.ts    story-of-the-season detection, matchday tracks (no RNG)      │
+            │ eras.ts       eras, dynasties, golden ages, decade rankings (derived)      │
             │ sim.ts        simulation targets (matchday … N seasons), bulk loop        │
             │ runtime.ts    non-serialised caches + live RNG                             │
             └───────────────────────────────────────────────────────────────────────────┘
@@ -141,11 +143,37 @@ rounds have fixed slots. A test asserts that no club ever has two matches in one
 
 ## History and storage levels
 
-| Level | Stored per season | 100 seasons (measured) |
+| Level | Stored per season | 100 seasons (measured, 0.6) |
 |---|---|---|
-| Essential | final tables, champions, movements, cup winners/finals, club snapshots (ratings, reputation, stability, position), timelines, news | 2.7 MB JSON (0.4 MB gzipped) |
-| Standard (default) | + matchday-by-matchday positions, full cup results, best/worst matches, world records | 5.5 MB (0.9 MB gzipped) |
-| Full | + every league result | 15.3 MB (2.2 MB gzipped) |
+| Essential | final tables, champions, movements, cup winners/finals, club snapshots (ratings, reputation, stability, position), timelines, news, **stories of the season**, **head-to-head aggregates** | 3.6 MB JSON (0.5 MB gzipped) |
+| Standard (default) | + matchday-by-matchday positions, full cup results, best/worst matches, world records, **title/promotion race tracks** (top six's points by matchday, every league), **last 10 meetings of each derby** | 6.8 MB (1.2 MB gzipped) |
+| Full | + every league result | 16.6 MB (2.4 MB gzipped) |
+
+### Stories, eras and rivalries (0.6)
+
+None of these consume randomness or change simulation state. A test checks that results are identical at every storage level and that 0.6 Goal-2 code reproduces the Goal-1 results bit for bit.
+
+* **Stories** (`stories.ts`) are detected in `recordSeasonEnd` from the season's matches, which are still in memory
+  at every storage level. A matchday track (points, and positions by points, goal difference and goals scored)
+  is rebuilt per league. The detected kinds are: title decided on the final day (the champion could still be
+  caught going into it) or snatched; runaway titles; see-saw races (6+ lead changes after a quarter of the
+  season); invincibles; long unbeaten, winning and losing runs; collapses from the top four (or the automatic
+  promotion places) after a third of the season into relegation; great escapes (bottom with a fifth of the
+  season left); record high and low points against the world's history (top two tiers for lows); and the two
+  biggest cup giant-killings (winner at least two levels below). At most 10 are kept per season (by
+  importance), and those with importance 4–5 also go to the news.
+* **Race tracks**: the top six finishers' cumulative points per matchday in `LeagueSeasonRecord.race`
+  (Standard+). The current season's race is computed live from its matches.
+* **Eras** (`eras.ts`, computed on demand): runs of 3+ top-flight titles no more than 3 seasons apart, with titles
+  in at least half the seasons spanned; 5+ titles make a *dynasty*. A **golden age** is a club's highest-scoring
+  window of 3–12 seasons (title 10, FA Cup 4, other cups 2.5, promotion 1.5, lower-division title 1, up to 2 for a high
+  pyramid finish, minus 0.8 per season). The **decades bump chart** ranks clubs by mean pyramid position per decade.
+* **Rivalries**: derbies are country configuration (`src/data/england/derbies.ts`, 33 pairs). `history.h2h`
+  aggregates every competitive meeting between two playable clubs (`[P, W_a, D, W_b, GF_a, GF_b]`, key `a|b`
+  with a < b). Its size is bounded by the number of pairs (~0.3 MB after a century). Derby meetings
+  (Standard+) keep the last 10 per derby. Derby news covers top-two-tier derbies, cup derbies and derby wins
+  by 3+ goals. The head-to-head page lists the individual meetings that are stored: derbies, cup ties
+  (Standard+) and league games (Full).
 
 Best/worst matches are ranked as follows. **Biggest wins**: larger margin, then more goals scored,
 then away wins ahead of home wins, then the earlier match. **Heaviest defeats**: larger margin, then
@@ -157,8 +185,10 @@ more goals conceded, then home defeats ahead of away defeats, then the earlier m
   store holds slot metadata (name, seed, season, date, size). Autosave writes after every simulation.
 * Export downloads `.sws.json.gz` (gzip via `CompressionStream`, or plain JSON when that is
   unavailable). Import accepts both.
-* Every save has `schema` (currently 2). Migration 1 → 2 (0.6) gives every club neutral ownership
-  ambition (`ambition` 0, `ownerSince` null) and the new `ownership` setting at 0.
+* Every save has `schema` (currently 3). Migration 1 → 2 (0.6) gives every club neutral ownership
+  ambition (`ambition` 0, `ownerSince` null) and the new `ownership` setting at 0. Migration 2 → 3 (0.6)
+  adds empty stories for past seasons (they cannot be re-detected), an empty head-to-head table counted
+  from the current season (`h2hSince`, shown in the UI) and empty derby lists.
 * Every save has `schema`. `upgradeWorld` runs registered migrations (`MIGRATIONS[n]: n → n+1`) and
   fills defaults for new fields. Saves from a newer schema are rejected with a clear message.
 * Browsers that block storage for `file://` pages get an on-screen message pointing to export/import.
@@ -182,11 +212,16 @@ Measured in this container (Node 22, headless Chromium):
 Re-measured for 0.6 with `node --expose-gc --experimental-strip-types tools/perf.mjs` on a slower
 container. 0.5 and 0.6 were measured on the same machine so they are directly comparable:
 
-| 100 seasons | 0.5 | 0.6 (goal 1: ownership ambition) |
-|---|---|---|
-| Essential | 0.78 s · 2.71 MB (0.40 MB gz) | 0.76 s · 2.72 MB (0.41 MB gz) |
-| Standard | 1.99 s · 5.51 MB (0.94 MB gz) | 2.07 s · 5.53 MB (0.95 MB gz) |
-| Full | 1.93 s · 15.25 MB (2.15 MB gz) | 1.80 s · 15.26 MB (2.15 MB gz) |
+| 100 seasons | 0.5 | 0.6 goal 1 (ownership) | 0.6 goal 2 (stories, rivalries) |
+|---|---|---|---|
+| Essential | 0.78 s · 2.71 MB (0.40 MB gz) | 0.76 s · 2.72 MB (0.41 MB gz) | 1.1–1.3 s · 3.55 MB (0.54 MB gz) |
+| Standard | 1.99 s · 5.51 MB (0.94 MB gz) | 2.07 s · 5.53 MB (0.95 MB gz) | 2.27 s · 6.82 MB (1.17 MB gz) |
+| Full | 1.93 s · 15.25 MB (2.15 MB gz) | 1.80 s · 15.26 MB (2.15 MB gz) | 2.40 s · 16.56 MB (2.37 MB gz) |
+
+Goal 2 adds about 3–4 ms per season. Profiling showed head-to-head bookkeeping and the end-of-season matchday
+tracks as the main costs; head-to-head now uses a numeric-key runtime cache. The extra save size is mostly derby
+news (~0.25 MB per century), the head-to-head table (~0.3 MB, bounded) and, at Standard, race tracks
+(~0.4 MB).
 
 Crests are separate cached image files referenced by stable URLs and lazy-loaded. Nothing is embedded
 as base64 in the HTML, which was the 0.4.x performance problem. Charts draw to canvas with per-pixel
@@ -194,12 +229,12 @@ min/max decimation, so matchday-level histories (~4,600 points per century) rend
 
 ## Testing
 
-* `npm test`: 34 engine tests covering database integrity, fixture counts and uniqueness, home/away
+* `npm test`: 41 engine tests covering database integrity, fixture counts and uniqueness, home/away
   balance, clash-free calendar, scoring, tiebreakers, promotion/relegation counts, play-off brackets
   (including the six-team Championship format), FA Cup and EFL Cup structure, single winners,
   history consistency, graph data, best/worst ranking rules, attribute bounds, determinism,
   save/load equivalence, bulk vs step-by-step equivalence, and pause/resume equivalence.
-* `node tools/browser-test.mjs`: 35 end-to-end checks in headless Chromium against `dist/` opened via
+* `node tools/browser-test.mjs`: 45 end-to-end checks in headless Chromium against `dist/` opened via
   `file://`, with all network requests blocked. Covers navigation, club links, graph hover and tooltips,
   decimal formatting, badge loading, matchday controls, competitions, history pages, settings, saves
   and reload, a 100-season bulk run with pause/resume and cancel, responsiveness, memory, phone-width

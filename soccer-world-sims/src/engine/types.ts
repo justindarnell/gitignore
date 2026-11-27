@@ -92,6 +92,8 @@ export interface CountryConfig {
   /** Month (0-11) and minimum day of the season's first Saturday. */
   seasonStart: { month: number; day: number };
   regions: Record<string, 'N' | 'S'>;
+  /** Named derbies/rivalries (tracked when both clubs exist in the world). */
+  derbies?: DerbyConfig[];
 }
 
 // =====================================================================================
@@ -233,6 +235,8 @@ export interface LeagueSeasonRecord {
   promotedViaPlayoff?: string;
   relegated: string[];
   playoffFinal?: { home: string; away: string; hg: number; ag: number; pens?: [number, number]; et?: boolean };
+  /** Title/promotion race (Standard+): the top six finishers' cumulative points after each matchday. */
+  race?: [string, ...number[]][];
 }
 
 export interface CupSeasonRecord {
@@ -288,7 +292,18 @@ export interface History {
   /** League match results per season (Full storage): season -> compact matches. */
   matches: Record<number, CompactMatch[]>;
   records: { biggestWins: MatchRecord[] };
+  /** Detected stories per season (all storage levels). */
+  stories: Story[][];
+  /** Head-to-head aggregates between playable clubs, key "a|b" (a < b), all competitions (all levels). */
+  h2h: Record<string, H2H>;
+  /** First season counted in h2h (later than the world's start for saves upgraded from schema 2). */
+  h2hSince: number;
+  /** Most recent derby meetings per derby id (Standard+), newest last. */
+  derbyMeetings: Record<string, DerbyMeeting[]>;
 }
+
+/** [season, comp, stage, home, away, hg, ag, flags(bit0 et, bit1 pens), penH, penA] */
+export type DerbyMeeting = [number, string, string, string, string, number, number, number?, number?, number?];
 
 export interface World {
   schema: number;

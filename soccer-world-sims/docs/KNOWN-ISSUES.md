@@ -23,6 +23,16 @@
   the model. Midfield is derived (mean of attack and defence) because goal data cannot identify it.
 * Several modern-era targets are explicit judgements (documented in `tools/calibrate/targets.mjs`).
 
+## Stories and rivalries
+
+* In-season positions used by stories (lead changes, collapses, great escapes) rank by points, goal difference
+  and goals scored only. Final positions use the full tiebreakers.
+* Story thresholds (e.g. 6 lead changes, 20-game unbeaten runs in the top flight) are judgements, chosen so a
+  typical season produces a handful of stories.
+* The derby list is a curated set of well-known pairs, not exhaustive. Head-to-head totals in saves upgraded from
+  an earlier version count from the upgrade season only. Individual meetings are listed only where stored
+  (derbies and cup ties at Standard, league games at Full).
+
 ## Rules
 
 * Simplifications are documented in COMPETITIONS.md: European entrants are approximated as the

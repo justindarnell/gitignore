@@ -50,7 +50,17 @@ The same seed and settings always produce the same history, however you split th
   relegations, records (streaks, biggest wins, notable achievements) and Rise & fall rankings (most
   improved and declined by rating, reputation, pyramid position or stability, for all time, the last
   5 or 10 seasons, or a custom period).
-* **News**: the world news feed, filterable by type.
+  The profile also lists the club's **rivalries** (derby records) and its **golden age**.
+* **Standings** includes a **title-race chart** (points by matchday for the top six; past seasons need
+  Standard storage).
+* **Season review** (`#/season/<year>`, linked from the overview at season end and from History →
+  Season reviews): the automatically detected *story of the season* (final-day title races, collapses,
+  great escapes, long runs, records, giant-killings), the honours and the title-race chart.
+* **History → Eras & dynasties**: labelled eras ("The Newcastle Era, 2041–2049"), dynasties (5+ titles),
+  a decades bump chart of the top clubs' pyramid positions and each top club's golden age.
+  **History → Rivalries**: every configured derby with its record. **Head-to-head** (`#/h2h/<a>/<b>`):
+  any two clubs, with totals and the individual meetings that are stored.
+* **News**: the world news feed, filterable by type (including Stories, Derbies and Ownership).
 * **Settings**: see below.
 * **Saves**: save slots, autosave, export/import, and starting a new world (optionally from a seed).
 

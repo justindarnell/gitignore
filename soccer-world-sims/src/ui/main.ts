@@ -12,6 +12,7 @@ import { cupsPage } from './pages/cups.ts';
 import { clubsPage, clubPage } from './pages/clubs.ts';
 import { historyPage } from './pages/history.ts';
 import { newsPage, settingsPage, savesPage } from './pages/misc.ts';
+import { seasonPage, h2hPage } from './pages/stories.ts';
 import * as store from './store.ts';
 import type { SaveMeta } from '../persistence/save.ts';
 
@@ -41,7 +42,7 @@ const $ = <T extends HTMLElement>(sel: string) => document.querySelector(sel) as
 // ------------------------------------------------------------------ routing
 const PAGES: Record<string, Page> = {
   overview: overviewPage, standings: standingsPage, fixtures: fixturesPage, cups: cupsPage, clubs: clubsPage, club: clubPage,
-  history: historyPage, news: newsPage, settings: settingsPage,
+  history: historyPage, news: newsPage, settings: settingsPage, season: seasonPage, h2h: h2hPage,
 };
 const NAV = [['overview', 'Overview'], ['standings', 'Standings'], ['fixtures', 'Fixtures'], ['cups', 'Cups'], ['clubs', 'Clubs'], ['history', 'History'], ['news', 'News'], ['settings', 'Settings'], ['saves', 'Saves']];
 
@@ -63,7 +64,7 @@ function render(keepScroll = false): void {
   main.innerHTML = res.html;
   document.title = `${res.title} · Soccer World Sims`;
   cleanup = res.mount?.(main);
-  const navKey = r.page === 'club' ? 'clubs' : r.page;
+  const navKey = r.page === 'club' ? 'clubs' : r.page === 'season' || r.page === 'h2h' ? 'history' : r.page;
   for (const a of document.querySelectorAll<HTMLAnchorElement>('#nav a')) a.classList.toggle('active', a.dataset.page === navKey);
   $('#season-label').textContent = seasonLabel(world.season.year);
   $('#date-label').textContent = nextSlotLabel(world);
@@ -198,6 +199,8 @@ document.addEventListener('change', e => {
   if (k === 'standings-season') go(`#/standings/${el.dataset.league}${el.value ? '/' + el.value : ''}`);
   else if (k === 'fixtures-round') go(`#/fixtures/${el.dataset.comp}/${el.value}`);
   else if (k === 'clubs-league') { state.clubsFilter.league = el.value; render(true); }
+  else if (k === 'season-review') go(`#/season/${el.value}`);
+  else if (k === 'h2h-a' || k === 'h2h-b') { const r = route(); const ids = [r.args[0] ?? '', r.args[1] ?? '']; const sel = [...document.querySelectorAll<HTMLSelectElement>('.h2h-pick select')].map(x => x.value); go(`#/h2h/${sel[0] ?? ids[0]}/${sel[1] ?? ids[1]}`); }
   else if (k === 'history-season') go(`#/history/tables/${el.value}/${el.dataset.league}`);
   else if (k === 'rank-from') { state.rankFrom = Number(el.value); render(true); }
   else if (k === 'rank-to') { state.rankTo = Number(el.value); render(true); }

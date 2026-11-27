@@ -1,3 +1,4 @@
+import { ENGLAND_DERBIES } from './derbies.ts';
 import type { CountryConfig, LeagueConfig, PlayoffConfig, SlotRef, Tiebreaker } from '../../engine/types.ts';
 
 // Calendar convention: week 0 = first Saturday on/after 1 August; day 0 = Sat, 1 = Sun,
@@ -85,6 +86,7 @@ export const ENGLAND: CountryConfig = {
   id: 'ENG',
   name: 'England',
   seasonStart: { month: 7, day: 1 },
+  derbies: ENGLAND_DERBIES,
   leagues,
   cups: [
     {

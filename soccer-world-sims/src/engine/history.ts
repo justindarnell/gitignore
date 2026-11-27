@@ -1,6 +1,7 @@
 import type { Runtime } from './runtime.ts';
-import type { ClubHistory, TimelineKind, CompactMatch, CupSeasonRecord, LeagueSeasonRecord, Match, MatchRecord, NewsItem, TableRow, World } from './types.ts';
-import { COUNTRIES } from './runtime.ts';
+import type { ClubHistory, DerbyMeeting, TimelineKind, CompactMatch, CupSeasonRecord, LeagueSeasonRecord, Match, MatchRecord, NewsItem, TableRow, World } from './types.ts';
+import { COUNTRIES, pairKey, pairIndex } from './runtime.ts';
+import { detectStories, leagueTrack } from './stories.ts';
 
 const MAX_RECORDS = 8;
 const MAX_WORLD_RECORDS = 25;
@@ -71,6 +72,50 @@ export function recordMatch(world: World, m: Match): void {
   if (margin >= 4 && (world.history.clubs[winner] || world.history.clubs[loser])) insertRanked(world.history.records.biggestWins, rec, compareWorld, MAX_WORLD_RECORDS);
 }
 
+const MAX_DERBY_MEETINGS = 10;
+
+/**
+ * Head-to-head aggregate (every competitive match between two playable clubs, all storage levels;
+ * bounded by the number of pairs) plus derby meetings (Standard+) and derby news. Pure bookkeeping:
+ * no randomness, so it cannot change results.
+ */
+export function recordMeeting(world: World, rt: Runtime, m: Match): void {
+  if (m.hg === undefined) return;
+  const ih = rt.clubIndex.get(m.home), ia = rt.clubIndex.get(m.away);
+  if (ih === undefined || ia === undefined) return;
+  const pi = pairIndex(ih, ia);
+  const H = world.history;
+  let r = rt.h2hByIdx.get(pi);
+  if (!r) { r = H.h2h[pairKey(m.home, m.away)] ??= [0, 0, 0, 0, 0, 0]; rt.h2hByIdx.set(pi, r); }
+  const homeIsA = m.home < m.away;
+  const ga = homeIsA ? m.hg : m.ag!, gb = homeIsA ? m.ag! : m.hg;
+  r[0]++; r[4] += ga; r[5] += gb;
+  if (ga > gb) r[1]++; else if (ga < gb) r[3]++; else r[2]++;
+  const derby = rt.derbyByIdx.get(pi);
+  if (!derby) return;
+  const flags = (m.et ? 1 : 0) | (m.pens ? 2 : 0);
+  if (world.settings.storage !== 'essential') {
+    const list = H.derbyMeetings[derby.id] ??= [];
+    const rec: DerbyMeeting = [world.season.year, m.comp, m.stage, m.home, m.away, m.hg, m.ag!];
+    if (flags) rec.push(flags, m.pens?.[0] ?? 0, m.pens?.[1] ?? 0);
+    list.push(rec);
+    if (list.length > MAX_DERBY_MEETINGS) list.splice(0, list.length - MAX_DERBY_MEETINGS);
+  }
+  // News: top-two-tier derbies, cup derbies and heavy derby defeats anywhere.
+  const tier = Math.max(rt.tierOf.get(m.home) ?? 9, rt.tierOf.get(m.away) ?? 9);
+  const isLeague = !!world.season.tables[m.comp];
+  const margin = Math.abs(m.hg - m.ag!);
+  if (!(tier <= 2 || !isLeague || margin >= 3)) return;
+  const nm = (id: string) => world.info[id].short;
+  const comp = competitionLabel(world.country, m.comp, isLeague ? undefined : m.stage);
+  const score = `${m.hg}–${m.ag}${m.et ? ' a.e.t.' : ''}${m.pens ? ` (${m.pens[0]}–${m.pens[1]} pens)` : ''}`;
+  const winner = m.pens ? (m.pens[0] > m.pens[1] ? m.home : m.away) : m.hg > m.ag! ? m.home : m.hg < m.ag! ? m.away : null;
+  const text = winner
+    ? `${nm(winner)} win the ${derby.name}: ${nm(m.home)} ${score} ${nm(m.away)} (${comp}).`
+    : `The ${derby.name} ends level: ${nm(m.home)} ${score} ${nm(m.away)} (${comp}).`;
+  pushNews(world, { date: world.season.calendar[m.slot].date, kind: 'derby', clubs: [m.home, m.away], importance: tier === 1 || !isLeague ? 3 : 2, text });
+}
+
 export function pushNews(world: World, item: Omit<NewsItem, 'season'> & { season?: number }): void {
   world.news.push({ season: world.season.year, ...item });
   if (world.news.length > MAX_NEWS) world.news.splice(0, world.news.length - MAX_NEWS);
@@ -96,9 +141,19 @@ export function recordSeasonEnd(
   const name = (id: string) => world.info[id]?.short ?? s.externals[id]?.name ?? id;
   const storage = world.settings.storage;
 
+  // ---- Matchday tracks (points/positions by matchday), used for stories and the race chart.
+  const tracks = Object.fromEntries(country.leagues.map(l => [l.id, leagueTrack(s.matches, l.id, s.leagueClubs[l.id])]));
+  // ---- Stories of the season (detected before this season enters the history, for records).
+  const stories = detectStories(world, country, tables, relegated, tracks);
+  world.history.stories.push(stories);
+
   // ---- League records
   const leagueRecords: LeagueSeasonRecord[] = country.leagues.map(l => {
     const rec: LeagueSeasonRecord = { league: l.id, table: tables[l.id].map(r => ({ ...r })), champion: tables[l.id][0].club, promoted: promoted[l.id], relegated: relegated[l.id] };
+    if (storage !== 'essential') {
+      const tr = tracks[l.id];
+      rec.race = tables[l.id].slice(0, 6).map(r => { const i = tr.clubs.indexOf(r.club); return [r.club, ...tr.pts.map(p => p[i])] as [string, ...number[]]; });
+    }
     if (l.playoff) {
       const st = s.playoffs[l.playoff.id];
       const final = st.ties.find(t => t.roundIndex === l.playoff!.rounds.length - 1);
@@ -187,6 +242,7 @@ export function recordSeasonEnd(
       if (i === 0 || rep >= 75) pushNews(world, { date, kind: 'relegation', clubs: [c], importance: rep >= 80 ? 5 : i === 0 ? 3 : 2, text: `${name(c)} relegated from the ${leagueName(l.id)}${rep >= 80 ? ' — a historic fall for one of the giants' : ''}.` });
     }
   });
+  for (const st of stories) if (st.importance >= 4) pushNews(world, { date, kind: 'story', clubs: st.clubs, importance: st.importance, text: st.text });
   for (const rec of cupRecords) {
     const cup = country.cups.find(c => c.id === rec.cup)!;
     if (world.info[rec.winner]) addEvent(world, rec.winner, `${cup.name} winners`, 'honour', 1);

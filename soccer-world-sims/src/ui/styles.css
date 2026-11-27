@@ -69,6 +69,7 @@ a.eyebrow:hover { color: var(--text); }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 14px; }
 .grid-2 { display: grid; grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr); gap: 14px; align-items: start; }
 .span-2 { grid-column: span 2; }
+.span-all { grid-column: 1 / -1; }
 .card { background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; box-shadow: var(--shadow); min-width: 0; }
 .grid-2 > div > .card, .grid-2 > aside > .card { margin-bottom: 14px; }
 section.card + section.card { margin-top: 0; }
@@ -218,7 +219,7 @@ details.round { margin-bottom: 10px; }
 .matches .score { font-weight: 700; margin: 0 6px; }
 .chart-title { font-weight: 600; margin: 8px 0 6px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 .chart-title .seg { margin-left: auto; }
-.chart-legend { display: flex; gap: 14px; font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+.chart-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
 .chart-legend i { display: inline-block; width: 14px; height: 3px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
 .chart { position: relative; width: 100%; margin-bottom: 10px; }
 .chart canvas { display: block; cursor: crosshair; }
@@ -262,3 +263,15 @@ details.round { margin-bottom: 10px; }
   .ovr-box { border-left: 0; padding: 0; }
   input[type=search] { min-width: 0; width: 100%; }
 }
+
+/* ---- stories, eras, rivalries (0.6) */
+.story-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.story-list li { padding: 6px 10px; border-left: 3px solid var(--surface-3); background: var(--surface-2); border-radius: 6px; }
+.story-list li.imp-5 { border-left-color: var(--z-champion); }
+.story-list li.imp-4 { border-left-color: var(--series-1); }
+.kind-story { margin-right: 6px; }
+.h2h-summary { display: grid; grid-template-columns: 1fr 1fr 1fr; text-align: center; gap: 10px; align-items: center; }
+.h2h-summary .big { font-size: 34px; font-weight: 750; font-variant-numeric: tabular-nums; }
+.h2h-pick select { max-width: 42vw; }
+.eras li strong { font-weight: 650; }
+.chart canvas { display: block; max-width: 100%; }

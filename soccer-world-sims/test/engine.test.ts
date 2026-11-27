@@ -10,6 +10,7 @@ import { ENGLAND } from '../src/data/england/config.ts';
 import { Rng } from '../src/engine/rng.ts';
 import { shootout } from '../src/engine/match.ts';
 import { DEFAULT_PARAMS } from '../src/engine/params.ts';
+import { titleEras, goldenAge, decadeRankings } from '../src/engine/eras.ts';
 import type { Match, TableRow, World } from '../src/engine/types.ts';
 import clubsDb from '../src/data/england/clubs.json' with { type: 'json' };
 
@@ -389,5 +390,102 @@ describe('ownership ambition (0.6)', () => {
     for (const c of up.clubs) { assert.equal(c.ambition, 0); assert.equal(c.ownerSince, null); }
     assert.equal(up.settings.ownership, 0);
     step(up); // migrated worlds simulate
+  });
+});
+
+describe('stories, eras, races and rivalries (0.6)', () => {
+  const w = createWorld({ seed: 'stories-test', settings: { storage: 'standard' } });
+  simulate(w, { kind: 'seasons', n: 25 });
+  const tierIn = (k: number, id: string) => { const i = w.clubs.findIndex(c => c.id === id); return i < 0 ? 9 : ['ENG1', 'ENG2', 'ENG3', 'ENG4', 'ENG5'].indexOf(w.history.snapshots[k].league[i]) + 1; };
+  test('stories are recorded every season and are consistent with the recorded tables', () => {
+    assert.equal(w.history.stories.length, 25);
+    assert.ok(w.history.stories.flat().length > 25);
+    w.history.stories.forEach((ss, k) => {
+      const ls = w.history.leagues[k];
+      for (const s of ss) {
+        assert.ok(s.importance >= 1 && s.importance <= 5 && s.text.length > 10);
+        const lr = ls.find(x => x.league === s.league);
+        if (s.kind === 'collapse') assert.ok(lr!.relegated.includes(s.clubs[0]));
+        if (s.kind === 'great-escape') assert.ok(!lr!.relegated.includes(s.clubs[0]));
+        if (s.kind === 'runaway') assert.ok(lr!.table[0].pts - lr!.table[1].pts >= 15);
+        if (s.kind === 'final-day') assert.equal(s.clubs[0], lr!.champion);
+        if (s.kind === 'record-points') {
+          const li = ls.indexOf(lr!);
+          for (let j = 0; j < k; j++) assert.ok(w.history.leagues[j][li].table[0].pts < lr!.table[0].pts);
+        }
+        if (s.kind === 'giant-killing') assert.ok(tierIn(k, s.clubs[0]) - tierIn(k, s.clubs[1]) >= 2);
+      }
+    });
+  });
+  test('detecting stories and keeping head-to-head records consume no randomness (identical results at every storage level)', () => {
+    const key = (x: World) => JSON.stringify({ c: x.clubs, r: x.rng, t: x.history.leagues.map(l => l.map(y => y.table)) });
+    const e = createWorld({ seed: 'storage-eq', settings: { storage: 'essential' } }), f = createWorld({ seed: 'storage-eq', settings: { storage: 'full' } });
+    simulate(e, { kind: 'seasons', n: 3 }); simulate(f, { kind: 'seasons', n: 3 });
+    assert.equal(key(e), key(f));
+    assert.deepEqual(e.history.stories, f.history.stories);
+    assert.deepEqual(e.history.h2h, f.history.h2h);
+    assert.equal(e.history.leagues[0][0].race, undefined, 'race tracks are Standard+');
+    assert.deepEqual(e.history.derbyMeetings, {}, 'derby meeting lists are Standard+');
+  });
+  test('race tracks: top six finishers, one value per matchday, ending at final points', () => {
+    for (const lr of w.history.leagues.at(-1)!) {
+      assert.equal(lr.race!.length, 6);
+      const size = lr.table.length;
+      lr.race!.forEach((r, i) => {
+        assert.equal(r[0], lr.table[i].club);
+        assert.equal(r.length - 1, 2 * (size - 1));
+        assert.equal(r[r.length - 1], lr.table[i].pts);
+        for (let k = 2; k < r.length; k++) assert.ok((r[k] as number) >= (r[k - 1] as number));
+      });
+    }
+  });
+  test('head-to-head counts every match between playable clubs exactly once', () => {
+    const v = createWorld({ seed: 'h2h-count' });
+    simulate(v, { kind: 'season' });
+    const played = v.season.matches.filter(m => m.hg !== undefined && v.info[m.home] && v.info[m.away]);
+    const tot = Object.values(v.history.h2h).reduce((a, r) => a + r[0], 0);
+    assert.equal(tot, played.length);
+    for (const r of Object.values(v.history.h2h)) { assert.equal(r[0], r[1] + r[2] + r[3]); }
+    const [a, b] = ['arsenal', 'tottenham-hotspur'];
+    const ms = played.filter(m => (m.home === a && m.away === b) || (m.home === b && m.away === a));
+    const rec = v.history.h2h['arsenal|tottenham-hotspur'];
+    assert.equal(rec[0], ms.length);
+    assert.equal(rec[4], ms.reduce((s, m) => s + (m.home === a ? m.hg! : m.ag!), 0), 'goals for the alphabetically first club');
+  });
+  test('derby meetings are bounded, between the derby clubs, and reported in the news', () => {
+    for (const [id, list] of Object.entries(w.history.derbyMeetings)) {
+      const d = ENGLAND.derbies!.find(x => x.id === id)!;
+      assert.ok(list.length <= 10);
+      for (const m of list) assert.ok(d.clubs.includes(m[3]) && d.clubs.includes(m[4]));
+    }
+    assert.ok(Object.keys(w.history.derbyMeetings).length >= 5);
+    assert.ok(w.news.some(n => n.kind === 'derby'));
+  });
+  test('eras: title clusters, dynasties at five titles; golden ages and decade rankings are well-formed', () => {
+    const fake = { info: { a: { short: 'Alpha' }, b: { short: 'Beta' } }, history: {
+      snapshots: [2030, 2031, 2032, 2033, 2034, 2035, 2036, 2037, 2038, 2039, 2040].map(year => ({ year })),
+      leagues: ['a', 'a', 'b', 'a', 'a', 'a', 'b', 'b', 'a', 'b', 'b'].map(c => [{ champion: c }]),
+    } } as unknown as World;
+    const eras = titleEras(fake);
+    assert.deepEqual(eras.map(e => [e.club, e.from, e.to, e.titles, e.kind]), [['a', 2030, 2038, 6, 'dynasty'], ['b', 2036, 2040, 4, 'era']]);
+    assert.equal(eras[0].label, 'The Alpha Dynasty, 2030–2039');
+    for (const c of w.clubs.slice(0, 30)) {
+      const g = goldenAge(w, ENGLAND, c.id);
+      if (g) { assert.ok(g.to - g.from >= 2 && g.to - g.from <= 11); assert.ok(g.bestFinish >= 1 && g.bestFinish <= 116); }
+    }
+    const d = decadeRankings(w, 8);
+    assert.deepEqual(d.decades, [2020, 2030, 2040, 2050]);
+    assert.ok(d.clubs.length >= 8);
+    for (const r of d.ranks) assert.equal(r.length, 4);
+  });
+  test('schema 2 saves migrate to schema 3 with empty stories and head-to-head from the current season', () => {
+    const raw = JSON.parse(exportWorld(w));
+    raw.schema = 2;
+    delete raw.history.stories; delete raw.history.h2h; delete raw.history.h2hSince; delete raw.history.derbyMeetings;
+    const up = importWorld(JSON.stringify(raw));
+    assert.equal(up.history.stories.length, up.history.leagues.length);
+    assert.equal(up.history.h2hSince, up.season.year);
+    simulate(up, { kind: 'seasons', n: 1 });
+    assert.equal(up.history.stories.length, up.history.leagues.length);
   });
 });

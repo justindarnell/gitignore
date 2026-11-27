@@ -36,9 +36,10 @@ See [docs/USER-GUIDE.md](docs/USER-GUIDE.md) for the full guide.
 | Competitions | Double round-robin leagues with full tiebreakers; the new six-team Championship play-off; League One/Two/National League play-offs; FA Cup (incl. 4th qualifying round with non-playable qualifiers) and EFL Cup (regional rounds, two-legged semis) |
 | Club evolution | Reputation, stability, development cycles, rank-based economics, promotion/relegation effects, title fatigue, ten kinds of random events |
 | History | Rolls of honour, trophy totals, historical tables, movements, records, most improved/declined, best/worst matches, timelines, news |
+| Stories | Story of the season (final-day races, collapses, great escapes, runs, records, giant-killings), eras and dynasties, golden ages, decades bump chart, title-race charts, derbies and head-to-head records |
 | Saves | IndexedDB slots, autosave, export/import (gzip), schema versioning, three storage levels |
 | Calibration | ~1.1M simulated seasons across grid, Latin-hypercube and local searches, holdout validation and sensitivity analysis — [report](docs/CALIBRATION.md) |
-| Tests | 34 engine tests (`npm test`) + 35 end-to-end browser checks from `file://` |
+| Tests | 41 engine tests (`npm test`) + 45 end-to-end browser checks from `file://` |
 
 ## Develop
 

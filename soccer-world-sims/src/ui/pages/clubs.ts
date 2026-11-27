@@ -4,6 +4,9 @@ import { leagues, league, standings, seasonLabel, compLabel, form, trophies, pos
 import { mountChart, type Band } from '../components/chart.ts';
 import { pyramidRank } from '../../engine/world.ts';
 import { ambitionLabel } from '../../engine/params.ts';
+import { goldenAge } from '../../engine/eras.ts';
+import { clubRivalries } from './stories.ts';
+import { country } from '../data.ts';
 import type { MatchRecord, World } from '../../engine/types.ts';
 
 // ---------------------------------------------------------------- directory
@@ -110,7 +113,9 @@ export const clubPage: Page = ({ world, args, state }) => {
     <section class="card"><h2>Achievements</h2><ul class="plain">
       ${best ? `<li>Best finish: <strong>${best.pos}${best.pos === 1 ? 'st' : ''} in the ${esc(league(world, best.league).name)}</strong> (${esc(seasonLabel(best.year))})</li>` : '<li class="muted">Complete a season to build a record.</li>'}
       ${seasonsBy.map(x => `<li>${x.n} season${x.n > 1 ? 's' : ''} in the ${esc(x.l.name)}</li>`).join('')}
+      ${(() => { const g = goldenAge(world, country(world), id); return g ? `<li>Golden age: <strong>${esc(seasonLabel(g.from))}–${esc(seasonLabel(g.to))}</strong> <span class="muted small">(${g.titles} titles, ${g.cups} cups, best #${g.bestFinish})</span></li>` : ''; })()}
       <li>${moves.filter(m => m.up).length} promotions · ${moves.filter(m => !m.up).length} relegations</li></ul></section>
+    ${clubRivalries(world, id)}
     <section class="card"><h2>Promotions & relegations</h2>${moves.length ? `<ul class="timeline">${[...moves].reverse().map(m => `<li class="${m.up ? 'up' : 'down'}"><span class="muted">${esc(seasonLabel(m.year))}</span> ${esc(m.text)}</li>`).join('')}</ul>` : empty('No divisional changes yet.')}</section>
     <section class="card"><h2>Biggest wins</h2>${h.best.length ? `<ol class="matches">${h.best.map(r => matchLine(world, r)).join('')}</ol>` : empty('No wins recorded yet.')}<p class="muted small">Ranked by margin, then goals scored, then away wins, then earliest.</p></section>
     <section class="card"><h2>Heaviest defeats</h2>${h.worst.length ? `<ol class="matches">${h.worst.map(r => matchLine(world, r)).join('')}</ol>` : empty('No defeats recorded yet.')}<p class="muted small">Ranked by margin, then goals conceded, then home defeats, then earliest.</p></section>
