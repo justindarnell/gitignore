@@ -6,6 +6,9 @@ import type { LeagueConfig, Match, TableRow, World } from '../engine/types.ts';
 export { seasonLabel, overall, standings, country };
 
 export function leagues(world: World): LeagueConfig[] { return country(world).leagues; }
+/** Number of clubs in the playable pyramid (116 for 2026/27, 92 for 1992/93). */
+export function pyramidSize(world: World): number { return leagues(world).reduce((a, l) => a + l.size, 0); }
+export function pyramidNote(world: World): string { const ls = leagues(world); return `1 = top of the ${ls[0].name}, ${pyramidSize(world)} = bottom of the ${ls[ls.length - 1].name}`; }
 export function league(world: World, id: string): LeagueConfig { return leagues(world).find(l => l.id === id)!; }
 export function compLabel(world: World, comp: string, stage?: string): string {
   const l = leagues(world).find(x => x.id === comp);

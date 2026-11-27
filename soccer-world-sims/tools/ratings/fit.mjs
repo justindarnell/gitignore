@@ -8,12 +8,18 @@
 // (promoted/relegated clubs carry their underlying strength), so a club that dominated a
 // weaker division is NOT rated like an established top-flight side.
 //
-// Output: tools/ratings/fit-output.json
+// Output: tools/ratings/fit-output.json (2026/27 start) or fit-output-<year>.json with --start <year>
+// (historical starts use only the four seasons before that year, from engsoccerdata).
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseCsv, parseOpenfootball, clubKey } from '../history/lib.mjs';
-import { master } from './master.mjs';
+import { master as master2026 } from './master.mjs';
+import { members } from './master1992.mjs';
+
+const ai = process.argv.indexOf('--start');
+const START = ai > 0 ? Number(process.argv[ai + 1]) : 2026;
+const master = START === 2026 ? master2026 : members(START);
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const raw = p => join(root, 'data', 'history', 'raw', p);
@@ -21,16 +27,19 @@ const alias = { 'accrington-stanley': 'accrington', 'cheltenham-town': 'cheltenh
 const key = n => alias[clubKey(n)] ?? clubKey(n);
 
 // Recency weights by season (starting year). Half-life about one season.
-const SEASON_WEIGHT = { 2022: 0.15, 2023: 0.3, 2024: 0.55, 2025: 1.0 };
+const SEASON_WEIGHT = { [START - 4]: 0.15, [START - 3]: 0.3, [START - 2]: 0.55, [START - 1]: 1.0 };
 const matches = [];
 for (const r of parseCsv(readFileSync(raw('engsoccerdata/england.csv'), 'utf8'))) {
   const s = +r.Season;
   if (SEASON_WEIGHT[s]) matches.push({ s, tier: +r.tier, h: key(r.home), a: key(r.visitor), hg: +r.hgoal, ag: +r.vgoal });
 }
 const of = (s, tier, f) => parseOpenfootball(raw(f)).forEach(g => matches.push({ s, tier, h: key(g.home), a: key(g.away), hg: g.hg, ag: g.ag }));
-['1-premierleague', '2-championship', '3-league1', '4-league2'].forEach((f, i) => of(2022, i + 1, `openfootball/2022-23/${f}.txt`));
-['1-premierleague', '2-championship', '3-league1', '4-league2', '5-nationalleague'].forEach((f, i) => of(2025, i + 1, `openfootball/2025-26/${f}.txt`));
-of(2024, 5, 'openfootball/2024-25/5-nationalleague.txt');
+if (START === 2026) {
+  // engsoccerdata lacks 2022/23 and 2025/26 and the National League: openfootball fills the gaps.
+  ['1-premierleague', '2-championship', '3-league1', '4-league2'].forEach((f, i) => of(2022, i + 1, `openfootball/2022-23/${f}.txt`));
+  ['1-premierleague', '2-championship', '3-league1', '4-league2', '5-nationalleague'].forEach((f, i) => of(2025, i + 1, `openfootball/2025-26/${f}.txt`));
+  of(2024, 5, 'openfootball/2024-25/5-nationalleague.txt');
+}
 
 // Map dataset keys -> our club ids.
 const idOf = new Map();
@@ -95,7 +104,7 @@ function expPts(lh, la) {
   return [3 * w + d, 3 * (1 - w - d) + d];
 }
 const recent = new Map();
-const m2025 = matches.map((m, i) => ({ ...m, gi: i })).filter(m => m.s === 2025);
+const m2025 = matches.map((m, i) => ({ ...m, gi: i })).filter(m => m.s === START - 1);
 for (const m of m2025) {
   const g = games[m.gi];
   const lh = Math.exp(mu + H + att(g.h) - def(g.a)), la = Math.exp(mu + att(g.a) - def(g.h));
@@ -113,7 +122,7 @@ for (const c of master) {
   const weighted = games.filter(g => g.h === i || g.a === i).reduce((s, g) => s + g.w, 0);
   out.clubs[c.id] = { att: att(i), def: def(i), dataTier: tierIdx[i], weightedMatches: Math.round(weighted * 10) / 10, formResidualPpg: last.length ? last.reduce((s, x) => s + x, 0) / last.length : 0, formMatches: last.length };
 }
-writeFileSync(join(root, 'tools', 'ratings', 'fit-output.json'), JSON.stringify(out, null, 1));
+writeFileSync(join(root, 'tools', 'ratings', START === 2026 ? 'fit-output.json' : `fit-output-${START}.json`), JSON.stringify({ start: START, ...out }, null, 1));
 console.log('mu', mu.toFixed(3), 'H', H.toFixed(3), 'divA', out.divisionAttack.map(x => x.toFixed(3)), 'divD', out.divisionDefence.map(x => x.toFixed(3)), 'missing', missing);
 const rows = master.filter(c => out.clubs[c.id]).map(c => ({ c, ...out.clubs[c.id], s: out.clubs[c.id].att + out.clubs[c.id].def })).sort((a, b) => b.s - a.s);
 for (const r of rows) console.log(String(r.c.div), r.c.short.padEnd(16), (r.att).toFixed(3), (r.def).toFixed(3), 'sum', r.s.toFixed(3), 'form', r.formResidualPpg.toFixed(2), 'w', r.weightedMatches);

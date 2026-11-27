@@ -31,7 +31,8 @@ See [docs/USER-GUIDE.md](docs/USER-GUIDE.md) for the full guide.
 
 | Area | Highlights |
 |---|---|
-| World | 116 real clubs in verified 2026/27 divisions; data-driven country/competition config |
+| World | 116 real clubs in verified 2026/27 divisions, or a 1992/93 start (92 clubs, era rules); data-driven country/competition config |
+| Sandbox | What-if editing and injected events (recorded as interventions), fork a world, compare two timelines side by side |
 | Match engine | Poisson goals from attack/midfield/defence powers, home advantage, Dixon–Coles low-score correction, per-match upset noise, seasonal form, cup squad rotation, extra time, penalties |
 | Competitions | Double round-robin leagues with full tiebreakers; the new six-team Championship play-off; League One/Two/National League play-offs; FA Cup (incl. 4th qualifying round with non-playable qualifiers) and EFL Cup (regional rounds, two-legged semis) |
 | Club evolution | Reputation, stability, development cycles, rank-based economics, promotion/relegation effects, title fatigue, ten kinds of random events |
@@ -39,7 +40,7 @@ See [docs/USER-GUIDE.md](docs/USER-GUIDE.md) for the full guide.
 | Stories | Story of the season (final-day races, collapses, great escapes, runs, records, giant-killings), eras and dynasties, golden ages, decades bump chart, title-race charts, derbies and head-to-head records |
 | Saves | IndexedDB slots, autosave, export/import (gzip), schema versioning, three storage levels |
 | Calibration | ~1.1M simulated seasons across grid, Latin-hypercube and local searches, holdout validation and sensitivity analysis — [report](docs/CALIBRATION.md) |
-| Tests | 41 engine tests (`npm test`) + 45 end-to-end browser checks from `file://` |
+| Tests | 51 engine tests (`npm test`) + 56 end-to-end browser checks from `file://` |
 
 ## Develop
 
@@ -54,6 +55,8 @@ node tools/browser-test.mjs   # end-to-end checks in headless Chromium (needs Pl
 npm run history:fetch         # download raw historical data (not committed)
 npm run history:benchmarks    # -> data/history/derived/
 node tools/ratings/fit.mjs && node tools/ratings/build-db.mjs   # rebuild the club database
+node tools/ratings/fit.mjs --start 1992 && node tools/ratings/build-db.mjs --start 1992   # 1992/93 start database
+node --expose-gc --experimental-strip-types tools/perf.mjs     # speed, heap and save size per storage level
 node tools/calibrate/run.mjs <phase>                             # see docs/CALIBRATION.md
 ```
 

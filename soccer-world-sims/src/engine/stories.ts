@@ -155,9 +155,9 @@ export function detectStories(world: World, country: CountryConfig, tables: Reco
     if (gap >= 2 && world.info[loser]) kills.push({ gap, roundIndex: t.roundIndex, tie: { cup: cup.name, round: t.round, w: t.winner, l: loser } });
   }
   kills.sort((a, b) => b.gap - a.gap || b.roundIndex - a.roundIndex);
-  const lvl = (id: string) => { const t = tierOf(id); return t <= country.leagues.length ? country.leagues[t - 1].name : 'non-league'; };
+  const lvl = (id: string) => { const t = tierOf(id); return t <= country.leagues.length ? `${country.leagues[t - 1].name} ` : s.externals[id] ? '' : 'non-league '; };
   for (const k of kills.slice(0, 2)) add({ kind: 'giant-killing', clubs: [k.tie.w, k.tie.l], importance: Math.min(5, 1 + k.gap),
-    text: `Giant-killing: ${lvl(k.tie.w)} ${name(k.tie.w)} knock ${lvl(k.tie.l)} ${name(k.tie.l)} out of the ${k.tie.cup} (${k.tie.round}).` });
+    text: `Giant-killing: ${lvl(k.tie.w)}${name(k.tie.w)} knock ${lvl(k.tie.l)}${name(k.tie.l)} out of the ${k.tie.cup} (${k.tie.round}).` });
 
   out.sort((a, b) => b.importance - a.importance);
   return out.slice(0, max);

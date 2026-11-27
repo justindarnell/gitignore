@@ -7,12 +7,15 @@ import { sortTable, emptyRow } from '../src/engine/table.ts';
 import { compareBest, compareWorst } from '../src/engine/history.ts';
 import { exportWorld, importWorld, cloneWorld } from '../src/persistence/save.ts';
 import { ENGLAND } from '../src/data/england/config.ts';
+import { ENGLAND_1992 } from '../src/data/england/config1992.ts';
 import { Rng } from '../src/engine/rng.ts';
 import { shootout } from '../src/engine/match.ts';
 import { DEFAULT_PARAMS } from '../src/engine/params.ts';
 import { titleEras, goldenAge, decadeRankings } from '../src/engine/eras.ts';
 import type { Match, TableRow, World } from '../src/engine/types.ts';
 import clubsDb from '../src/data/england/clubs.json' with { type: 'json' };
+import clubs1992 from '../src/data/england/clubs-1992.json' with { type: 'json' };
+import { applyIntervention, forkWorld, EVENT_EFFECTS } from '../src/engine/sandbox.ts';
 
 const SIZES: Record<string, number> = { ENG1: 20, ENG2: 24, ENG3: 24, ENG4: 24, ENG5: 24 };
 
@@ -487,5 +490,142 @@ describe('stories, eras, races and rivalries (0.6)', () => {
     assert.equal(up.history.h2hSince, up.season.year);
     simulate(up, { kind: 'seasons', n: 1 });
     assert.equal(up.history.stories.length, up.history.leagues.length);
+  });
+});
+
+describe('sandbox: interventions and forks (0.6)', () => {
+  const strip = (w: World) => { const x = JSON.parse(exportWorld(w)); delete x.created; delete x.name; delete x.lineage; return JSON.stringify({ c: x.clubs, h: x.history, r: x.rng, s: x.season }); };
+  test('edits are clamped, recorded in history (interventions, timeline, news) and consume no randomness', () => {
+    const w = createWorld({ seed: 'iv-edit' });
+    simulate(w, { kind: 'month' });
+    const rng = JSON.stringify(w.rng);
+    const iv = applyIntervention(w, 'everton', { kind: 'edit', values: { attack: 150, stability: 3, ambition: 0.5 } });
+    assert.equal(JSON.stringify(w.rng), rng);
+    const c = w.clubs.find(x => x.id === 'everton')!;
+    assert.equal(c.attack, 99); assert.equal(c.stability, 5); assert.equal(c.ambition, 0.5);
+    assert.deepEqual(Object.keys(iv.changes).sort(), ['ambition', 'attack', 'stability']);
+    assert.equal(w.interventions.length, 1);
+    assert.ok(w.history.clubs.everton.events.some(e => e.kind === 'intervention' && e.text.startsWith('User intervention')));
+    assert.ok(w.news.some(n => n.kind === 'intervention'));
+  });
+  test('injected events have their documented effects', () => {
+    const w = createWorld({ seed: 'iv-event' });
+    const before = { ...w.clubs.find(x => x.id === 'reading')! };
+    applyIntervention(w, 'reading', { kind: 'takeover' });
+    const c = w.clubs.find(x => x.id === 'reading')!;
+    assert.equal(c.attack, before.attack + EVENT_EFFECTS.takeover.quality!);
+    assert.equal(c.ambition, 0.9);
+    assert.equal(c.ownerSince, 2026);
+    applyIntervention(w, 'arsenal', { kind: 'crisis' });
+    assert.ok(w.clubs.find(x => x.id === 'arsenal')!.stability < 66.53 - 17);
+  });
+  test('the same intervention at the same point reproduces exactly: stepwise, bulk and across save/load', () => {
+    const run = (mode: 'bulk' | 'step' | 'save') => {
+      let w = createWorld({ seed: 'iv-repro' });
+      for (let i = 0; i < 30; i++) step(w);
+      applyIntervention(w, 'sunderland', { kind: 'windfall' });
+      if (mode === 'save') w = importWorld(exportWorld(w));
+      if (mode === 'step') { while (w.history.leagues.length < 2) step(w); }
+      else simulate(w, absoluteTarget(w, { kind: 'seasons', n: 2 }));
+      return strip(w);
+    };
+    const a = run('bulk');
+    assert.equal(run('step'), a);
+    assert.equal(run('save'), a);
+  });
+  test('a fork continues identically to its parent until something differs, and records its lineage', () => {
+    const p = createWorld({ seed: 'fork' });
+    simulate(p, { kind: 'seasons', n: 1 });
+    const f = forkWorld(p, 'Fork');
+    assert.equal(f.lineage.parentId, p.lineage.id);
+    assert.equal(f.lineage.forkedAt!.season, p.season.year);
+    assert.notEqual(f.lineage.id, p.lineage.id);
+    simulate(p, { kind: 'seasons', n: 2 }); simulate(f, { kind: 'seasons', n: 2 });
+    assert.equal(strip(f), strip(p), 'same seed and state: identical continuation');
+    const g = forkWorld(p, 'Changed');
+    applyIntervention(g, 'manchester-city', { kind: 'crisis' });
+    simulate(p, { kind: 'seasons', n: 2 }); simulate(g, { kind: 'seasons', n: 2 });
+    assert.notEqual(strip(g), strip(p), 'an intervention makes the timelines diverge');
+    assert.deepEqual(g.history.leagues.slice(0, 3), p.history.leagues.slice(0, 3), 'shared history before the fork is untouched');
+  });
+  test('schema 3 saves migrate to schema 4 (start 2026, no interventions, root lineage)', () => {
+    const w = createWorld({ seed: 'mig4' });
+    const raw = JSON.parse(exportWorld(w));
+    raw.schema = 3; delete raw.start; delete raw.interventions; delete raw.lineage;
+    const up = importWorld(JSON.stringify(raw));
+    assert.equal(up.start, '2026'); assert.deepEqual(up.interventions, []); assert.equal(up.lineage.id, 'root:2026:mig4');
+  });
+});
+
+describe('historical start: 1992/93 (0.6)', () => {
+  const w = createWorld({ seed: 'start-1992', start: '1992' });
+  simulate(w, { kind: 'seasons', n: 1 });
+  const rec = w.history.leagues[0];
+  test('database: 92 clubs in verified 1992/93 divisions, rated only from data before the season', () => {
+    const db = clubs1992.clubs as any[];
+    assert.equal(db.length, 92);
+    assert.deepEqual([1, 2, 3, 4].map(d => db.filter(c => c.division === d).length), [22, 24, 24, 22]);
+    const pl = db.filter(c => c.division === 1).map(c => c.id).sort();
+    assert.deepEqual(pl, ['arsenal', 'aston-villa', 'blackburn-rovers', 'chelsea', 'coventry-city', 'crystal-palace', 'everton', 'ipswich-town', 'leeds-united', 'liverpool',
+      'manchester-city', 'manchester-united', 'middlesbrough', 'norwich-city', 'nottingham-forest', 'oldham-athletic', 'queens-park-rangers', 'sheffield-united',
+      'sheffield-wednesday', 'southampton', 'tottenham-hotspur', 'wimbledon'].sort(), 'the 22 founder members of the Premier League');
+    assert.equal(db.find(c => c.id === 'colchester-united').division, 4, 'Colchester promoted from the Conference in 1992');
+    assert.equal(db.find(c => c.id === 'colchester-united').previousDivision, 6);
+    assert.ok(!db.some(c => c.id.startsWith('aldershot') || c.id.startsWith('maidstone')), 'Aldershot and Maidstone folded in 1992');
+    for (const c of db) {
+      assert.match(c.provenance.ratings, /1988\/89-1991\/92|no data/);
+      assert.match(c.provenance.reputation, /1962-1991/);
+    }
+    assert.ok(db.find(c => c.id === 'blackburn-rovers').provenance.ambition.includes('Jack Walker'));
+  });
+  test('era rules from config: 22-club Premier League, promotion and relegation counts, play-offs', () => {
+    assert.equal(w.country, 'ENG1992');
+    const [pl, d1, d2, d3] = rec;
+    assert.equal(pl.table.length, 22); assert.equal(pl.table[0].p, 42);
+    assert.equal(pl.relegated.length, 3);
+    assert.equal(d1.promoted.length, 3); assert.equal(d1.relegated.length, 3);
+    assert.equal(d2.promoted.length, 3); assert.equal(d2.relegated.length, 4);
+    assert.equal(d3.promoted.length, 4); assert.equal(d3.relegated.length, 0, 'no playable Conference');
+    for (const [lr, a, b] of [[d1, 3, 6], [d2, 3, 6], [d3, 4, 7]] as const) {
+      const pos = lr.table.findIndex(r => r.club === lr.promotedViaPlayoff) + 1;
+      assert.ok(pos >= a && pos <= b);
+    }
+    const v = createWorld({ seed: 'start-1992b', start: '1992', settings: { storage: 'essential' } });
+    simulate(v, { kind: 'seasons', n: 4 });
+    const counts: Record<string, number> = {};
+    for (const c of v.clubs) counts[c.league] = (counts[c.league] ?? 0) + 1;
+    assert.deepEqual(counts, { ENG1: 22, ENG2: 24, ENG3: 24, ENG4: 22 });
+  });
+  test('cups: FA Cup with non-league qualifiers, League Cup two-legged rounds with away goals', () => {
+    const fa = w.season.cups.FAC, lc = w.season.cups.LC;
+    assert.deepEqual([0, 1, 2, 3, 4, 5, 6, 7].map(i => fa.ties.filter(t => t.roundIndex === i).length), [36, 18, 32, 16, 8, 4, 2, 1]);
+    assert.deepEqual([0, 1, 2, 3, 4, 5, 6].map(i => lc.ties.filter(t => t.roundIndex === i).length), [28, 32, 16, 8, 4, 2, 1]);
+    assert.equal(new Set(lc.ties.flatMap(t => [t.a, t.b])).size, 92);
+    // away goals: every two-legged tie level on aggregate after 90 minutes of the second leg with
+    // different away goals is decided by them, without extra time.
+    let decided = 0;
+    for (const v of [w, ...['ag1', 'ag2', 'ag3'].map(sd => { const x = createWorld({ seed: sd, start: '1992', settings: { storage: 'essential' } }); simulate(x, { kind: 'season' }); return x; })]) {
+      for (const t of v.season.cups.LC.ties.filter(t => t.matches.length === 2)) {
+        const [m1, m2] = t.matches.map(id => v.season.matches.find(m => m.id === id)!);
+        if (m2.et) continue;
+        const aggA = m1.hg! + m2.ag!, aggB = m1.ag! + m2.hg!;
+        if (aggA === aggB && m2.ag !== m1.ag) { decided++; assert.equal(t.winner, m2.ag! > m1.ag! ? t.a : t.b); assert.ok(!m2.pens); }
+      }
+    }
+    assert.ok(decided > 0, 'away goals decided some ties');
+  });
+  test('1992/93 calendar: double round robin and no club ever has two matches in one slot', () => {
+    for (const l of ENGLAND_1992.leagues) assert.equal(w.season.matches.filter(m => m.comp === l.id).length, l.size * (l.size - 1));
+    const seen = new Set<string>();
+    for (const m of w.season.matches) for (const c of [m.home, m.away]) { const k = `${c}@${m.slot}`; assert.ok(!seen.has(k), `clash ${k}`); seen.add(k); }
+  });
+  test('a 1992 world is deterministic and survives save/load', () => {
+    const a = createWorld({ seed: 'd92', start: '1992' }), b = createWorld({ seed: 'd92', start: '1992' });
+    simulate(a, { kind: 'seasons', n: 2 });
+    for (let i = 0; i < 50; i++) step(b);
+    const b2 = importWorld(exportWorld(b));
+    simulate(b2, absoluteTarget(b2, { kind: 'seasons', n: 2 }));
+    const strip = (x: World) => { const o = JSON.parse(exportWorld(x)); delete o.created; return JSON.stringify(o); };
+    assert.equal(strip(b2), strip(a));
   });
 });

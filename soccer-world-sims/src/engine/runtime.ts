@@ -2,9 +2,10 @@ import { Rng } from './rng.ts';
 import { effectiveParams, type EngineParams } from './params.ts';
 import type { ClubState, CountryConfig, DerbyConfig, H2H, Match, World } from './types.ts';
 import { ENGLAND } from '../data/england/config.ts';
+import { ENGLAND_1992 } from '../data/england/config1992.ts';
 
 /** Registry of country configurations (add new countries here). */
-export const COUNTRIES: Record<string, CountryConfig> = { ENG: ENGLAND };
+export const COUNTRIES: Record<string, CountryConfig> = { ENG: ENGLAND, ENG1992: ENGLAND_1992 };
 
 /**
  * Non-serialised runtime cache for a world: lookup maps, effective parameters and the live

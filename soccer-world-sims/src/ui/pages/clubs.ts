@@ -1,11 +1,12 @@
 import type { Page } from '../types.ts';
 import { club, crest, esc, f1, f0, bar, tabs, empty, scoreText } from '../dom.ts';
-import { leagues, league, standings, seasonLabel, compLabel, form, trophies, positionNow, overall, zoneOf, clubIndex } from '../data.ts';
+import { pyramidSize, pyramidNote, leagues, league, standings, seasonLabel, compLabel, form, trophies, positionNow, overall, zoneOf, clubIndex } from '../data.ts';
 import { mountChart, type Band } from '../components/chart.ts';
 import { pyramidRank } from '../../engine/world.ts';
 import { ambitionLabel } from '../../engine/params.ts';
 import { goldenAge } from '../../engine/eras.ts';
 import { clubRivalries } from './stories.ts';
+import { whatIfCard } from './sandbox.ts';
 import { country } from '../data.ts';
 import type { MatchRecord, World } from '../../engine/types.ts';
 
@@ -82,6 +83,7 @@ export const clubPage: Page = ({ world, args, state }) => {
     ${crest(world, id, 'xl')}
     <div class="profile-title"><h1>${esc(info.name)}</h1>
       <div class="muted"><a href="#/standings/${l.id}">${esc(l.name)}</a> · ${now.pos}${ordinalSuffix(now.pos)} · ${now.row.pts} pts after ${now.row.p} games · pyramid #${pyramidRank(world, l.id, now.pos)}</div>
+      ${world.interventions.some(i => i.club === id) ? `<div class="tag intervention-flag" title="This club was edited by the user">✎ ${world.interventions.filter(i => i.club === id).length} user intervention(s)</div>` : ''}
       <div class="form-line">${form(world, id, 8).map(x => `<span class="form form-${x}">${x}</span>`).join('')}</div></div>
     <div class="ovr-box"><div class="eyebrow">Overall</div><div class="ovr">${f0(overall(c))}</div></div>
   </div>
@@ -105,7 +107,7 @@ export const clubPage: Page = ({ world, args, state }) => {
       <div class="chart-title">Overall rating, reputation and stability</div>
       <div class="chart-legend"><span><i style="background:var(--series-1)"></i>Overall</span><span><i style="background:var(--series-2)"></i>Reputation</span><span><i style="background:var(--series-3)"></i>Stability</span></div>
       <div id="chart-ratings"></div>
-      <div class="chart-title row">Combined pyramid position <span class="muted small">(1 = top of the Premier League, 116 = bottom of the National League)</span>
+      <div class="chart-title row">Combined pyramid position <span class="muted small">(${esc(pyramidNote(world))})</span>
         <span class="seg">${(['season', 'matchday'] as const).map(k => `<button class="seg-btn${state.positionDetail === k ? ' active' : ''}" data-action="position-detail" data-detail="${k}">${k === 'season' ? 'By season' : 'By matchday'}</button>`).join('')}</span></div>
       <div id="chart-position"></div>
       ${!snaps.length ? '<p class="muted small">Graphs fill in as seasons are completed (the current season is shown live).</p>' : ''}
@@ -119,7 +121,8 @@ export const clubPage: Page = ({ world, args, state }) => {
     <section class="card"><h2>Promotions & relegations</h2>${moves.length ? `<ul class="timeline">${[...moves].reverse().map(m => `<li class="${m.up ? 'up' : 'down'}"><span class="muted">${esc(seasonLabel(m.year))}</span> ${esc(m.text)}</li>`).join('')}</ul>` : empty('No divisional changes yet.')}</section>
     <section class="card"><h2>Biggest wins</h2>${h.best.length ? `<ol class="matches">${h.best.map(r => matchLine(world, r)).join('')}</ol>` : empty('No wins recorded yet.')}<p class="muted small">Ranked by margin, then goals scored, then away wins, then earliest.</p></section>
     <section class="card"><h2>Heaviest defeats</h2>${h.worst.length ? `<ol class="matches">${h.worst.map(r => matchLine(world, r)).join('')}</ol>` : empty('No defeats recorded yet.')}<p class="muted small">Ranked by margin, then goals conceded, then home defeats, then earliest.</p></section>
-    <section class="card span-2"><h2>Timeline</h2>${events.length ? `<ul class="timeline">${events.map(e => `<li class="tone-${e.tone}"><span class="muted">${esc(seasonLabel(e.season))}</span> ${esc(e.text)}</li>`).join('')}</ul>` : empty('Honours, moves and club events appear here.')}</section>
+    ${whatIfCard(world, id, false)}
+    <section class="card span-2"><h2>Timeline</h2>${events.length ? `<ul class="timeline">${events.map(e => `<li class="tone-${e.tone}${e.kind === 'intervention' ? ' intervention' : ''}"><span class="muted">${esc(seasonLabel(e.season))}</span> ${esc(e.text)}</li>`).join('')}</ul>` : empty('Honours, moves and club events appear here.')}</section>
   </div>`;
 
   const mount = (root: HTMLElement) => {
@@ -166,7 +169,7 @@ export const clubPage: Page = ({ world, args, state }) => {
     cleanups.push(mountChart(pEl, {
       ariaLabel: `${info.name} combined pyramid position by ${state.positionDetail}`,
       series: [{ label: 'Pyramid position', color: css('--series-1'), values: pp.map(p => p.pyr) }],
-      yMin: 1, yMax: 116, invert: true, bands, yTicks: [1, 20, 44, 68, 92, 116], height: 240,
+      yMin: 1, yMax: pyramidSize(world), invert: true, bands, yTicks: [1, ...bands.map(b => Math.round(b.to - 0.5))], height: 240,
       xTicks: years.filter((_, k) => k % every === 0).map(y => ({ index: firstIdx.get(y)!, label: seasonLabel(y) })),
       title: i => `${seasonLabel(pp[i].year)}${pp[i].md ? ` · matchday ${pp[i].md}` : ''}`,
       rows: i => {

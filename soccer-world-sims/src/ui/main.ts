@@ -13,6 +13,9 @@ import { clubsPage, clubPage } from './pages/clubs.ts';
 import { historyPage } from './pages/history.ts';
 import { newsPage, settingsPage, savesPage } from './pages/misc.ts';
 import { seasonPage, h2hPage } from './pages/stories.ts';
+import { comparePage, type CompareState } from './pages/sandbox.ts';
+import { applyIntervention, forkWorld, EDITABLE, type InterventionSpec } from '../engine/sandbox.ts';
+import { STARTS } from '../data/england/starts.ts';
 import * as store from './store.ts';
 import type { SaveMeta } from '../persistence/save.ts';
 
@@ -36,6 +39,8 @@ let autosave = ls.get('sws-autosave', true);
 let busy = false;
 let cleanup: (() => void) | void;
 let newSeed = '';
+let newStart = '2026';
+const cmp: CompareState = { id: null, world: null, loading: false, error: null, club: 'liverpool', year: null };
 
 const $ = <T extends HTMLElement>(sel: string) => document.querySelector(sel) as T;
 
@@ -44,7 +49,7 @@ const PAGES: Record<string, Page> = {
   overview: overviewPage, standings: standingsPage, fixtures: fixturesPage, cups: cupsPage, clubs: clubsPage, club: clubPage,
   history: historyPage, news: newsPage, settings: settingsPage, season: seasonPage, h2h: h2hPage,
 };
-const NAV = [['overview', 'Overview'], ['standings', 'Standings'], ['fixtures', 'Fixtures'], ['cups', 'Cups'], ['clubs', 'Clubs'], ['history', 'History'], ['news', 'News'], ['settings', 'Settings'], ['saves', 'Saves']];
+const NAV = [['overview', 'Overview'], ['standings', 'Standings'], ['fixtures', 'Fixtures'], ['cups', 'Cups'], ['clubs', 'Clubs'], ['history', 'History'], ['compare', 'Compare'], ['news', 'News'], ['settings', 'Settings'], ['saves', 'Saves']];
 
 function route(): { page: string; args: string[] } {
   const parts = location.hash.replace(/^#\/?/, '').split('/').filter(Boolean).map(decodeURIComponent);
@@ -56,7 +61,8 @@ function render(keepScroll = false): void {
   if (typeof cleanup === 'function') cleanup();
   cleanup = undefined;
   const r = route();
-  const page = r.page === 'saves' ? savesPage(saves, store.storageError, autosave) : PAGES[r.page] ?? overviewPage;
+  if (r.page === 'compare') syncCompare(r.args[0] ?? null);
+  const page = r.page === 'saves' ? savesPage(saves, store.storageError, autosave, newStart) : r.page === 'compare' ? comparePage(saves, cmp) : PAGES[r.page] ?? overviewPage;
   const main = $<HTMLElement>('#main');
   let res;
   try { res = page({ world, args: r.args, state }); }
@@ -70,6 +76,34 @@ function render(keepScroll = false): void {
   $('#date-label').textContent = nextSlotLabel(world);
   ls.set('sws-ui', { ...state, fixturesRound: undefined });
   if (keepScroll) window.scrollTo(0, y); else if (!r.args.length || r.page !== 'club') window.scrollTo(0, 0);
+}
+
+/** Load timeline B for the compare page (async; re-renders when ready). */
+function syncCompare(id: string | null): void {
+  if (id === cmp.id || cmp.loading) return;
+  cmp.id = id; cmp.world = null; cmp.error = null; cmp.year = null;
+  if (!id) return;
+  cmp.loading = true;
+  if (!saves) refreshSaves();
+  store.readSave(id).then(w => { if (cmp.id === id) cmp.world = w; }).catch(e => { cmp.error = `Could not load that save: ${e?.message ?? e}`; })
+    .finally(() => { cmp.loading = false; if (route().page === 'compare') render(true); });
+}
+
+/** Simulate timeline B up to the current world's date in a separate worker and save it back. */
+function compareCatchUp(): void {
+  if (!cmp.world || !cmp.id || busy) return;
+  const target: SimTarget = world.season.complete ? { kind: 'untilComplete', year: world.season.year } : { kind: 'until', year: world.season.year, slot: world.season.slotIndex };
+  const w = new Worker(URL.createObjectURL(new Blob([__WORKER_SOURCE__], { type: 'text/javascript' })));
+  setBusy(true); toast('Simulating timeline B…');
+  const id = cmp.id;
+  w.onmessage = e => {
+    if (e.data.type !== 'result') return;
+    w.terminate();
+    const B = upgradeWorld(e.data.world);
+    store.writeSave(B, id, B.name).then(() => { cmp.world = B; setBusy(false); toast('Timeline B caught up and saved.'); refreshSaves(); render(true); })
+      .catch(err => { setBusy(false); toast('Saving timeline B failed: ' + err.message); });
+  };
+  w.postMessage({ type: 'run', world: cmp.world, target });
 }
 
 function go(hash: string) { if (location.hash === hash) render(true); else location.hash = hash; }
@@ -181,7 +215,51 @@ const actions: Record<string, (el: HTMLElement) => void | Promise<void>> = {
   'rename': async el => { const m = saves?.find(s => s.id === el.dataset.id); const n = prompt('Save name', m?.name ?? ''); if (n) { await store.renameSave(el.dataset.id!, n); refreshSaves(); } },
   'delete': async el => { if (!confirm('Delete this save permanently?')) return; await store.deleteSave(el.dataset.id!); refreshSaves(); },
   'export': () => store.downloadWorld(world),
-  'new-world': () => { if (busy || !confirm('Start a new world from 2026/27? Unsaved progress in the current world will be lost (the autosave is replaced).')) return; world = createWorld({ seed: newSeed || String(Date.now()), name: 'New world', settings: { storage: world.settings.storage } }); afterSim(); go('#/overview'); },
+  'whatif-edit': el => {
+    if (busy) return;
+    const values: Record<string, number> = {};
+    for (const k of EDITABLE) {
+      const inp = document.querySelector<HTMLInputElement>(`[data-whatif="${k}"]`);
+      // Only fields the user changed: the form shows rounded values, which must not overwrite exact ones.
+      if (inp && inp.value !== '' && inp.value !== inp.defaultValue) values[k] = k === 'ambition' ? Number(inp.value) / 100 : Number(inp.value);
+    }
+    const iv = applyIntervention(world, el.dataset.club!, { kind: 'edit', values });
+    toast(Object.keys(iv.changes).length ? 'Intervention recorded.' : 'Nothing changed.');
+    afterSim();
+  },
+  'whatif-event': el => {
+    if (busy) return;
+    applyIntervention(world, el.dataset.club!, { kind: el.dataset.kind } as InterventionSpec);
+    toast('Event injected and recorded as a user intervention.');
+    afterSim();
+  },
+  'fork': async () => {
+    if (busy) return;
+    const f = forkWorld(world);
+    const id = 'slot-' + Date.now();
+    await store.writeSave(f, id, f.name);
+    toast(`Fork saved as "${f.name}". You are still in the original; load the fork from the list or compare the two.`);
+    refreshSaves();
+  },
+  'fork-switch': async () => {
+    if (busy) return;
+    const original = world;
+    const oid = 'slot-' + Date.now();
+    await store.writeSave(original, oid, original.name);
+    world = forkWorld(original);
+    toast(`Saved the original as a slot and switched to the fork "${world.name}".`);
+    afterSim(); refreshSaves();
+  },
+  'fork-compare': async () => {
+    if (busy) return;
+    const f = forkWorld(world);
+    const id = 'slot-' + Date.now();
+    await store.writeSave(f, id, f.name);
+    await refreshSaves();
+    go(`#/compare/${id}`);
+  },
+  'compare-catchup': () => compareCatchUp(),
+  'new-world': () => { if (busy || !confirm(`Start a new world from ${seasonLabel(STARTS[newStart].year)}? Unsaved progress in the current world will be lost (the autosave is replaced).`)) return; world = createWorld({ seed: newSeed || String(Date.now()), start: newStart, name: 'New world', settings: { storage: world.settings.storage } }); afterSim(); go('#/overview'); },
 };
 
 document.addEventListener('click', e => {
@@ -199,6 +277,10 @@ document.addEventListener('change', e => {
   if (k === 'standings-season') go(`#/standings/${el.dataset.league}${el.value ? '/' + el.value : ''}`);
   else if (k === 'fixtures-round') go(`#/fixtures/${el.dataset.comp}/${el.value}`);
   else if (k === 'clubs-league') { state.clubsFilter.league = el.value; render(true); }
+  else if (k === 'compare-pick') go(el.value ? `#/compare/${el.value}` : '#/compare');
+  else if (k === 'compare-year') { cmp.year = Number(el.value); render(true); }
+  else if (k === 'compare-club') { cmp.club = el.value; render(true); }
+  else if (k === 'new-start') { newStart = el.value; }
   else if (k === 'season-review') go(`#/season/${el.value}`);
   else if (k === 'h2h-a' || k === 'h2h-b') { const r = route(); const ids = [r.args[0] ?? '', r.args[1] ?? '']; const sel = [...document.querySelectorAll<HTMLSelectElement>('.h2h-pick select')].map(x => x.value); go(`#/h2h/${sel[0] ?? ids[0]}/${sel[1] ?? ids[1]}`); }
   else if (k === 'history-season') go(`#/history/tables/${el.value}/${el.dataset.league}`);

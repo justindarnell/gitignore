@@ -14,7 +14,17 @@ const minify = !process.argv.includes('--dev');
 mkdirSync(dist, { recursive: true });
 for (const f of ['app.js', 'styles.css', 'index.html']) rmSync(join(dist, f), { force: true });
 
-const worker = await build({ entryPoints: [join(root, 'src/worker/sim-worker.ts')], bundle: true, format: 'iife', target: 'es2020', minify, write: false, legalComments: 'none' });
+// Club databases keep a documented `provenance` per club; the app never shows it, so the bundle omits it
+// (the JSON files in src/data and the docs remain the reference).
+const stripProvenance = { name: 'strip-provenance', setup(b) {
+  b.onLoad({ filter: /src[\\/]data[\\/].*clubs.*\.json$/ }, args => {
+    const db = JSON.parse(readFileSync(args.path, 'utf8'));
+    for (const c of db.clubs) delete c.provenance;
+    return { contents: JSON.stringify(db), loader: 'json' };
+  });
+} };
+
+const worker = await build({ entryPoints: [join(root, 'src/worker/sim-worker.ts')], bundle: true, format: 'iife', target: 'es2020', minify, write: false, legalComments: 'none', plugins: [stripProvenance] });
 const workerSource = worker.outputFiles[0].text;
 
 // Crest images are generated locally and never committed (licensing). The UI only requests
@@ -24,7 +34,7 @@ const crestIds = existsSync(crests) ? readdirSync(crests).filter(f => f.endsWith
 
 await build({
   entryPoints: [join(root, 'src/ui/main.ts')], bundle: true, format: 'iife', target: 'es2020', minify, sourcemap: false,
-  outfile: join(dist, 'app.js'), legalComments: 'none',
+  outfile: join(dist, 'app.js'), legalComments: 'none', plugins: [stripProvenance],
   define: { __WORKER_SOURCE__: JSON.stringify(workerSource), __APP_VERSION__: JSON.stringify(pkg.version), __CREST_IDS__: JSON.stringify(crestIds) },
 });
 writeFileSync(join(dist, 'styles.css'), readFileSync(join(root, 'src/ui/styles.css')));

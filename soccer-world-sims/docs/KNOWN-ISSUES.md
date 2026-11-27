@@ -33,6 +33,19 @@
   an earlier version count from the upgrade season only. Individual meetings are listed only where stored
   (derbies and cup ties at Standard, league games at Full).
 
+## Sandbox and the 1992/93 start
+
+* The engine parameters were calibrated on the 2026/27 pyramid. The 1992 world has not been calibrated
+  separately. Its fitted divisions are much closer in strength, so it is more open than 2026 worlds (17–21
+  different champions in 60 seasons in three test worlds, and mid-sized clubs can build long title runs).
+  Treat it as a sandbox, not a validated reconstruction.
+* Rules are frozen at 1992/93: 22 Premier League clubs forever, no Conference relegation, no FA Cup replays
+  (COMPETITIONS.md).
+* Ownership ambition edited through *What-if* only changes development when the experimental ownership
+  dynamics setting is on. Injected events always apply their immediate effects.
+* Comparing needs timeline B stored in this browser (IndexedDB). Worlds from different start seasons cannot
+  be compared.
+
 ## Rules
 
 * Simplifications are documented in COMPETITIONS.md: European entrants are approximated as the

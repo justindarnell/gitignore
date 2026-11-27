@@ -4,12 +4,13 @@ import { seasonLabel } from '../data.ts';
 import { PRESETS, DEFAULT_SETTINGS } from '../../engine/params.ts';
 import type { Settings } from '../../engine/types.ts';
 import type { SaveMeta } from '../../persistence/save.ts';
+import { STARTS } from '../../data/england/starts.ts';
 
 // ---------------------------------------------------------------- news
 export const newsPage: Page = ({ world, args, state }) => {
   const kind = args[0] ?? state.newsKind;
   state.newsKind = kind;
-  const kinds = [['all', 'All'], ['title', 'Titles'], ['cup', 'Cups'], ['promotion', 'Promotions'], ['relegation', 'Relegations'], ['event', 'Club events'], ['owner', 'Ownership'], ['story', 'Stories'], ['derby', 'Derbies'], ['milestone', 'Milestones']];
+  const kinds = [['all', 'All'], ['title', 'Titles'], ['cup', 'Cups'], ['promotion', 'Promotions'], ['relegation', 'Relegations'], ['event', 'Club events'], ['owner', 'Ownership'], ['story', 'Stories'], ['derby', 'Derbies'], ['intervention', 'Interventions'], ['milestone', 'Milestones']];
   const items = world.news.filter(n => kind === 'all' || n.kind === kind).slice(-400).reverse();
   const bySeason = new Map<number, typeof items>();
   for (const n of items) { if (!bySeason.has(n.season)) bySeason.set(n.season, []); bySeason.get(n.season)!.push(n); }
@@ -61,7 +62,7 @@ export const settingsPage: Page = ({ world }) => {
 };
 
 // ---------------------------------------------------------------- saves
-export const savesPage = (saves: SaveMeta[] | null, storageError: string | null, autosave: boolean): Page => ({ world }) => ({
+export const savesPage = (saves: SaveMeta[] | null, storageError: string | null, autosave: boolean, newStart = '2026'): Page => ({ world }) => ({
   title: 'Saves',
   html: `<div class="page-head"><h1>Saves</h1><p class="muted">Worlds are stored in this browser (IndexedDB). Export files to back up or move between browsers.</p></div>
   ${storageError ? `<div class="notice">${esc(storageError)}</div>` : ''}
@@ -69,8 +70,11 @@ export const savesPage = (saves: SaveMeta[] | null, storageError: string | null,
     <div class="toolbar"><input type="text" value="${esc(world.name)}" data-input="world-name" aria-label="World name"><button class="btn primary" data-action="save-new">Save as new slot</button><button class="btn" data-action="export">Export file</button>
       <label class="btn">Import file<input type="file" accept=".json,.gz,application/json" data-change="import" hidden></label>
       <label class="check"><input type="checkbox" data-change="autosave"${autosave ? ' checked' : ''}> Autosave after each simulation</label></div>
-    <p class="muted small">${esc(seasonLabel(world.season.year))} · ${world.history.leagues.length} seasons completed · seed <code>${esc(world.seed)}</code> · storage ${esc(world.settings.storage)}</p></section>
+    <p class="muted small">${esc(seasonLabel(world.season.year))} · ${world.history.leagues.length} seasons completed · seed <code>${esc(world.seed)}</code> · storage ${esc(world.settings.storage)} · started ${esc(seasonLabel(STARTS[world.start]?.year ?? 2026))}${world.lineage?.parentName ? ` · forked from "${esc(world.lineage.parentName)}" at ${esc(world.lineage.forkedAt?.date ?? '')}` : ''}</p>
+    <div class="toolbar"><button class="btn" data-action="fork">Fork this world</button><button class="btn" data-action="fork-switch">Fork and switch to the fork</button><a class="btn" href="#/compare">Compare timelines</a></div>
+    <p class="muted small">A fork is an independent copy with the same seed and history up to now: change settings or intervene in one of them and compare how the timelines diverge.</p>
+    ${world.interventions.length ? `<h3>User interventions in this world</h3><ul class="plain small">${world.interventions.slice().reverse().slice(0, 20).map(i => `<li>${esc(seasonLabel(i.season))} · ${esc(i.date)} · <a href="#/club/${esc(i.club)}">${esc(world.info[i.club]?.short ?? i.club)}</a>: ${esc(i.text)}</li>`).join('')}</ul>` : ''}</section>
   <section class="card"><h2>Saved worlds</h2>${saves === null ? '<p class="muted">Loading…</p>' : saves.length ? `<div class="table-wrap"><table class="table"><thead><tr><th>Name</th><th>Season</th><th class="hide-sm">Saved</th><th class="num hide-sm">Size</th><th></th></tr></thead><tbody>${saves.map(m => `<tr><td><strong>${esc(m.name)}</strong>${m.id === 'autosave' ? ' <span class="tag">auto</span>' : ''}<div class="muted small">seed ${esc(m.seed)} · ${m.seasonsPlayed} seasons</div></td><td>${esc(seasonLabel(m.season))}<div class="muted small">${esc(m.date)}</div></td><td class="hide-sm muted small">${esc(new Date(m.savedAt).toLocaleString())}</td><td class="num hide-sm muted small">${m.bytes ? (m.bytes / 1e6).toFixed(1) + ' MB' : ''}</td><td class="actions"><button class="btn small primary" data-action="load" data-id="${esc(m.id)}">Load</button><button class="btn small" data-action="overwrite" data-id="${esc(m.id)}">Overwrite</button><button class="btn small" data-action="rename" data-id="${esc(m.id)}">Rename</button><button class="btn small danger" data-action="delete" data-id="${esc(m.id)}">Delete</button></td></tr>`).join('')}</tbody></table></div>` : '<p class="muted">No saves yet.</p>'}</section>
-  <section class="card"><h2>New world</h2><p class="muted small">Starts again from the real 2026/27 season. Use the same seed to reproduce a world exactly.</p>
-    <div class="toolbar"><input type="text" placeholder="Seed (optional)" data-input="new-seed" aria-label="Seed"><button class="btn danger" data-action="new-world">Start new world</button></div></section>`,
+  <section class="card"><h2>New world</h2><p class="muted small">Start from a real season: the present day, or the first Premier League season with clubs rated from results before 1992/93 and that era's competition rules. Use the same seed to reproduce a world exactly.</p>
+    <div class="toolbar"><select data-change="new-start" aria-label="Start season">${Object.values(STARTS).map(s => `<option value="${s.id}"${s.id === newStart ? ' selected' : ''}>${esc(s.label)}</option>`).join('')}</select><input type="text" placeholder="Seed (optional)" data-input="new-seed" aria-label="Seed"><button class="btn danger" data-action="new-world">Start new world</button></div></section>`,
 });

@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.6.0 (in progress)
+## 0.6.0 (2026-11-27)
 
 ### Goal 1: ownership ambition (realism experiment, not adopted)
 * New latent club trait **ownership ambition** (−1 asset-stripping … +1 wealthy takeover) with slow drift,
@@ -32,6 +32,18 @@
 * Storage: stories and head-to-head at every level; race tracks and the last 10 derby meetings at Standard+.
   100-season saves: Essential 3.6 MB, Standard 6.8 MB, Full 16.6 MB. Save schema 3 with migration.
 * Charts never overflow their card at phone width, and chart legends wrap.
+
+### Goal 3: sandbox tools
+* **What-if editing** on club profiles: attribute edits and injected events (takeover, sell-off, crisis,
+  windfall). They are deterministic and recorded as user interventions (timeline ✎, news, Saves page).
+* **Fork and compare**: fork a world (keep or switch), compare two timelines (champions, tables, a club's
+  path, settings and interventions, first divergence), and catch up a timeline that is behind in a worker.
+* **Historical start 1992/93**: 92 clubs from engsoccerdata, rated with the same pipeline using only
+  1988/89–1991/92 data (`fit.mjs`/`build-db.mjs --start 1992`). Divisions are verified by tests. The era rules are
+  config (`config1992.ts`) with two new generic options: qualifier ratings and away goals in two-legged rounds.
+* UI no longer assumes 116 clubs or 2026 competition names; cup format texts come from config.
+* Save schema 4 (start season, interventions, lineage). 51 engine tests, 56 browser checks.
+* Bundle: club data is included once and without provenance strings (305 KB `app.js`).
 
 ## 0.5.0 (2026-11-27): complete rebuild
 

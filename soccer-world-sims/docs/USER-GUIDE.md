@@ -64,6 +64,22 @@ The same seed and settings always produce the same history, however you split th
 * **Settings**: see below.
 * **Saves**: save slots, autosave, export/import, and starting a new world (optionally from a seed).
 
+## Sandbox
+
+* **What-if** (club profile): edit a club's attack, midfield, defence, reputation, stability or ownership
+  ambition, or inject an event: wealthy takeover, sell-off, institutional crisis or investment windfall.
+  Every change is recorded as a **user intervention**, marked ✎ in the club timeline, in the news
+  (filter "Interventions") and on the Saves page.
+* **Fork** (Saves page): *Fork this world* saves an independent copy with the same seed and history; *Fork
+  and switch* saves the original and continues in the fork. Change settings or intervene in one of them.
+* **Compare** (menu): pick a saved world as timeline B for champions side by side, final tables, a club's
+  path in both timelines and where they first diverged. *Fork current world & compare* does both in one
+  click; *Simulate B to …* brings a timeline that is behind up to date.
+* **Start season** (Saves → New world): the present day (2026/27, 116 clubs) or **1992/93**, the first
+  Premier League season: 92 clubs rated from 1988–92 results and that era's rules (22-club Premier League,
+  First/Second/Third Division, League Cup with away goals). See COMPETITIONS.md for what differs from
+  reality.
+
 ## Settings
 
 All sliders default to **100%** (ownership dynamics: **0%**), the calibrated, historically realistic model. Presets:

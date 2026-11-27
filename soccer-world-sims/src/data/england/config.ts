@@ -91,6 +91,7 @@ export const ENGLAND: CountryConfig = {
   cups: [
     {
       id: 'FAC', name: 'FA Cup', short: 'FAC', colour: '#e11d48', prestige: 1,
+      format: 'Fourth qualifying round: 24 National League clubs plus 40 non-playable qualifiers (marked Q). League One and Two enter in the First Round; Premier League and Championship clubs in the Third Round. Random draws, no replays: extra time and penalties. Semi-finals and final at a neutral venue.',
       rounds: [
         { name: 'Fourth Qualifying Round', slots: [sat(10)], extraTime: true,
           entrants: ctx => ctx.leagueClubs('ENG5'),
@@ -107,6 +108,7 @@ export const ENGLAND: CountryConfig = {
     },
     {
       id: 'EFLC', name: 'EFL Cup', short: 'EFL', colour: '#16a34a', prestige: 0.6,
+      format: "Regional First and Second Rounds. The two best-placed clubs relegated from the Premier League get byes to Round Two; the previous season's top seven Premier League clubs (a stand-in for European entrants, as European competitions are not simulated) enter in Round Three. No extra time before the final; two-legged semi-finals.",
       rounds: [
         { name: 'First Round', slots: [tue(1)], extraTime: false, regional: true, rotation: 0.8,
           entrants: ctx => {

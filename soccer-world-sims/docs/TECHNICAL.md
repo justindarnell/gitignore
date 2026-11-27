@@ -14,6 +14,7 @@
             │ history.ts    snapshots, records, honours, timelines, news, head-to-head   │
             │ stories.ts    story-of-the-season detection, matchday tracks (no RNG)      │
             │ eras.ts       eras, dynasties, golden ages, decade rankings (derived)      │
+            │ sandbox.ts    what-if interventions, forks (deterministic, no RNG)         │
             │ sim.ts        simulation targets (matchday … N seasons), bulk loop        │
             │ runtime.ts    non-serialised caches + live RNG                             │
             └───────────────────────────────────────────────────────────────────────────┘
@@ -128,6 +129,24 @@ Every channel is bounded and mean-reverting. Success raises reputation and reven
 ceiling upkeep and reversion stop "winning makes you win forever". Failure lowers them, but recovery
 toward reputation and asymmetric reversion stop irreversible collapse.
 
+## Sandbox (0.6)
+
+* **Start seasons** (`src/data/england/starts.ts`): `createWorld({ start: '1992' })` selects a club
+  database and a `CountryConfig` (`ENG` for 2026/27, `ENG1992` for 1992/93). The engine and UI read league
+  sizes and names from the config; the pyramid size (116 or 92) is derived.
+* **Interventions** (`applyIntervention`): attribute edits (clamped to valid ranges) and injected events
+  (wealthy takeover, sell-off to asset-strippers, institutional crisis, investment windfall) with fixed
+  effects. They are applied between steps, consume no randomness and are recorded in `world.interventions`,
+  the club timeline (kind `intervention`, shown with ✎) and the news. Applying the same intervention at
+  the same point reproduces exactly, stepwise, in bulk and across save/load (tested).
+* **Forks** (`forkWorld`): a deep copy that keeps the seed, history and random state, with
+  `lineage = { id, parentId, parentName, forkedAt }`. Without changes a fork continues identically to its
+  parent (tested), so differences come only from settings or interventions.
+* **Compare** (`#/compare/<slot>`): the current world against any saved world with the same start, covering
+  champions per season, final tables, a club's pyramid position in both timelines, settings differences,
+  interventions and the first season where the final tables differ. If the saved timeline is behind, it can be
+  simulated to the same date in a separate worker and saved back to its slot.
+
 ## Club database pipeline
 
 See [DATA-SOURCES.md](DATA-SOURCES.md). In short, `fit.mjs` fits a recency-weighted, ridge-regularised
@@ -185,7 +204,9 @@ more goals conceded, then home defeats ahead of away defeats, then the earlier m
   store holds slot metadata (name, seed, season, date, size). Autosave writes after every simulation.
 * Export downloads `.sws.json.gz` (gzip via `CompressionStream`, or plain JSON when that is
   unavailable). Import accepts both.
-* Every save has `schema` (currently 3). Migration 1 → 2 (0.6) gives every club neutral ownership
+* Every save has `schema` (currently 4). Migration 3 → 4 (0.6) sets `start` '2026', no interventions and a
+  root lineage.
+* Earlier migrations: Migration 1 → 2 (0.6) gives every club neutral ownership
   ambition (`ambition` 0, `ownerSince` null) and the new `ownership` setting at 0. Migration 2 → 3 (0.6)
   adds empty stories for past seasons (they cannot be re-detected), an empty head-to-head table counted
   from the current season (`h2hSince`, shown in the UI) and empty derby lists.
@@ -218,6 +239,11 @@ container. 0.5 and 0.6 were measured on the same machine so they are directly co
 | Standard | 1.99 s · 5.51 MB (0.94 MB gz) | 2.07 s · 5.53 MB (0.95 MB gz) | 2.27 s · 6.82 MB (1.17 MB gz) |
 | Full | 1.93 s · 15.25 MB (2.15 MB gz) | 1.80 s · 15.26 MB (2.15 MB gz) | 2.40 s · 16.56 MB (2.37 MB gz) |
 
+Goal 3 adds no per-step cost; a 1992/93 world simulates 100 seasons in 2.3 s (Standard, 5.8 MB).
+`dist/app.js` is 305 KB (both club databases once, without the provenance strings). Before the build
+change, the 1992 database pushed it to 665 KB because a module-level property access kept a second
+and third copy of the data in the worker bundle.
+
 Goal 2 adds about 3–4 ms per season. Profiling showed head-to-head bookkeeping and the end-of-season matchday
 tracks as the main costs; head-to-head now uses a numeric-key runtime cache. The extra save size is mostly derby
 news (~0.25 MB per century), the head-to-head table (~0.3 MB, bounded) and, at Standard, race tracks
@@ -229,12 +255,12 @@ min/max decimation, so matchday-level histories (~4,600 points per century) rend
 
 ## Testing
 
-* `npm test`: 41 engine tests covering database integrity, fixture counts and uniqueness, home/away
+* `npm test`: 51 engine tests covering database integrity, fixture counts and uniqueness, home/away
   balance, clash-free calendar, scoring, tiebreakers, promotion/relegation counts, play-off brackets
   (including the six-team Championship format), FA Cup and EFL Cup structure, single winners,
   history consistency, graph data, best/worst ranking rules, attribute bounds, determinism,
   save/load equivalence, bulk vs step-by-step equivalence, and pause/resume equivalence.
-* `node tools/browser-test.mjs`: 45 end-to-end checks in headless Chromium against `dist/` opened via
+* `node tools/browser-test.mjs`: 56 end-to-end checks in headless Chromium against `dist/` opened via
   `file://`, with all network requests blocked. Covers navigation, club links, graph hover and tooltips,
   decimal formatting, badge loading, matchday controls, competitions, history pages, settings, saves
   and reload, a 100-season bulk run with pause/resume and cancel, responsiveness, memory, phone-width

@@ -10,17 +10,18 @@ import type {
   ClubInfo, ClubState, CountryConfig, CupConfig, CupContext, CupState, LeagueConfig, Match, PlayoffState,
   SeasonState, Settings, TableRow, Tie, World,
 } from './types.ts';
-import clubsDb from '../data/england/clubs.json' with { type: 'json' };
-import { ENGLAND_PREVIOUS } from '../data/england/config.ts';
+import { STARTS } from '../data/england/starts.ts';
 
 export const ENGINE_VERSION = '0.6.0';
-export const SAVE_SCHEMA = 3;
+export const SAVE_SCHEMA = 4;
 
 export interface CreateOptions {
   seed?: string;
   name?: string;
   settings?: Partial<Settings>;
   params?: Partial<EngineParams>;
+  /** Start season id (STARTS: '2026' default, '1992'). */
+  start?: string;
   startYear?: number;
   /** Apply the engine's promotion/relegation summer adjustment to clubs that changed division
    *  for the starting season (default true), so season 1 is treated like every later season. */
@@ -33,8 +34,10 @@ export interface CreateOptions {
 export function createWorld(opts: CreateOptions = {}): World {
   const seed = opts.seed ?? String(Date.now());
   const rng = Rng.fromSeed(seed);
-  const db = clubsDb as unknown as { clubs: DbClub[] };
-  const country = COUNTRIES.ENG;
+  const start = STARTS[opts.start ?? '2026'];
+  if (!start) throw new Error(`Unknown start season ${opts.start}`);
+  const db = start.db as unknown as { clubs: DbClub[] };
+  const country = COUNTRIES[start.country];
   const info: Record<string, ClubInfo> = {};
   const clubs: ClubState[] = [];
   for (const c of db.clubs) {
@@ -60,19 +63,20 @@ export function createWorld(opts: CreateOptions = {}): World {
   const levelCurve = clubs.map(overall).sort((a, b) => b - a);
   const world: World = {
     schema: SAVE_SCHEMA, engineVersion: ENGINE_VERSION,
-    name: opts.name ?? 'New world', seed, created: new Date().toISOString(), country: 'ENG',
+    name: opts.name ?? 'New world', seed, created: new Date().toISOString(), country: start.country, start: start.id,
+    interventions: [], lineage: { id: `root:${start.id}:${seed}` },
     rng: rng.state(), params, settings: { ...DEFAULT_SETTINGS, ...opts.settings }, settingsLog: [],
     info, clubs, levelCurve,
     season: undefined as unknown as SeasonState,
-    history: { snapshots: [], leagues: [], cups: [], clubs: {}, matches: {}, records: { biggestWins: [] }, stories: [], h2h: {}, h2hSince: opts.startYear ?? 2026, derbyMeetings: {} },
+    history: { snapshots: [], leagues: [], cups: [], clubs: {}, matches: {}, records: { biggestWins: [] }, stories: [], h2h: {}, h2hSince: opts.startYear ?? start.year, derbyMeetings: {} },
     news: [],
-    previousRankings: { ...ENGLAND_PREVIOUS.rankings },
-    previousRelegated: { ...ENGLAND_PREVIOUS.relegated },
+    previousRankings: { ...start.previous().rankings },
+    previousRelegated: { ...start.previous().relegated },
   };
   for (const c of clubs) world.history.clubs[c.id] = { best: [], worst: [], events: [], positions: {} };
   // Initial form from the database estimate (opposition-adjusted, capped; decays in-season).
   const formOf = new Map(db.clubs.map(c => [c.id, c.formEstimate]));
-  startSeason(world, opts.startYear ?? 2026, rng, (id) => ((formOf.get(id) ?? 50) - 50) / 30 * params.initialFormWeight);
+  startSeason(world, opts.startYear ?? start.year, rng, (id) => ((formOf.get(id) ?? 50) - 50) / 30 * params.initialFormWeight);
   return world;
 }
 
@@ -232,19 +236,20 @@ function playMatch(world: World, rt: Runtime, m: Match): void {
   }
   const table = world.season.tables[m.comp];
   if (table) applyResult(table, m.home, m.away, hg, ag);
-  else resolveKnockout(world, rt, m, lh, la, comp.extraTime(m.stage));
+  else resolveKnockout(world, rt, m, lh, la, comp.extraTime(m.stage), comp.awayGoals(m.stage));
   if (world.settings.storage !== 'essential') recordMatch(world, m);
   recordMeeting(world, rt, m); // head-to-head, derbies (no randomness)
 }
 
-interface CompInfo { rotation(stage: string): number; extraTime(stage: string): boolean }
+interface CompInfo { rotation(stage: string): number; extraTime(stage: string): boolean; awayGoals(stage: string): boolean }
 function compInfo(rt: Runtime, compId: string): CompInfo {
   const cup = rt.country.cups.find(c => c.id === compId);
   if (cup) return {
     rotation: st => cup.rounds.find(r => r.name === st)?.rotation ?? 0,
     extraTime: st => cup.rounds.find(r => r.name === st)?.extraTime ?? true,
+    awayGoals: st => !!cup.rounds.find(r => r.name === st)?.awayGoals,
   };
-  return { rotation: () => 0, extraTime: () => true };
+  return { rotation: () => 0, extraTime: () => true, awayGoals: () => false };
 }
 
 function findTie(world: World, m: Match): Tie | undefined {
@@ -255,23 +260,27 @@ function findTie(world: World, m: Match): Tie | undefined {
   return undefined;
 }
 
-function resolveKnockout(world: World, rt: Runtime, m: Match, lh: number, la: number, extraTime: boolean): void {
+function resolveKnockout(world: World, rt: Runtime, m: Match, lh: number, la: number, extraTime: boolean, awayGoals = false): void {
   const tie = findTie(world, m);
   if (!tie) return;
   const p = rt.params, rng = rt.rng;
   if (m.leg === 1) return;
   let aggA: number, aggB: number;
-  if (m.leg === 2) {
-    const first = rt.byId.get(tie.matches[0])!;
+  const first = m.leg === 2 ? rt.byId.get(tie.matches[0])! : undefined;
+  if (first) {
     // First leg: a at home. Second leg: b at home.
     aggA = first.hg! + m.ag!; aggB = first.ag! + m.hg!;
   } else { aggA = m.hg!; aggB = m.ag!; }
-  if (aggA === aggB && extraTime) {
+  // Away goals (two-legged ties where the round's rules say so): a's away goals are scored in leg 2.
+  const awayDecides = () => awayGoals && first && m.ag! !== first.ag!;
+  if (aggA === aggB && !awayDecides() && extraTime) {
     const [eh, ea] = sampleExtraTime(lh, la, p, rng);
     m.hg! += eh; m.ag! += ea; m.et = true;
     if (m.leg === 2) { aggA += ea; aggB += eh; } else { aggA += eh; aggB += ea; }
   }
-  if (aggA === aggB) {
+  if (aggA === aggB && awayDecides()) {
+    tie.winner = m.ag! > first!.ag! ? tie.a : tie.b;
+  } else if (aggA === aggB) {
     const pens = shootout(p, rng);
     m.pens = pens;
     // pens are recorded home-first for this match
@@ -332,7 +341,7 @@ function drawCupRound(world: World, rt: Runtime, cup: CupConfig, st: CupState): 
     for (let i = 0; i < ext.count; i++) {
       const id = `x-${cup.id}-${ext.level}-${i + 1}`;
       // Non-playable qualifiers: step 2 ~ rating 35, step 3 ~ 30 (below the National League).
-      const rating = (ext.level === 2 ? 35 : 30) + 2 * rng.normal();
+      const rating = (ext.rating ?? (ext.level === 2 ? 35 : 30)) + 2 * rng.normal();
       world.season.externals[id] = { name: `${ext.label} Qualifier ${i + 1}`, level: ext.level, rating };
       entrants.push(id);
     }

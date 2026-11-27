@@ -216,6 +216,42 @@ await page.reload();
 await page.waitForSelector('.page-head h1');
 check('autosave restores the world after reload', (await page.textContent('#season-label')) === label);
 
+// ---- sandbox: what-if, fork and compare (0.6)
+await page.goto(url + '#/club/everton');
+await page.waitForSelector('.whatif');
+await page.click('.whatif summary');
+await page.click('[data-action="whatif-event"][data-kind="crisis"]');
+await page.waitForSelector('.timeline li.intervention');
+check('what-if: injected event is flagged as a user intervention in the club timeline', (await page.$$eval('.timeline li.intervention', l => l.map(x => x.textContent).join('|'))).includes('User intervention: Institutional crisis'));
+await page.fill('[data-whatif="attack"]', '95');
+await page.click('[data-action="whatif-edit"]');
+await page.waitForFunction(() => document.querySelectorAll('.whatif .timeline li').length >= 2);
+check('what-if: attribute edit is applied and recorded', (await page.textContent('.attrs')).includes('95.0') && (await page.textContent('.intervention-flag')).includes('2'));
+check('what-if: only the edited attribute is recorded', /Attributes edited: attack [\d.]+ → 95\.0$/.test((await page.$$eval('.whatif .timeline li', l => l[0].textContent.trim()))), await page.$$eval('.whatif .timeline li', l => l[0].textContent.trim()));
+await page.goto(url + '#/saves');
+await page.waitForSelector('[data-action="fork"]');
+check('saves page lists interventions of the current world', (await page.textContent('#main')).includes('User interventions in this world'));
+await page.goto(url + '#/compare');
+await page.waitForSelector('[data-action="fork-compare"]');
+await page.click('[data-action="fork-compare"]');
+await page.waitForSelector('table.compare-champs', { timeout: 20000 });
+const cmpText = await page.textContent('#main');
+check('fork & compare: the fork is identical to its parent so far', cmpText.includes('B was forked from A') && cmpText.includes('identical in every season'), cmpText.match(/Relation:[^.]*\./)?.[0]);
+await page.click('#nav a[data-page="overview"]');
+await page.click('[data-sim="season"]');
+await page.waitForFunction(() => document.querySelector('#progress').hidden && !document.querySelector('[data-sim="season"]').disabled, null, { timeout: 60000 });
+await page.goto(url + '#/saves');
+await page.waitForSelector('[data-action="load"]');
+const forkId = await page.$$eval('[data-action="load"]', b => b.map(x => x.dataset.id).filter(id => id !== 'autosave').sort().at(-1));
+await page.goto(url + '#/compare/' + forkId);
+await page.waitForSelector('[data-action="compare-catchup"]', { timeout: 20000 });
+await page.click('[data-action="compare-catchup"]');
+await page.waitForFunction(() => !document.querySelector('[data-action="compare-catchup"]') && document.querySelector('table.compare-champs'), null, { timeout: 60000 });
+const rowsCmp = await page.$$eval('table.compare-champs tbody tr', r => r.length);
+check('compare: the other timeline catches up in a worker and both are compared season by season', rowsCmp >= 102, `${rowsCmp} seasons compared`);
+check('compare: club graph shows both timelines', !!(await page.$('#chart-compare canvas')));
+await shot('09-compare');
+
 // ---- memory
 const mem = await page.evaluate(() => performance.memory ? Math.round(performance.memory.usedJSHeapSize / 1e6) : null);
 check('JS heap after 101 seasons', mem === null || mem < 400, `${mem} MB`);
@@ -230,6 +266,29 @@ await page.waitForSelector('table.standings');
 const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
 check('no horizontal page scroll at phone width', !overflow);
 await shot('07-mobile-standings');
+
+// ---- historical start: 1992/93 (0.6)
+await page.setViewportSize({ width: 1400, height: 900 });
+await page.goto(url + '#/saves');
+await page.waitForSelector('[data-change="new-start"]');
+await page.selectOption('[data-change="new-start"]', '1992');
+page.once('dialog', d => d.accept());
+await page.click('[data-action="new-world"]');
+await page.waitForFunction(() => document.querySelector('#season-label').textContent === '1992/93');
+await page.goto(url + '#/standings/ENG1');
+await page.waitForSelector('table.standings');
+const rows92 = await page.$$eval('table.standings tbody tr', r => r.length);
+const tabs92 = await page.$$eval('.tabs a.tab', t => t.map(x => x.textContent.trim()));
+check('1992/93 start: 22-club Premier League and era division names', rows92 === 22 && tabs92.includes('First Division') && tabs92.includes('Third Division'), `${rows92} clubs; ${tabs92.join(', ')}`);
+await page.click('[data-sim="season"]');
+await page.waitForFunction(() => document.querySelector('#progress').hidden && !document.querySelector('[data-sim="season"]').disabled, null, { timeout: 60000 });
+await page.goto(url + '#/cups/LC');
+await page.waitForSelector('.tie');
+check('1992/93 start: League Cup with the era format', (await page.textContent('#main')).includes('Away goals count'));
+await page.goto(url + '#/club/wimbledon');
+await page.waitForSelector('#chart-position canvas');
+check('1992/93 start: historical clubs have profiles and a 92-club pyramid', (await page.textContent('#main')).includes('92 = bottom of the Third Division'));
+check('no console errors after the sandbox and 1992 checks', errors.length === 0, errors.slice(0, 3).join(' | '));
 
 await browser.close();
 const failed = results.filter(r => !r.ok);

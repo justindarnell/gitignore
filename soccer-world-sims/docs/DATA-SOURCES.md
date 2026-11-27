@@ -50,6 +50,33 @@ Ratings use results only. Transfer spending, wages and injuries are not modelled
 division for 2026/27 receive the engine's normal promotion or relegation summer adjustment at world
 creation, so season one is treated like every later season.
 
+## Historical start database: 1992/93
+
+`src/data/england/clubs-1992.json` is built with **the same pipeline and method** as the 2026/27
+database, using only data available before the season:
+
+```sh
+node tools/ratings/fit.mjs --start 1992 && node tools/ratings/build-db.mjs --start 1992
+```
+
+* **Membership** (verified): the 92 clubs of engsoccerdata's 1992/93 season (`tools/ratings/master1992.mjs`).
+  The Premier League's 22 founder members; Colchester United promoted from the Conference; Aldershot
+  (folded March 1992) and Maidstone United (folded August 1992) absent; 1991/92 promotions and relegations
+  (e.g. Blackburn via the play-offs; Luton, Notts County, West Ham relegated). Engine tests assert these.
+  Clubs also in the 2026 database keep their 2026 ids; seven historical clubs get their own (Wimbledon FC,
+  Chester City, Bury, Darlington, Hereford United, Scarborough, Torquay United). Halifax Town uses the
+  FC Halifax Town id, as the 2026 database does.
+* **Ratings**: the same weighted Poisson fit over **1988/89–1991/92** (season weights 0.15/0.3/0.55/1.0,
+  ridge toward the division mean, style shrink 30%). The fitted divisional gaps are about half of today's,
+  so 1992 divisions are much closer in strength than 2026 ones.
+* **Reputation**: weighted pyramid level **1962–1991** plus pedigree from all seasons up to 1991/92.
+  **Stability**: rank volatility **1978–1990** (no subjective adjustments). **Form**: last 12 league games
+  of 1991/92.
+* **Ownership seeds** (documented takeovers before the season): Blackburn (Jack Walker, 1991), Newcastle
+  (Sir John Hall, 1991–92), Derby (Lionel Pickering, 1991), Wolves (Sir Jack Hayward, 1990). Everyone
+  else is neutral.
+* The bundle strips `provenance` (the UI does not show it); the JSON file keeps it for every club.
+
 ## Club crests
 
 * Source: FootyLogos.com 2026-27 competition packs (SVG), supplied by the project owner.

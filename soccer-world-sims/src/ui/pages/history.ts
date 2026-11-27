@@ -1,6 +1,6 @@
 import type { Page } from '../types.ts';
 import { club, esc, tabs, empty, scoreText, f1, signed } from '../dom.ts';
-import { leagues, league, seasonLabel, compLabel, titleCounts, country } from '../data.ts';
+import { leagues, league, seasonLabel, compLabel, titleCounts, country, pyramidNote } from '../data.ts';
 import { leagueTable } from './standings.ts';
 import { erasSection, rivalriesSection } from './stories.ts';
 import type { World } from '../../engine/types.ts';
@@ -127,7 +127,7 @@ function rankings(world: World, args: string[], state: { rankMetric: string; ran
     <div class="seg">${periods.map(([k, l]) => `<a class="seg-btn${period === k ? ' active' : ''}" href="#/history/rankings/${metric}/${k}">${l}</a>`).join('')}</div>
     ${period === 'custom' ? `<label>From <select data-change="rank-from">${years.map(y => `<option value="${y}"${y === years[a] ? ' selected' : ''}>${esc(seasonLabel(y))}</option>`).join('')}</select></label><label>To <select data-change="rank-to">${years.map(y => `<option value="${y}"${y === years[b] ? ' selected' : ''}>${esc(seasonLabel(y))}</option>`).join('')}</select></label>` : ''}</div>
     <div class="grid-2"><section class="card"><h2>Most improved</h2>${list(up)}</section><section class="card"><h2>Most declined</h2>${list(down)}</section></div>
-    <p class="muted small">Values are end-of-season snapshots. Pyramid position: 1 = Premier League champions, 116 = bottom of the National League.</p>`;
+    <p class="muted small">Values are end-of-season snapshots. Pyramid position: ${esc(pyramidNote(world))}.</p>`;
 }
 
 function seasonsList(world: World): string {

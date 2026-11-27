@@ -43,6 +43,14 @@ const MIGRATIONS: Record<number, (w: any) => any> = {
     h.derbyMeetings ??= {};
     return w;
   },
+  // 3 -> 4 (0.6.0): start seasons, user interventions and timeline lineage (forks). Earlier saves all
+  // started in 2026/27 and have no interventions.
+  3: w => {
+    w.start ??= '2026';
+    w.interventions ??= [];
+    w.lineage ??= { id: `root:2026:${w.seed}` };
+    return w;
+  },
 };
 
 export class SaveError extends Error {}

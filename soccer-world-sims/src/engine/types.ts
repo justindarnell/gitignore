@@ -55,7 +55,9 @@ export interface CupContext {
   previouslyRelegatedFrom(leagueId: string): string[];
 }
 
-export interface ExternalEntrantSpec { count: number; label: string; level: number }
+/** Non-playable entrants: `level` places them below the playable pyramid (tier = leagues + level - 1);
+ *  `rating` overrides the default strength (35 at level 2, 30 below). */
+export interface ExternalEntrantSpec { count: number; label: string; level: number; rating?: number }
 
 export interface CupRoundConfig {
   name: string;
@@ -73,6 +75,8 @@ export interface CupRoundConfig {
   regional?: boolean;
   /** Squad rotation factor for higher-tier clubs (1 = full strength). Applied as a rating penalty. */
   rotation?: number;
+  /** Two-legged ties: level aggregates are decided on away goals before extra time (and after it). */
+  awayGoals?: boolean;
 }
 
 export interface CupConfig {
@@ -82,6 +86,8 @@ export interface CupConfig {
   rounds: CupRoundConfig[];
   colour: string;
   prestige: number; // for reputation/news weighting
+  /** Plain-language format description shown on the cups page. */
+  format?: string;
 }
 
 export interface CountryConfig {
@@ -256,7 +262,7 @@ export interface MatchRecord {
   home: string; away: string; hg: number; ag: number; et?: boolean; pens?: [number, number];
 }
 
-export type TimelineKind = 'event' | 'honour' | 'move' | 'milestone' | 'owner';
+export type TimelineKind = 'event' | 'honour' | 'move' | 'milestone' | 'owner' | 'intervention';
 
 export interface ClubHistory {
   best: MatchRecord[];   // biggest wins, ranked
@@ -327,4 +333,30 @@ export interface World {
   /** Ranking of each league at the end of the previous season (for cup entry rules). */
   previousRankings: Record<string, string[]>;
   previousRelegated: Record<string, string[]>;
+  /** Start season id (see src/data/england/starts.ts). */
+  start: string;
+  /** User interventions (what-if edits and injected events), in the order applied. */
+  interventions: Intervention[];
+  /** Identity and ancestry of this timeline (forks share a seed and history up to the fork point). */
+  lineage: Lineage;
+}
+
+export interface Intervention {
+  id: number;
+  season: number;
+  slot: number;
+  date: string;
+  club: string;
+  kind: 'edit' | 'takeover' | 'selloff' | 'crisis' | 'windfall';
+  /** attribute -> [before, after] */
+  changes: Record<string, [number, number]>;
+  text: string;
+}
+
+export interface Lineage {
+  id: string;
+  parentId?: string;
+  parentName?: string;
+  /** Point at which this timeline was forked from its parent. */
+  forkedAt?: { season: number; slot: number; date: string };
 }

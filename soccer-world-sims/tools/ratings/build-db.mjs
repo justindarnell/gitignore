@@ -14,12 +14,19 @@
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { master } from './master.mjs';
+import { master as master2026 } from './master.mjs';
+import { members } from './master1992.mjs';
+
+// --start <year> builds a historical start database (src/data/england/clubs-<year>.json) with the same
+// method, using only data from before that season.
+const ai = process.argv.indexOf('--start');
+const START = ai > 0 ? Number(process.argv[ai + 1]) : 2026;
+const master = START === 2026 ? master2026 : members(START);
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
-const fit = JSON.parse(readFileSync(join(root, 'tools/ratings/fit-output.json'), 'utf8'));
+const fit = JSON.parse(readFileSync(join(root, START === 2026 ? 'tools/ratings/fit-output.json' : `tools/ratings/fit-output-${START}.json`), 'utf8'));
 export const RATING_LOG = 0.035;
-const BASE = 78; // rating of the mean 2025/26 Premier League attack / defence
+const BASE = 78; // rating of the mean top-flight attack / defence in the season before the start
 
 // ---- subjective estimates (documented) for clubs without usable National League data
 const ESTIMATES = {
@@ -72,19 +79,30 @@ export const OWNERSHIP = {
   'sheffield-wednesday': [-0.85, 2015, 'Dejphon Chansiri: unpaid wages, transfer embargoes and administration during 2025/26'],
 };
 
+// Ownership seeds for a 1992/93 start (documented takeovers before the season; everyone else neutral).
+const OWNERSHIP_1992 = {
+  'blackburn-rovers': [0.9, 1991, 'Jack Walker took control in January 1991 and funded record signings'],
+  'newcastle-united': [0.6, 1991, 'Sir John Hall won control of the club in 1991-92 and began heavy investment'],
+  'derby-county': [0.5, 1991, 'Lionel Pickering became majority owner in 1991 and funded major signings'],
+  'wolverhampton-wanderers': [0.5, 1990, 'Sir Jack Hayward bought the club in 1990 and funded stadium and squad investment'],
+};
+const OWN = START === 2026 ? OWNERSHIP : START === 1992 ? OWNERSHIP_1992 : {};
+
 // ---- historical tables for reputation / stability
 const rows = readFileSync(join(root, 'data/history/derived/season-tables.csv'), 'utf8').trim().split('\n').slice(1).map(l => { const [season, tier, div, pos, club, p, w, d, lo, gf, ga, pts] = l.split(','); return { season: +season, tier: +tier, pos: +pos, club }; });
-const alias = { 'yeovil': 'yeovil-town', 'accrington': 'accrington-stanley', 'cheltenham': 'cheltenham-town', 'stevenage-borough': 'stevenage', 'leicester': 'leicester-city', 'halifax-town': 'fc-halifax-town', 'fylde': 'afc-fylde' };
+const alias = { chester: 'chester-city', 'yeovil': 'yeovil-town', 'accrington': 'accrington-stanley', 'cheltenham': 'cheltenham-town', 'stevenage-borough': 'stevenage', 'leicester': 'leicester-city', 'halifax-town': 'fc-halifax-town', 'fylde': 'afc-fylde' };
 for (const r of rows) r.club = alias[r.club] ?? r.club;
 // Aldershot Town (founded 1992) is a successor club; earlier 'Aldershot' rows belong to Aldershot FC.
 for (const r of rows) if (r.club === 'aldershot' && r.season >= 1992) r.club = 'aldershot-town';
 const sizes = {};
 for (const r of rows) { sizes[r.season] ??= {}; sizes[r.season][r.tier] = Math.max(sizes[r.season][r.tier] ?? 0, r.pos); }
 const rankOf = new Map(); // `${club}|${season}` -> pyramid rank
+const tierAt = new Map(); // `${club}|${season}` -> tier
 for (const r of rows) {
   let off = 0;
   for (let t = 1; t < r.tier; t++) off += sizes[r.season][t] ?? 24;
   rankOf.set(`${r.club}|${r.season}`, off + r.pos);
+  tierAt.set(`${r.club}|${r.season}`, r.tier);
 }
 
 // Current (2025/26-based) fitted overall for every club -> "level" curve by pyramid rank.
@@ -92,29 +110,29 @@ const fitted = master.map(c => {
   const f = fit.clubs[c.id];
   let A, D, src = 'fit';
   if (f) { A = f.att; D = f.def; }
-  else { const e = ESTIMATES[c.id]; A = fit.divisionAttack[4] + e.dA; D = fit.divisionDefence[4] + e.dD; src = 'estimate'; }
+  else { const e = ESTIMATES[c.id] ?? { dA: 0, dD: 0, note: 'no data: division mean' }; A = fit.divisionAttack[4] + e.dA; D = fit.divisionDefence[4] + e.dD; src = 'estimate'; }
   return { c, A, D, src, overall: BASE + (A + D) / 2 / RATING_LOG };
 });
 const levelCurve = fitted.map(x => x.overall).sort((a, b) => b - a); // index 0 = best club
 const level = rank => rank <= levelCurve.length ? levelCurve[rank - 1] : levelCurve.at(-1) - 4;
 
-const lastSeason = 2025;
-const NL_RANK = 104; // approximate pyramid rank for an average National League season
+const lastSeason = START - 1;
+const NL_RANK = START === 2026 ? 104 : 100; // approximate pyramid rank for a season just below the playable pyramid
 function reputation(id) {
   let wsum = 0, lsum = 0, tfSeasons = 0, titles = 0;
   for (let s = 1888; s <= lastSeason; s++) {
     const r = rankOf.get(`${id}|${s}`);
     if (r !== undefined && r <= (sizes[s]?.[1] ?? 0)) { tfSeasons++; if (r === 1) titles++; }
   }
-  for (let s = 1996; s <= lastSeason; s++) {
+  for (let s = START - 30; s <= lastSeason; s++) {
     const w = Math.pow(0.5, (lastSeason - s) / 8);
     let r = rankOf.get(`${id}|${s}`);
     // 2025/26 League One/Two/NL tables are incomplete: use the 2026/27 division as a proxy level.
-    if (r === undefined && s === 2025) {
+    if (r === undefined && START === 2026 && s === 2025) {
       const c = master.find(x => x.id === id);
       r = c.div === 1 ? 10 : c.div === 2 ? 32 : c.div === 3 ? 56 : c.div === 4 ? 80 : NL_RANK;
     }
-    if (r === undefined) r = s >= 1996 ? NL_RANK + 8 : NL_RANK; // outside tiers 1-4: National League or below
+    if (r === undefined) r = START !== 2026 || s >= 1996 ? NL_RANK + 8 : NL_RANK; // outside tiers 1-4: non-league
     wsum += w; lsum += w * level(r);
   }
   const pedigree = Math.min(6, 0.04 * tfSeasons + 0.4 * titles);
@@ -123,18 +141,16 @@ function reputation(id) {
 function stabilityOf(id) {
   const ranks = [];
   // Only seasons inside tiers 1-4 are observable; non-league seasons are treated as unknown.
-  for (let s = 2012; s <= 2024; s++) ranks.push(rankOf.get(`${id}|${s}`));
+  const tiersSeen = [];
+  for (let s = START - 14; s <= START - 2; s++) { ranks.push(rankOf.get(`${id}|${s}`)); tiersSeen.push(tierAt.get(`${id}|${s}`) ?? 5); }
   const moves = [], tiers = [];
   for (let i = 1; i < ranks.length; i++) if (ranks[i] !== undefined && ranks[i - 1] !== undefined) moves.push(Math.abs(ranks[i] - ranks[i - 1]));
-  for (let i = 1; i < ranks.length; i++) {
-    const t = r => r === undefined ? 5 : r <= 20 ? 1 : r <= 44 ? 2 : r <= 68 ? 3 : 4;
-    tiers.push(t(ranks[i]) !== t(ranks[i - 1]) ? 1 : 0);
-  }
+  for (let i = 1; i < ranks.length; i++) tiers.push(tiersSeen[i] !== tiersSeen[i - 1] ? 1 : 0);
   const divChanges = tiers.reduce((a, b) => a + b, 0);
   // With little observable data, fall back to a neutral 7 ranks/yr (typical lower-league churn).
   const vol = moves.length >= 6 ? moves.reduce((a, b) => a + b, 0) / moves.length : 7;
   let st = 68 - 1.1 * vol - 2.0 * divChanges;
-  const note = STABILITY_NOTES[id];
+  const note = START === 2026 ? STABILITY_NOTES[id] : undefined;
   if (note) st += note[0];
   return { stability: Math.max(15, Math.min(90, st)), volatility: vol, divChanges, note: note?.[1] };
 }
@@ -154,12 +170,12 @@ for (const x of fitted) {
   const form = 50 + 20 * Math.max(-1.5, Math.min(1.5, resid / 0.75));
   const rep = reputation(x.c.id);
   const st = stabilityOf(x.c.id);
-  const own = OWNERSHIP[x.c.id];
+  const own = OWN[x.c.id];
   out.push({
     id: x.c.id, name: x.c.name, short: x.c.short, code: x.c.code, country: 'ENG', division: x.c.div,
     // Division in 2025/26 (6 = below the National League). Used to apply the engine's normal
     // promotion/relegation summer adjustment at world creation, consistently with later seasons.
-    previousDivision: f ? f.dataTier : 6,
+    previousDivision: START === 2026 ? (f ? f.dataTier : 6) : (tierAt.get(`${x.c.id}|${START - 1}`) ?? 6),
     crest: `${x.c.id}.webp`,
     attack: +attack.toFixed(2), midfield: +midfield.toFixed(2), defence: +defence.toFixed(2),
     reputation: +Math.max(20, Math.min(97, rep.rep)).toFixed(2),
@@ -169,16 +185,18 @@ for (const x of fitted) {
     ambition: own ? own[0] : 0,
     ownerSince: own ? own[1] : null,
     provenance: {
-      ratings: x.src === 'fit' ? `fit: ${f.weightedMatches} weighted league matches 2022/23-2025/26` : `estimate: ${ESTIMATES[x.c.id].note}`,
-      reputation: `researched: weighted pyramid level 1996-2025 + pedigree ${rep.pedigree.toFixed(1)} (${rep.tfSeasons} top-flight seasons, ${rep.titles} titles)`,
-      stability: `volatility ${st.volatility.toFixed(1)} ranks/yr, ${st.divChanges} division changes 2012-2024` + (st.note ? `; subjective: ${st.note}` : ''),
+      ratings: x.src === 'fit' ? `fit: ${f.weightedMatches} weighted league matches ${START - 4}/${String(START - 3).slice(2)}-${START - 1}/${String(START).slice(2)}` : `estimate: ${(ESTIMATES[x.c.id] ?? { note: 'no data: division mean' }).note}`,
+      reputation: `researched: weighted pyramid level ${START - 30}-${START - 1} + pedigree ${rep.pedigree.toFixed(1)} (${rep.tfSeasons} top-flight seasons, ${rep.titles} titles)`,
+      stability: `volatility ${st.volatility.toFixed(1)} ranks/yr, ${st.divChanges} division changes ${START - 14}-${START - 2}` + (st.note ? `; subjective: ${st.note}` : ''),
       ambition: own ? `documented: ${own[2]} (judgement: seed ${own[0] > 0 ? '+' : ''}${own[0].toFixed(2)})` : 'neutral default: no decisive documented ownership change',
       form: f ? `researched: ${resid >= 0 ? '+' : ''}${resid.toFixed(2)} pts/game vs expectation over last ${f.formMatches} league games` : 'no data: neutral',
     },
   });
 }
 mkdirSync(join(root, 'src/data/england'), { recursive: true });
-writeFileSync(join(root, 'src/data/england/clubs.json'), JSON.stringify({ schema: 1, season: '2026/27', ratingLog: RATING_LOG, midfieldWeight: W, generated: new Date().toISOString().slice(0, 10), clubs: out }, null, 1));
+// Final rankings of the season before a historical start (for cup entry rules that use them).
+const previous = START === 2026 ? undefined : Object.fromEntries([1, 2, 3, 4].map(t => [`ENG${t}`, rows.filter(r => r.season === START - 1 && r.tier === t).sort((x, y) => x.pos - y.pos).map(r => r.club)]));
+writeFileSync(join(root, START === 2026 ? 'src/data/england/clubs.json' : `src/data/england/clubs-${START}.json`), JSON.stringify({ schema: 1, season: `${START}/${String(START + 1).slice(2)}`, ratingLog: RATING_LOG, midfieldWeight: W, generated: new Date().toISOString().slice(0, 10), ...(previous ? { previousRankings: previous } : {}), clubs: out }, null, 1));
 for (const d of [1, 2, 3, 4, 5]) {
   console.log('--- tier', d);
   for (const c of out.filter(c => c.division === d).sort((a, b) => b.squadQuality - a.squadQuality)) console.log(c.short.padEnd(15), 'A', c.attack.toFixed(1), 'M', c.midfield.toFixed(1), 'D', c.defence.toFixed(1), 'Q', c.squadQuality.toFixed(1), 'Rep', c.reputation.toFixed(1), 'St', c.stability.toFixed(1), 'F', c.formEstimate, 'Amb', c.ambition);
