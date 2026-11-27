@@ -1,0 +1,1738 @@
+{
+ "generated": "2026-11-27",
+ "notes": [
+  "season = starting year (2024 = 2024/25).",
+  "Tables rebuilt from results with 3 points per win; points deductions not applied.",
+  "Promotion/relegation derived from the following season's divisional membership.",
+  "Data: engsoccerdata 1888/89-2024/25 (tiers 1-4); openfootball 2025/26 (PL and Championship complete; League One/Two used for membership only)."
+ ],
+ "lastCompleteSeason": 2025,
+ "premierLeague": {
+  "matchStats20Club": {
+   "seasons": "1995/96-2025",
+   "matches": 11780,
+   "goalsPerMatch": 2.705,
+   "homeGoals": 1.535,
+   "awayGoals": 1.17,
+   "homeWinPct": 45.84,
+   "drawPct": 25.21,
+   "awayWinPct": 28.95,
+   "goalillessPct": 7.64,
+   "cleanSheetPctPerTeamMatch": 28.29,
+   "margin3plusPct": 15.71,
+   "margin4plusPct": 5.968,
+   "margin5plusPct": 2.105,
+   "teamScored6plusPct": 1.188,
+   "total7plusPct": 2.377,
+   "totalGoalsDistribution": {
+    "0": 0.0764,
+    "1": 0.1756,
+    "2": 0.2392,
+    "3": 0.2158,
+    "4": 0.1547,
+    "5": 0.08,
+    "6": 0.0346,
+    "7": 0.0154,
+    "8+": 0.0083
+   },
+   "commonScorelines": [
+    [
+     "1-0",
+     0.1756
+    ],
+    [
+     "2-1",
+     0.1502
+    ],
+    [
+     "2-0",
+     0.1266
+    ],
+    [
+     "1-1",
+     0.1126
+    ],
+    [
+     "0-0",
+     0.0764
+    ],
+    [
+     "3-1",
+     0.074
+    ],
+    [
+     "3-0",
+     0.0656
+    ],
+    [
+     "2-2",
+     0.0518
+    ],
+    [
+     "3-2",
+     0.041
+    ],
+    [
+     "4-0",
+     0.0289
+    ],
+    [
+     "4-1",
+     0.0274
+    ],
+    [
+     "4-2",
+     0.0135
+    ],
+    [
+     "5-0",
+     0.0115
+    ],
+    [
+     "3-3",
+     0.0098
+    ],
+    [
+     "5-1",
+     0.0082
+    ]
+   ]
+  },
+  "matchStatsRecent": {
+   "seasons": "2015/16-2025",
+   "matches": 4180,
+   "goalsPerMatch": 2.823,
+   "homeGoals": 1.55,
+   "awayGoals": 1.273,
+   "homeWinPct": 44.33,
+   "drawPct": 23.68,
+   "awayWinPct": 31.99,
+   "goalillessPct": 6.29,
+   "cleanSheetPctPerTeamMatch": 26.81,
+   "margin3plusPct": 17.78,
+   "margin4plusPct": 6.627,
+   "margin5plusPct": 2.297,
+   "teamScored6plusPct": 1.1,
+   "total7plusPct": 2.416,
+   "totalGoalsDistribution": {
+    "0": 0.0629,
+    "1": 0.1584,
+    "2": 0.2361,
+    "3": 0.2249,
+    "4": 0.1663,
+    "5": 0.0907,
+    "6": 0.0366,
+    "7": 0.017,
+    "8+": 0.0072
+   },
+   "commonScorelines": [
+    [
+     "1-0",
+     0.1584
+    ],
+    [
+     "2-1",
+     0.1514
+    ],
+    [
+     "2-0",
+     0.1273
+    ],
+    [
+     "1-1",
+     0.1089
+    ],
+    [
+     "3-1",
+     0.0792
+    ],
+    [
+     "3-0",
+     0.0734
+    ],
+    [
+     "0-0",
+     0.0629
+    ],
+    [
+     "2-2",
+     0.0553
+    ],
+    [
+     "3-2",
+     0.044
+    ],
+    [
+     "4-1",
+     0.0323
+    ],
+    [
+     "4-0",
+     0.0318
+    ],
+    [
+     "4-2",
+     0.0151
+    ],
+    [
+     "5-0",
+     0.0144
+    ],
+    [
+     "5-1",
+     0.01
+    ],
+    [
+     "3-3",
+     0.0089
+    ]
+   ]
+  },
+  "points20Club": {
+   "1": {
+    "n": 31,
+    "mean": 87.5,
+    "sd": 6,
+    "p10": 80,
+    "p50": 87,
+    "p90": 95,
+    "min": 75,
+    "max": 100
+   },
+   "2": {
+    "n": 31,
+    "mean": 80.5,
+    "sd": 6.5,
+    "p10": 71,
+    "p50": 80,
+    "p90": 89,
+    "min": 68,
+    "max": 97
+   },
+   "3": {
+    "n": 31,
+    "mean": 73.7,
+    "sd": 5,
+    "p10": 68,
+    "p50": 74,
+    "p90": 82,
+    "min": 65,
+    "max": 83
+   },
+   "4": {
+    "n": 31,
+    "mean": 68.8,
+    "sd": 4.2,
+    "p10": 63,
+    "p50": 68,
+    "p90": 75,
+    "min": 60,
+    "max": 79
+   },
+   "5": {
+    "n": 31,
+    "mean": 64.7,
+    "sd": 4.4,
+    "p10": 59,
+    "p50": 65,
+    "p90": 70,
+    "min": 56,
+    "max": 75
+   },
+   "6": {
+    "n": 31,
+    "mean": 61.4,
+    "sd": 3.5,
+    "p10": 58,
+    "p50": 62,
+    "p90": 66,
+    "min": 55,
+    "max": 69
+   },
+   "10": {
+    "n": 31,
+    "mean": 50,
+    "sd": 3.2,
+    "p10": 46,
+    "p50": 50,
+    "p90": 53,
+    "min": 44,
+    "max": 59
+   },
+   "17": {
+    "n": 31,
+    "mean": 38.1,
+    "sd": 2.3,
+    "p10": 35,
+    "p50": 38,
+    "p90": 41,
+    "min": 34,
+    "max": 44
+   },
+   "18": {
+    "n": 31,
+    "mean": 34.7,
+    "sd": 3.8,
+    "p10": 30,
+    "p50": 34,
+    "p90": 39,
+    "min": 25,
+    "max": 42
+   },
+   "20": {
+    "n": 31,
+    "mean": 24.9,
+    "sd": 6.5,
+    "p10": 16,
+    "p50": 25,
+    "p90": 33,
+    "min": 11,
+    "max": 34
+   },
+   "withinSeasonPointsSD": {
+    "n": 31,
+    "mean": 16.49,
+    "sd": 2.26,
+    "p10": 13.62,
+    "p50": 16.65,
+    "p90": 19.24,
+    "min": 11.6,
+    "max": 20.48
+   },
+   "goalDifferenceChampion": {
+    "n": 31,
+    "mean": 51.3,
+    "sd": 12.2,
+    "p10": 38,
+    "p50": 50,
+    "p90": 71,
+    "min": 32,
+    "max": 79
+   },
+   "goalDifferenceLast": {
+    "n": 31,
+    "mean": -40.4,
+    "sd": 12,
+    "p10": -60,
+    "p50": -40,
+    "p90": -28,
+    "min": -69,
+    "max": -21
+   }
+  },
+  "pointsRecent": {
+   "1": {
+    "n": 11,
+    "mean": 90.8,
+    "sd": 6.1,
+    "p10": 84,
+    "p50": 91,
+    "p90": 99,
+    "min": 81,
+    "max": 100
+   },
+   "2": {
+    "n": 11,
+    "mean": 82.5,
+    "sd": 7.7,
+    "p10": 74,
+    "p50": 81,
+    "p90": 92,
+    "min": 71,
+    "max": 97
+   },
+   "4": {
+    "n": 11,
+    "mean": 69.5,
+    "sd": 3.5,
+    "p10": 66,
+    "p50": 69,
+    "p90": 75,
+    "min": 65,
+    "max": 76
+   },
+   "6": {
+    "n": 11,
+    "mean": 62.8,
+    "sd": 3.5,
+    "p10": 58,
+    "p50": 63,
+    "p90": 66,
+    "min": 57,
+    "max": 69
+   },
+   "17": {
+    "n": 11,
+    "mean": 37.6,
+    "sd": 1.9,
+    "p10": 36,
+    "p50": 38,
+    "p90": 40,
+    "min": 35,
+    "max": 41
+   },
+   "18": {
+    "n": 11,
+    "mean": 32.6,
+    "sd": 4.2,
+    "p10": 26,
+    "p50": 34,
+    "p90": 37,
+    "min": 25,
+    "max": 39
+   },
+   "20": {
+    "n": 11,
+    "mean": 20.6,
+    "sd": 5,
+    "p10": 16,
+    "p50": 21,
+    "p90": 25,
+    "min": 12,
+    "max": 31
+   },
+   "withinSeasonPointsSD": {
+    "n": 11,
+    "mean": 17.92,
+    "sd": 1.66,
+    "p10": 15.43,
+    "p50": 18.11,
+    "p90": 19.72,
+    "min": 15.05,
+    "max": 20.48
+   },
+   "goalDifferenceChampion": {
+    "n": 11,
+    "mean": 56.6,
+    "sd": 13.6,
+    "p10": 44,
+    "p50": 52,
+    "p90": 73,
+    "min": 32,
+    "max": 79
+   },
+   "goalDifferenceLast": {
+    "n": 11,
+    "mean": -48,
+    "sd": 12,
+    "p10": -61,
+    "p50": -49,
+    "p90": -37,
+    "min": -69,
+    "max": -25
+   }
+  },
+  "promoted20Club": {
+   "clubSeasons": 89,
+   "survivalPct": 52.8,
+   "meanFinish": 15.47,
+   "finishDistribution": {
+    "n": 89,
+    "mean": 15.5,
+    "sd": 4.2,
+    "p10": 9,
+    "p50": 17,
+    "p90": 20,
+    "min": 5,
+    "max": 20
+   },
+   "top4Pct": 0,
+   "top6Pct": 1.12,
+   "topHalfPct": 19.1,
+   "allPromotedRelegatedSeasons": [
+    1997,
+    2023,
+    2024
+   ]
+  },
+  "promotedRecent": {
+   "clubSeasons": 30,
+   "survivalPct": 46.7,
+   "meanFinish": 16.17,
+   "finishDistribution": {
+    "n": 30,
+    "mean": 16.2,
+    "sd": 3.7,
+    "p10": 9.9,
+    "p50": 18,
+    "p90": 20,
+    "min": 7,
+    "max": 20
+   },
+   "top4Pct": 0,
+   "top6Pct": 0,
+   "topHalfPct": 16.67,
+   "allPromotedRelegatedSeasons": [
+    2023,
+    2024
+   ]
+  },
+  "promoted2001to2024": {
+   "clubSeasons": 72,
+   "survivalPct": 54.2,
+   "meanFinish": 15.63,
+   "finishDistribution": {
+    "n": 72,
+    "mean": 15.6,
+    "sd": 3.9,
+    "p10": 10,
+    "p50": 17,
+    "p90": 20,
+    "min": 7,
+    "max": 20
+   },
+   "top4Pct": 0,
+   "top6Pct": 0,
+   "topHalfPct": 16.67,
+   "allPromotedRelegatedSeasons": [
+    2023,
+    2024
+   ]
+  },
+  "relegatedFromPL": {
+   "relegations": 94,
+   "immediateReturnPct": 29.7,
+   "returnWithin3Pct": 45.1,
+   "returnWithin10Pct": 70.1,
+   "medianSeasonsAwayAmongReturners": 2
+  },
+  "longTermPLEra": {
+   "seasons": "1992/93-2025/26",
+   "uniqueChampions": 7,
+   "titleRetentionPct": 33.3,
+   "longestStreak": 4,
+   "streakDistribution": {
+    "1": 16,
+    "2": 4,
+    "3": 2,
+    "4": 1
+   },
+   "top4NewEntrantsPerSeason": {
+    "n": 33,
+    "mean": 1.12,
+    "sd": 0.69,
+    "p10": 0,
+    "p50": 1,
+    "p90": 2,
+    "min": 0,
+    "max": 3
+   },
+   "top6NewEntrantsPerSeason": {
+    "n": 33,
+    "mean": 1.45,
+    "sd": 0.86,
+    "p10": 1,
+    "p50": 1,
+    "p90": 2,
+    "min": 0,
+    "max": 4
+   },
+   "uniqueChampionsIn10Years": {
+    "n": 25,
+    "mean": 3.64,
+    "sd": 0.69,
+    "p10": 3,
+    "p50": 4,
+    "p90": 4.6,
+    "min": 3,
+    "max": 5
+   },
+   "uniqueChampionsIn25Years": {
+    "n": 10,
+    "mean": 6,
+    "sd": 0,
+    "p10": 6,
+    "p50": 6,
+    "p90": 6,
+    "min": 6,
+    "max": 6
+   },
+   "topFlight10YearWindows": {
+    "distinctTopFlightClubs": {
+     "n": 25,
+     "mean": 35.3,
+     "sd": 1,
+     "p10": 34,
+     "p50": 35,
+     "p90": 36.6,
+     "min": 33,
+     "max": 37
+    },
+    "everPresentClubs": {
+     "n": 25,
+     "mean": 8.7,
+     "sd": 1.1,
+     "p10": 7,
+     "p50": 9,
+     "p90": 10,
+     "min": 7,
+     "max": 11
+    }
+   },
+   "topFlight30YearWindows": {
+    "distinctTopFlightClubs": {
+     "n": 5,
+     "mean": 49.4,
+     "sd": 0.5,
+     "p10": 49,
+     "p50": 49,
+     "p90": 50,
+     "min": 49,
+     "max": 50
+    },
+    "everPresentClubs": {
+     "n": 5,
+     "mean": 6,
+     "sd": 0,
+     "p10": 6,
+     "p50": 6,
+     "p90": 6,
+     "min": 6,
+     "max": 6
+    }
+   },
+   "top6PlacesHeldByBest6ClubsPct": 72.5,
+   "championsList": {
+    "1992": "manchester-united",
+    "1993": "manchester-united",
+    "1994": "blackburn-rovers",
+    "1995": "manchester-united",
+    "1996": "manchester-united",
+    "1997": "arsenal",
+    "1998": "manchester-united",
+    "1999": "manchester-united",
+    "2000": "manchester-united",
+    "2001": "arsenal",
+    "2002": "manchester-united",
+    "2003": "arsenal",
+    "2004": "chelsea",
+    "2005": "chelsea",
+    "2006": "manchester-united",
+    "2007": "manchester-united",
+    "2008": "manchester-united",
+    "2009": "chelsea",
+    "2010": "manchester-united",
+    "2011": "manchester-city",
+    "2012": "manchester-united",
+    "2013": "manchester-city",
+    "2014": "chelsea",
+    "2015": "leicester-city",
+    "2016": "chelsea",
+    "2017": "manchester-city",
+    "2018": "manchester-city",
+    "2019": "liverpool",
+    "2020": "manchester-city",
+    "2021": "manchester-city",
+    "2022": "manchester-city",
+    "2023": "manchester-city",
+    "2024": "liverpool",
+    "2025": "arsenal"
+   }
+  },
+  "titleDefencePLEra": {
+   "championPointsChangeNextSeason": {
+    "n": 33,
+    "mean": -9.2,
+    "sd": 12.7,
+    "p10": -27.4,
+    "p50": -7,
+    "p90": 6.2,
+    "min": -37,
+    "max": 12
+   },
+   "defenderFinish": {
+    "n": 33,
+    "mean": 2.8,
+    "sd": 2.6,
+    "p10": 1,
+    "p50": 2,
+    "p90": 6.6,
+    "min": 1,
+    "max": 12
+   },
+   "defenderTop4Pct": 81.8
+  }
+ },
+ "topFlightPostwar": {
+  "longTerm": {
+   "seasons": "1946/47-2025/26",
+   "uniqueChampions": 17,
+   "titleRetentionPct": 22.8,
+   "longestStreak": 4,
+   "streakDistribution": {
+    "1": 49,
+    "2": 9,
+    "3": 3,
+    "4": 1
+   },
+   "top4NewEntrantsPerSeason": {
+    "n": 79,
+    "mean": 1.73,
+    "sd": 0.82,
+    "p10": 1,
+    "p50": 2,
+    "p90": 3,
+    "min": 0,
+    "max": 3
+   },
+   "top6NewEntrantsPerSeason": {
+    "n": 79,
+    "mean": 2.25,
+    "sd": 1.12,
+    "p10": 1,
+    "p50": 2,
+    "p90": 4,
+    "min": 0,
+    "max": 5
+   },
+   "uniqueChampionsIn10Years": {
+    "n": 71,
+    "mean": 5.07,
+    "sd": 1.61,
+    "p10": 3,
+    "p50": 5,
+    "p90": 7,
+    "min": 3,
+    "max": 8
+   },
+   "uniqueChampionsIn25Years": {
+    "n": 56,
+    "mean": 8.98,
+    "sd": 2.48,
+    "p10": 6,
+    "p50": 9,
+    "p90": 13,
+    "min": 6,
+    "max": 13
+   },
+   "topFlight10YearWindows": {
+    "distinctTopFlightClubs": {
+     "n": 71,
+     "mean": 35,
+     "sd": 1.6,
+     "p10": 33,
+     "p50": 35,
+     "p90": 37,
+     "min": 31,
+     "max": 39
+    },
+    "everPresentClubs": {
+     "n": 71,
+     "mean": 8.7,
+     "sd": 1.3,
+     "p10": 7,
+     "p50": 9,
+     "p90": 10,
+     "min": 5,
+     "max": 12
+    }
+   },
+   "topFlight30YearWindows": {
+    "distinctTopFlightClubs": {
+     "n": 51,
+     "mean": 48.3,
+     "sd": 2.1,
+     "p10": 44,
+     "p50": 49,
+     "p90": 51,
+     "min": 43,
+     "max": 52
+    },
+    "everPresentClubs": {
+     "n": 51,
+     "mean": 3.6,
+     "sd": 1.7,
+     "p10": 1,
+     "p50": 4,
+     "p90": 6,
+     "min": 1,
+     "max": 6
+    }
+   },
+   "top6PlacesHeldByBest6ClubsPct": 55.2,
+   "championsList": {
+    "1946": "liverpool",
+    "1947": "arsenal",
+    "1948": "portsmouth",
+    "1949": "portsmouth",
+    "1950": "tottenham-hotspur",
+    "1951": "manchester-united",
+    "1952": "arsenal",
+    "1953": "wolverhampton-wanderers",
+    "1954": "chelsea",
+    "1955": "manchester-united",
+    "1956": "manchester-united",
+    "1957": "wolverhampton-wanderers",
+    "1958": "wolverhampton-wanderers",
+    "1959": "burnley",
+    "1960": "tottenham-hotspur",
+    "1961": "ipswich-town",
+    "1962": "everton",
+    "1963": "liverpool",
+    "1964": "manchester-united",
+    "1965": "liverpool",
+    "1966": "manchester-united",
+    "1967": "manchester-city",
+    "1968": "leeds-united",
+    "1969": "everton",
+    "1970": "arsenal",
+    "1971": "derby-county",
+    "1972": "liverpool",
+    "1973": "leeds-united",
+    "1974": "ipswich-town",
+    "1975": "liverpool",
+    "1976": "liverpool",
+    "1977": "nottingham-forest",
+    "1978": "liverpool",
+    "1979": "liverpool",
+    "1980": "aston-villa",
+    "1981": "liverpool",
+    "1982": "liverpool",
+    "1983": "liverpool",
+    "1984": "everton",
+    "1985": "liverpool",
+    "1986": "everton",
+    "1987": "liverpool",
+    "1988": "arsenal",
+    "1989": "liverpool",
+    "1990": "arsenal",
+    "1991": "leeds-united",
+    "1992": "manchester-united",
+    "1993": "manchester-united",
+    "1994": "blackburn-rovers",
+    "1995": "manchester-united",
+    "1996": "manchester-united",
+    "1997": "arsenal",
+    "1998": "manchester-united",
+    "1999": "manchester-united",
+    "2000": "manchester-united",
+    "2001": "arsenal",
+    "2002": "manchester-united",
+    "2003": "arsenal",
+    "2004": "chelsea",
+    "2005": "chelsea",
+    "2006": "manchester-united",
+    "2007": "manchester-united",
+    "2008": "manchester-united",
+    "2009": "chelsea",
+    "2010": "manchester-united",
+    "2011": "manchester-city",
+    "2012": "manchester-united",
+    "2013": "manchester-city",
+    "2014": "chelsea",
+    "2015": "leicester-city",
+    "2016": "chelsea",
+    "2017": "manchester-city",
+    "2018": "manchester-city",
+    "2019": "liverpool",
+    "2020": "manchester-city",
+    "2021": "manchester-city",
+    "2022": "manchester-city",
+    "2023": "manchester-city",
+    "2024": "liverpool",
+    "2025": "arsenal"
+   }
+  },
+  "titleDefence": {
+   "championPointsChangeNextSeason": {
+    "n": 79,
+    "mean": -12.3,
+    "sd": 11.6,
+    "p10": -29,
+    "p50": -11,
+    "p90": 1.2,
+    "min": -46,
+    "max": 12
+   },
+   "defenderFinish": {
+    "n": 79,
+    "mean": 4.4,
+    "sd": 4.2,
+    "p10": 1,
+    "p50": 2,
+    "p90": 10.2,
+    "min": 1,
+    "max": 18
+   },
+   "defenderTop4Pct": 67.1
+  },
+  "giants50y": {
+   "definition": "Top 5 clubs by mean top-flight finish over the 10 seasons up to each base year; followed for 50 seasons.",
+   "baseYears": "1955-1975",
+   "clubCohorts": 105,
+   "relegatedWithinHorizonPct": 75.2,
+   "relegatedWithin10Pct": 52.4,
+   "relegatedWithin20Pct": 75.2,
+   "reachedTier3WithinHorizonPct": 39,
+   "reachedTier3Within40Pct": 39,
+   "medianYearsToFirstRelegation": 8,
+   "meanSeasonsOutsideTopFlight": 13.43,
+   "examples": [
+    "wolverhampton-wanderers (top-5 in 1955; tier 3 after 30 seasons)",
+    "blackpool (top-5 in 1955; tier 3 after 23 seasons)",
+    "portsmouth (top-5 in 1955; tier 3 after 6 seasons)",
+    "wolverhampton-wanderers (top-5 in 1956; tier 3 after 29 seasons)",
+    "blackpool (top-5 in 1956; tier 3 after 22 seasons)",
+    "burnley (top-5 in 1956; tier 3 after 24 seasons)",
+    "wolverhampton-wanderers (top-5 in 1957; tier 3 after 28 seasons)",
+    "blackpool (top-5 in 1957; tier 3 after 21 seasons)",
+    "wolverhampton-wanderers (top-5 in 1958; tier 3 after 27 seasons)",
+    "blackpool (top-5 in 1958; tier 3 after 20 seasons)",
+    "preston-north-end (top-5 in 1958; tier 3 after 12 seasons)",
+    "wolverhampton-wanderers (top-5 in 1959; tier 3 after 26 seasons)",
+    "burnley (top-5 in 1959; tier 3 after 21 seasons)",
+    "blackpool (top-5 in 1959; tier 3 after 19 seasons)",
+    "wolverhampton-wanderers (top-5 in 1960; tier 3 after 25 seasons)",
+    "burnley (top-5 in 1960; tier 3 after 20 seasons)",
+    "west-bromwich-albion (top-5 in 1960; tier 3 after 31 seasons)",
+    "wolverhampton-wanderers (top-5 in 1961; tier 3 after 24 seasons)",
+    "burnley (top-5 in 1961; tier 3 after 19 seasons)",
+    "west-bromwich-albion (top-5 in 1961; tier 3 after 30 seasons)",
+    "wolverhampton-wanderers (top-5 in 1962; tier 3 after 23 seasons)",
+    "burnley (top-5 in 1962; tier 3 after 18 seasons)",
+    "west-bromwich-albion (top-5 in 1962; tier 3 after 29 seasons)",
+    "wolverhampton-wanderers (top-5 in 1963; tier 3 after 22 seasons)",
+    "burnley (top-5 in 1963; tier 3 after 17 seasons)"
+   ]
+  },
+  "giants30y": {
+   "definition": "Top 5 clubs by mean top-flight finish over the 10 seasons up to each base year; followed for 30 seasons.",
+   "baseYears": "1955-1995",
+   "clubCohorts": 205,
+   "relegatedWithinHorizonPct": 52.2,
+   "relegatedWithin10Pct": 40.5,
+   "relegatedWithin20Pct": 52.2,
+   "reachedTier3WithinHorizonPct": 26.3,
+   "reachedTier3Within40Pct": 26.3,
+   "medianYearsToFirstRelegation": 7,
+   "meanSeasonsOutsideTopFlight": 5.68,
+   "examples": [
+    "wolverhampton-wanderers (top-5 in 1955; tier 3 after 30 seasons)",
+    "blackpool (top-5 in 1955; tier 3 after 23 seasons)",
+    "portsmouth (top-5 in 1955; tier 3 after 6 seasons)",
+    "wolverhampton-wanderers (top-5 in 1956; tier 3 after 29 seasons)",
+    "blackpool (top-5 in 1956; tier 3 after 22 seasons)",
+    "burnley (top-5 in 1956; tier 3 after 24 seasons)",
+    "wolverhampton-wanderers (top-5 in 1957; tier 3 after 28 seasons)",
+    "blackpool (top-5 in 1957; tier 3 after 21 seasons)",
+    "wolverhampton-wanderers (top-5 in 1958; tier 3 after 27 seasons)",
+    "blackpool (top-5 in 1958; tier 3 after 20 seasons)",
+    "preston-north-end (top-5 in 1958; tier 3 after 12 seasons)",
+    "wolverhampton-wanderers (top-5 in 1959; tier 3 after 26 seasons)",
+    "burnley (top-5 in 1959; tier 3 after 21 seasons)",
+    "blackpool (top-5 in 1959; tier 3 after 19 seasons)",
+    "wolverhampton-wanderers (top-5 in 1960; tier 3 after 25 seasons)",
+    "burnley (top-5 in 1960; tier 3 after 20 seasons)",
+    "wolverhampton-wanderers (top-5 in 1961; tier 3 after 24 seasons)",
+    "burnley (top-5 in 1961; tier 3 after 19 seasons)",
+    "west-bromwich-albion (top-5 in 1961; tier 3 after 30 seasons)",
+    "wolverhampton-wanderers (top-5 in 1962; tier 3 after 23 seasons)",
+    "burnley (top-5 in 1962; tier 3 after 18 seasons)",
+    "west-bromwich-albion (top-5 in 1962; tier 3 after 29 seasons)",
+    "wolverhampton-wanderers (top-5 in 1963; tier 3 after 22 seasons)",
+    "burnley (top-5 in 1963; tier 3 after 17 seasons)",
+    "burnley (top-5 in 1964; tier 3 after 16 seasons)"
+   ]
+  },
+  "risers25y": {
+   "definition": "Clubs in tiers 3-4 at base year; share reaching tier 1 / winning the title within 25 seasons.",
+   "baseYears": "1960-1995",
+   "reachTopFlightPct": 19.6,
+   "winTitlePct": 0.41,
+   "meanClubsReachingTopFlight": 9.4
+  },
+  "risers50y": {
+   "definition": "Clubs in tiers 3-4 at base year; share reaching tier 1 / winning the title within 50 seasons.",
+   "baseYears": "1960-1975",
+   "reachTopFlightPct": 27.7,
+   "winTitlePct": 0.78,
+   "meanClubsReachingTopFlight": 13.3
+  }
+ },
+ "championship": {
+  "matchStats": {
+   "matches": 17112,
+   "goalsPerMatch": 2.569,
+   "homeGoals": 1.451,
+   "awayGoals": 1.118,
+   "homeWinPct": 44.03,
+   "drawPct": 27.46,
+   "awayWinPct": 28.51,
+   "goalillessPct": 7.97,
+   "cleanSheetPctPerTeamMatch": 27.95,
+   "margin3plusPct": 12.03,
+   "margin4plusPct": 3.828,
+   "margin5plusPct": 1.221,
+   "teamScored6plusPct": 0.666,
+   "total7plusPct": 1.514,
+   "totalGoalsDistribution": {
+    "0": 0.0797,
+    "1": 0.1895,
+    "2": 0.2539,
+    "3": 0.2207,
+    "4": 0.138,
+    "5": 0.0727,
+    "6": 0.0304,
+    "7": 0.0105,
+    "8+": 0.0047
+   },
+   "commonScorelines": [
+    [
+     "1-0",
+     0.1895
+    ],
+    [
+     "2-1",
+     0.1629
+    ],
+    [
+     "1-1",
+     0.1303
+    ],
+    [
+     "2-0",
+     0.1237
+    ],
+    [
+     "0-0",
+     0.0797
+    ],
+    [
+     "3-1",
+     0.0647
+    ],
+    [
+     "3-0",
+     0.0578
+    ],
+    [
+     "2-2",
+     0.0541
+    ],
+    [
+     "3-2",
+     0.0449
+    ],
+    [
+     "4-1",
+     0.0211
+    ],
+    [
+     "4-0",
+     0.0191
+    ],
+    [
+     "4-2",
+     0.0126
+    ],
+    [
+     "3-3",
+     0.0094
+    ],
+    [
+     "5-0",
+     0.0067
+    ],
+    [
+     "5-1",
+     0.0062
+    ]
+   ]
+  },
+  "points": {
+   "1": {
+    "n": 31,
+    "mean": 94.6,
+    "sd": 6,
+    "p10": 88,
+    "p50": 94,
+    "p90": 102,
+    "min": 81,
+    "max": 106
+   },
+   "2": {
+    "n": 31,
+    "mean": 88,
+    "sd": 4.9,
+    "p10": 80,
+    "p50": 89,
+    "p90": 93,
+    "min": 79,
+    "max": 100
+   },
+   "3": {
+    "n": 31,
+    "mean": 83.4,
+    "sd": 4.5,
+    "p10": 77,
+    "p50": 84,
+    "p90": 89,
+    "min": 75,
+    "max": 92
+   },
+   "6": {
+    "n": 31,
+    "mean": 73.5,
+    "sd": 2.8,
+    "p10": 70,
+    "p50": 74,
+    "p90": 76,
+    "min": 68,
+    "max": 80
+   },
+   "7": {
+    "n": 31,
+    "mean": 71.1,
+    "sd": 2.6,
+    "p10": 68,
+    "p50": 70,
+    "p90": 74,
+    "min": 66,
+    "max": 78
+   },
+   "8": {
+    "n": 31,
+    "mean": 68.7,
+    "sd": 2.9,
+    "p10": 65,
+    "p50": 68,
+    "p90": 72,
+    "min": 63,
+    "max": 77
+   },
+   "21": {
+    "n": 31,
+    "mean": 49.2,
+    "sd": 2.6,
+    "p10": 47,
+    "p50": 49,
+    "p90": 52,
+    "min": 43,
+    "max": 55
+   },
+   "22": {
+    "n": 31,
+    "mean": 47,
+    "sd": 3.8,
+    "p10": 41,
+    "p50": 47,
+    "p90": 52,
+    "min": 40,
+    "max": 54
+   },
+   "24": {
+    "n": 31,
+    "mean": 35.7,
+    "sd": 6.9,
+    "p10": 26,
+    "p50": 38,
+    "p90": 44,
+    "min": 18,
+    "max": 45
+   },
+   "withinSeasonPointsSD": {
+    "n": 31,
+    "mean": 14.48,
+    "sd": 1.93,
+    "p10": 12.37,
+    "p50": 15.11,
+    "p90": 16.24,
+    "min": 9.45,
+    "max": 16.78
+   },
+   "goalDifferenceChampion": {
+    "n": 31,
+    "mean": 44.3,
+    "sd": 11.8,
+    "p10": 28,
+    "p50": 42,
+    "p90": 63,
+    "min": 26,
+    "max": 67
+   },
+   "goalDifferenceLast": {
+    "n": 31,
+    "mean": -36.3,
+    "sd": 11.7,
+    "p10": -55,
+    "p50": -34,
+    "p90": -24,
+    "min": -60,
+    "max": -16
+   }
+  },
+  "promoted": {
+   "clubSeasons": 89,
+   "survivalPct": 82,
+   "meanFinish": 15.12,
+   "finishDistribution": {
+    "n": 89,
+    "mean": 15.1,
+    "sd": 6.7,
+    "p10": 5,
+    "p50": 17,
+    "p90": 23,
+    "min": 2,
+    "max": 24
+   },
+   "top4Pct": 8.99,
+   "top6Pct": 13.48,
+   "topHalfPct": 35.96,
+   "allPromotedRelegatedSeasons": []
+  },
+  "relegated": {
+   "relegations": 90,
+   "immediateReturnPct": 24.4,
+   "returnWithin3Pct": 42.2,
+   "returnWithin10Pct": 65.2,
+   "medianSeasonsAwayAmongReturners": 2
+  }
+ },
+ "leagueOne": {
+  "matchStats": {
+   "matches": 16008,
+   "goalsPerMatch": 2.591,
+   "homeGoals": 1.45,
+   "awayGoals": 1.141,
+   "homeWinPct": 43.94,
+   "drawPct": 26.81,
+   "awayWinPct": 29.25,
+   "goalillessPct": 7.68,
+   "cleanSheetPctPerTeamMatch": 27.85,
+   "margin3plusPct": 12.43,
+   "margin4plusPct": 4.004,
+   "margin5plusPct": 1.181,
+   "teamScored6plusPct": 0.55,
+   "total7plusPct": 1.63,
+   "totalGoalsDistribution": {
+    "0": 0.0768,
+    "1": 0.1897,
+    "2": 0.2517,
+    "3": 0.2217,
+    "4": 0.1376,
+    "5": 0.0751,
+    "6": 0.031,
+    "7": 0.0115,
+    "8+": 0.0048
+   },
+   "commonScorelines": [
+    [
+     "1-0",
+     0.1897
+    ],
+    [
+     "2-1",
+     0.1643
+    ],
+    [
+     "1-1",
+     0.1261
+    ],
+    [
+     "2-0",
+     0.1256
+    ],
+    [
+     "0-0",
+     0.0768
+    ],
+    [
+     "3-1",
+     0.063
+    ],
+    [
+     "3-0",
+     0.0574
+    ],
+    [
+     "2-2",
+     0.0538
+    ],
+    [
+     "3-2",
+     0.0448
+    ],
+    [
+     "4-1",
+     0.023
+    ],
+    [
+     "4-0",
+     0.0208
+    ],
+    [
+     "4-2",
+     0.0122
+    ],
+    [
+     "3-3",
+     0.0099
+    ],
+    [
+     "5-0",
+     0.0074
+    ],
+    [
+     "5-1",
+     0.0069
+    ]
+   ]
+  },
+  "points": {
+   "1": {
+    "n": 29,
+    "mean": 94.4,
+    "sd": 6.3,
+    "p10": 86.4,
+    "p50": 95,
+    "p90": 101,
+    "min": 82,
+    "max": 111
+   },
+   "2": {
+    "n": 29,
+    "mean": 88.1,
+    "sd": 4.4,
+    "p10": 83,
+    "p50": 87,
+    "p90": 93.2,
+    "min": 79,
+    "max": 98
+   },
+   "3": {
+    "n": 29,
+    "mean": 84,
+    "sd": 4.7,
+    "p10": 78.8,
+    "p50": 84,
+    "p90": 89,
+    "min": 72,
+    "max": 96
+   },
+   "6": {
+    "n": 29,
+    "mean": 74.9,
+    "sd": 3.6,
+    "p10": 71,
+    "p50": 74,
+    "p90": 81.2,
+    "min": 69,
+    "max": 83
+   },
+   "7": {
+    "n": 29,
+    "mean": 72.8,
+    "sd": 3.8,
+    "p10": 68.8,
+    "p50": 73,
+    "p90": 80,
+    "min": 65,
+    "max": 80
+   },
+   "20": {
+    "n": 29,
+    "mean": 49.7,
+    "sd": 2.7,
+    "p10": 46,
+    "p50": 50,
+    "p90": 52,
+    "min": 40,
+    "max": 52
+   },
+   "21": {
+    "n": 29,
+    "mean": 47.7,
+    "sd": 2.7,
+    "p10": 44,
+    "p50": 48,
+    "p90": 50,
+    "min": 40,
+    "max": 51
+   },
+   "24": {
+    "n": 29,
+    "mean": 35.8,
+    "sd": 5.5,
+    "p10": 27,
+    "p50": 37,
+    "p90": 42.2,
+    "min": 25,
+    "max": 47
+   },
+   "withinSeasonPointsSD": {
+    "n": 29,
+    "mean": 15.02,
+    "sd": 2.03,
+    "p10": 12.82,
+    "p50": 14.91,
+    "p90": 17.28,
+    "min": 9.98,
+    "max": 19.06
+   },
+   "goalDifferenceChampion": {
+    "n": 29,
+    "mean": 40.9,
+    "sd": 10.1,
+    "p10": 25.6,
+    "p50": 42,
+    "p90": 54,
+    "min": 18,
+    "max": 60
+   },
+   "goalDifferenceLast": {
+    "n": 29,
+    "mean": -36,
+    "sd": 9.8,
+    "p10": -47.4,
+    "p50": -35,
+    "p90": -24.6,
+    "min": -60,
+    "max": -20
+   }
+  },
+  "promoted": {
+   "clubSeasons": 111,
+   "survivalPct": 81.1,
+   "meanFinish": 13.5,
+   "finishDistribution": {
+    "n": 111,
+    "mean": 13.5,
+    "sd": 6.5,
+    "p10": 4,
+    "p50": 14,
+    "p90": 22,
+    "min": 1,
+    "max": 24
+   },
+   "top4Pct": 10.81,
+   "top6Pct": 17.12,
+   "topHalfPct": 44.14,
+   "allPromotedRelegatedSeasons": []
+  }
+ },
+ "leagueTwo": {
+  "matchStats": {
+   "matches": 16448,
+   "goalsPerMatch": 2.536,
+   "homeGoals": 1.421,
+   "awayGoals": 1.115,
+   "homeWinPct": 43.23,
+   "drawPct": 27.62,
+   "awayWinPct": 29.15,
+   "goalillessPct": 8.26,
+   "cleanSheetPctPerTeamMatch": 28.38,
+   "margin3plusPct": 11.99,
+   "margin4plusPct": 3.605,
+   "margin5plusPct": 1.125,
+   "teamScored6plusPct": 0.596,
+   "total7plusPct": 1.629,
+   "totalGoalsDistribution": {
+    "0": 0.0826,
+    "1": 0.1964,
+    "2": 0.2547,
+    "3": 0.2193,
+    "4": 0.1322,
+    "5": 0.0703,
+    "6": 0.0281,
+    "7": 0.0108,
+    "8+": 0.0055
+   },
+   "commonScorelines": [
+    [
+     "1-0",
+     0.1964
+    ],
+    [
+     "2-1",
+     0.1622
+    ],
+    [
+     "1-1",
+     0.1331
+    ],
+    [
+     "2-0",
+     0.1215
+    ],
+    [
+     "0-0",
+     0.0826
+    ],
+    [
+     "3-1",
+     0.0634
+    ],
+    [
+     "3-0",
+     0.0571
+    ],
+    [
+     "2-2",
+     0.0502
+    ],
+    [
+     "3-2",
+     0.041
+    ],
+    [
+     "4-1",
+     0.0227
+    ],
+    [
+     "4-0",
+     0.0187
+    ],
+    [
+     "4-2",
+     0.0119
+    ],
+    [
+     "3-3",
+     0.0092
+    ],
+    [
+     "5-0",
+     0.0065
+    ],
+    [
+     "4-3",
+     0.0055
+    ]
+   ]
+  },
+  "points": {
+   "1": {
+    "n": 30,
+    "mean": 88.5,
+    "sd": 6.4,
+    "p10": 83,
+    "p50": 87,
+    "p90": 97.2,
+    "min": 69,
+    "max": 102
+   },
+   "3": {
+    "n": 30,
+    "mean": 81.2,
+    "sd": 3.8,
+    "p10": 78,
+    "p50": 81,
+    "p90": 85,
+    "min": 68,
+    "max": 88
+   },
+   "4": {
+    "n": 30,
+    "mean": 77.8,
+    "sd": 4,
+    "p10": 73.9,
+    "p50": 78,
+    "p90": 83.1,
+    "min": 65,
+    "max": 85
+   },
+   "7": {
+    "n": 30,
+    "mean": 71.3,
+    "sd": 3.5,
+    "p10": 69,
+    "p50": 71,
+    "p90": 75,
+    "min": 58,
+    "max": 78
+   },
+   "8": {
+    "n": 30,
+    "mean": 69.4,
+    "sd": 3.7,
+    "p10": 66.6,
+    "p50": 70,
+    "p90": 74,
+    "min": 57,
+    "max": 76
+   },
+   "22": {
+    "n": 30,
+    "mean": 46.4,
+    "sd": 3.4,
+    "p10": 42.8,
+    "p50": 47,
+    "p90": 50.1,
+    "min": 36,
+    "max": 52
+   },
+   "23": {
+    "n": 30,
+    "mean": 43.3,
+    "sd": 4.6,
+    "p10": 37.7,
+    "p50": 44,
+    "p90": 49,
+    "min": 32,
+    "max": 51
+   },
+   "24": {
+    "n": 30,
+    "mean": 38,
+    "sd": 6.9,
+    "p10": 28.7,
+    "p50": 38.5,
+    "p90": 45.2,
+    "min": 20,
+    "max": 48
+   },
+   "withinSeasonPointsSD": {
+    "n": 30,
+    "mean": 13.3,
+    "sd": 1.77,
+    "p10": 11.08,
+    "p50": 13.42,
+    "p90": 15.65,
+    "min": 9.98,
+    "max": 17.01
+   },
+   "goalDifferenceChampion": {
+    "n": 30,
+    "mean": 34,
+    "sd": 9.4,
+    "p10": 23,
+    "p50": 31.5,
+    "p90": 43.2,
+    "min": 21,
+    "max": 65
+   },
+   "goalDifferenceLast": {
+    "n": 30,
+    "mean": -34.9,
+    "sd": 14.3,
+    "p10": -54,
+    "p50": -32,
+    "p90": -21.6,
+    "min": -83,
+    "max": -14
+   }
+  }
+ },
+ "cups": {
+  "faCup": {
+   "source": "FA Cup (engsoccerdata)",
+   "seasons": "1995-2018",
+   "1v2": {
+    "ties": 400,
+    "higherTierProgressedPct": 79.3,
+    "higherTierHomeProgressedPct": 79.7,
+    "higherTierAwayProgressedPct": 78.8
+   },
+   "1v3": {
+    "ties": 148,
+    "higherTierProgressedPct": 75,
+    "higherTierHomeProgressedPct": 81.8,
+    "higherTierAwayProgressedPct": 67.6
+   },
+   "1v4": {
+    "ties": 78,
+    "higherTierProgressedPct": 85.9,
+    "higherTierHomeProgressedPct": 87.5,
+    "higherTierAwayProgressedPct": 84.8
+   },
+   "1v9": {
+    "ties": 43,
+    "higherTierProgressedPct": 95.3,
+    "higherTierHomeProgressedPct": 90.5,
+    "higherTierAwayProgressedPct": 100
+   },
+   "2v3": {
+    "ties": 141,
+    "higherTierProgressedPct": 61,
+    "higherTierHomeProgressedPct": 63.3,
+    "higherTierAwayProgressedPct": 58.1
+   },
+   "2v4": {
+    "ties": 70,
+    "higherTierProgressedPct": 67.1,
+    "higherTierHomeProgressedPct": 70.3,
+    "higherTierAwayProgressedPct": 63.6
+   },
+   "2v9": {
+    "ties": 41,
+    "higherTierProgressedPct": 75.6,
+    "higherTierHomeProgressedPct": 76.5,
+    "higherTierAwayProgressedPct": 75
+   },
+   "3v4": {
+    "ties": 335,
+    "higherTierProgressedPct": 63.9,
+    "higherTierHomeProgressedPct": 70.4,
+    "higherTierAwayProgressedPct": 57.8
+   },
+   "3v9": {
+    "ties": 349,
+    "higherTierProgressedPct": 80.2,
+    "higherTierHomeProgressedPct": 84.6,
+    "higherTierAwayProgressedPct": 75.9
+   },
+   "4v9": {
+    "ties": 338,
+    "higherTierProgressedPct": 69.5,
+    "higherTierHomeProgressedPct": 69.7,
+    "higherTierAwayProgressedPct": 69.4
+   }
+  },
+  "leagueCup": {
+   "source": "League Cup (engsoccerdata)",
+   "seasons": "1995-2018",
+   "1v2": {
+    "ties": 293,
+    "higherTierProgressedPct": 70.6,
+    "higherTierHomeProgressedPct": 78.8,
+    "higherTierAwayProgressedPct": 63.5
+   },
+   "1v3": {
+    "ties": 181,
+    "higherTierProgressedPct": 82.3,
+    "higherTierHomeProgressedPct": 88.6,
+    "higherTierAwayProgressedPct": 76.3
+   },
+   "1v4": {
+    "ties": 93,
+    "higherTierProgressedPct": 88.2,
+    "higherTierHomeProgressedPct": 87.5,
+    "higherTierAwayProgressedPct": 88.9
+   },
+   "2v3": {
+    "ties": 287,
+    "higherTierProgressedPct": 70.4,
+    "higherTierHomeProgressedPct": 78.3,
+    "higherTierAwayProgressedPct": 62.5
+   },
+   "2v4": {
+    "ties": 336,
+    "higherTierProgressedPct": 76.2,
+    "higherTierHomeProgressedPct": 78.5,
+    "higherTierAwayProgressedPct": 73.1
+   },
+   "2v9": {
+    "ties": 23,
+    "higherTierProgressedPct": 69.6,
+    "higherTierHomeProgressedPct": 50,
+    "higherTierAwayProgressedPct": 90.9
+   },
+   "3v4": {
+    "ties": 182,
+    "higherTierProgressedPct": 69.8,
+    "higherTierHomeProgressedPct": 69.2,
+    "higherTierAwayProgressedPct": 70.2
+   },
+   "3v9": {
+    "ties": 15,
+    "higherTierProgressedPct": 60,
+    "higherTierHomeProgressedPct": 71.4,
+    "higherTierAwayProgressedPct": 50
+   }
+  }
+ },
+ "pyramidRankExample": {
+  "manchester-city-2025": 2,
+  "manchester-city-1998": 47
+ }
+}

@@ -1,0 +1,938 @@
+{
+ "generated": "2026-11-27",
+ "mu": 0.19292000604671566,
+ "homeAdvantage": 0.21114483914061213,
+ "divisionAttack": [
+  -1.1102230246251566e-17,
+  -0.5549971466904191,
+  -0.836645686362746,
+  -1.060644801620979,
+  -1.3362078773548123
+ ],
+ "divisionDefence": [
+  -5.551115123125783e-18,
+  -0.4842342788974445,
+  -0.7364810920420046,
+  -0.9797445236692878,
+  -1.2617684225268693
+ ],
+ "ridge": 4,
+ "seasonWeights": {
+  "2022": 0.15,
+  "2023": 0.3,
+  "2024": 0.55,
+  "2025": 1
+ },
+ "matchesUsed": 8520,
+ "missing": [
+  "hornchurch",
+  "kidderminster-harriers",
+  "worthing"
+ ],
+ "clubs": {
+  "afc-bournemouth": {
+   "att": 0.03871252898837882,
+   "def": -0.04935355084865512,
+   "dataTier": 1,
+   "weightedMatches": 76,
+   "formResidualPpg": 0.29905830901816827,
+   "formMatches": 12
+  },
+  "arsenal": {
+   "att": 0.30159866270586433,
+   "def": 0.493134205867846,
+   "dataTier": 1,
+   "weightedMatches": 76,
+   "formResidualPpg": 0.24682303590492147,
+   "formMatches": 12
+  },
+  "aston-villa": {
+   "att": 0.0917838418906522,
+   "def": 0.018692182342106175,
+   "dataTier": 1,
+   "weightedMatches": 76,
+   "formResidualPpg": -0.29689268291264304,
+   "formMatches": 12
+  },
+  "brentford": {
+   "att": 0.08235341650438567,
+   "def": -0.04903740713259483,
+   "dataTier": 1,
+   "weightedMatches": 76,
+   "formResidualPpg": -0.37258477022917685,
+   "formMatches": 12
+  },
+  "brighton-and-hove-albion": {
+   "att": 0.07016990215878428,
+   "def": -0.005681903319178329,
+   "dataTier": 1,
+   "weightedMatches": 76,
+   "formResidualPpg": 0.3858822606341694,
+   "formMatches": 12
+  },
+  "chelsea": {
+   "att": 0.12106625342076023,
+   "def": 0.0231925343725897,
+   "dataTier": 1,
+   "weightedMatches": 76,
+   "formResidualPpg": -0.7674217862561395,
+   "formMatches": 12
+  },
+  "coventry-city": {
+   "att": -0.2365856698214918,
+   "def": -0.3559988945465438,
+   "dataTier": 2,
+   "weightedMatches": 92,
+   "formResidualPpg": 0.3595976965242844,
+   "formMatches": 12
+  },
+  "crystal-palace": {
+   "att": -0.14876198280519795,
+   "def": 0.015879182821380115,
+   "dataTier": 1,
+   "weightedMatches": 76,
+   "formResidualPpg": -0.10782508162152236,
+   "formMatches": 12
+  },
+  "everton": {
+   "att": -0.20384797022790085,
+   "def": 0.07288061782264599,
+   "dataTier": 1,
+   "weightedMatches": 76,
+   "formResidualPpg": -0.19830636605978613,
+   "formMatches": 12
+  },
+  "fulham": {
+   "att": -0.055211131073404515,
+   "def": -0.017115416212181305,
+   "dataTier": 1,
+   "weightedMatches": 76,
+   "formResidualPpg": 0.14505657560150925,
+   "formMatches": 12
+  },
+  "hull-city": {
+   "att": -0.5041665982266691,
+   "def": -0.5265241315199614,
+   "dataTier": 2,
+   "weightedMatches": 92,
+   "formResidualPpg": -0.2376404563091582,
+   "formMatches": 12
+  },
+  "ipswich-town": {
+   "att": -0.26767471167987267,
+   "def": -0.36716038107509874,
+   "dataTier": 2,
+   "weightedMatches": 87.6,
+   "formResidualPpg": 0.011638343253190927,
+   "formMatches": 12
+  },
+  "leeds-united": {
+   "att": -0.09703048540605518,
+   "def": -0.05996526540118842,
+   "dataTier": 1,
+   "weightedMatches": 82.8,
+   "formResidualPpg": 0.11551804058934655,
+   "formMatches": 12
+  },
+  "liverpool": {
+   "att": 0.30298734458236165,
+   "def": 0.07727359225748517,
+   "dataTier": 1,
+   "weightedMatches": 76,
+   "formResidualPpg": -0.3222490725092426,
+   "formMatches": 12
+  },
+  "manchester-city": {
+   "att": 0.3717519442497077,
+   "def": 0.3032876553767033,
+   "dataTier": 1,
+   "weightedMatches": 76,
+   "formResidualPpg": 0.0820517127153401,
+   "formMatches": 12
+  },
+  "manchester-united": {
+   "att": 0.09769956796898159,
+   "def": 0.006211204254125418,
+   "dataTier": 1,
+   "weightedMatches": 76,
+   "formResidualPpg": 0.6887845682765485,
+   "formMatches": 12
+  },
+  "newcastle-united": {
+   "att": 0.15458486332333238,
+   "def": -0.004899269407242149,
+   "dataTier": 1,
+   "weightedMatches": 76,
+   "formResidualPpg": -0.3974873937814308,
+   "formMatches": 12
+  },
+  "nottingham-forest": {
+   "att": -0.06633274996906566,
+   "def": -0.01343373469791318,
+   "dataTier": 1,
+   "weightedMatches": 76,
+   "formResidualPpg": 0.1553661179868017,
+   "formMatches": 12
+  },
+  "sunderland": {
+   "att": -0.4195023017241065,
+   "def": -0.071445402083176,
+   "dataTier": 1,
+   "weightedMatches": 84,
+   "formResidualPpg": 0.5069897263016887,
+   "formMatches": 12
+  },
+  "tottenham-hotspur": {
+   "att": 0.07972465828692095,
+   "def": -0.13948194269810232,
+   "dataTier": 1,
+   "weightedMatches": 76,
+   "formResidualPpg": -0.3296228866140169,
+   "formMatches": 12
+  },
+  "birmingham-city": {
+   "att": -0.577997468953102,
+   "def": -0.41108337798146827,
+   "dataTier": 2,
+   "weightedMatches": 92,
+   "formResidualPpg": -0.19197559550308765,
+   "formMatches": 12
+  },
+  "blackburn-rovers": {
+   "att": -0.7311279383099824,
+   "def": -0.4343040242173801,
+   "dataTier": 2,
+   "weightedMatches": 92,
+   "formResidualPpg": 0.005071958554555593,
+   "formMatches": 12
+  },
+  "bolton-wanderers": {
+   "att": -0.6900055351496209,
+   "def": -0.6605758034395804,
+   "dataTier": 3,
+   "weightedMatches": 77,
+   "formResidualPpg": 0.5547504034287468,
+   "formMatches": 12
+  },
+  "bristol-city": {
+   "att": -0.5618383717995356,
+   "def": -0.44281950873193665,
+   "dataTier": 2,
+   "weightedMatches": 92,
+   "formResidualPpg": -0.3363225143035788,
+   "formMatches": 12
+  },
+  "burnley": {
+   "att": -0.30633394820321724,
+   "def": -0.17260631524745534,
+   "dataTier": 1,
+   "weightedMatches": 81.6,
+   "formResidualPpg": -0.5899893580336678,
+   "formMatches": 12
+  },
+  "cardiff-city": {
+   "att": -0.5728750344434973,
+   "def": -0.50286070345885,
+   "dataTier": 3,
+   "weightedMatches": 76,
+   "formResidualPpg": 0.5155895765607493,
+   "formMatches": 12
+  },
+  "charlton-athletic": {
+   "att": -0.7696007053491953,
+   "def": -0.5619397250810215,
+   "dataTier": 2,
+   "weightedMatches": 92,
+   "formResidualPpg": -0.16272989148154285,
+   "formMatches": 12
+  },
+  "derby-county": {
+   "att": -0.5554208007611316,
+   "def": -0.4628564582006826,
+   "dataTier": 2,
+   "weightedMatches": 92,
+   "formResidualPpg": 0.3475460139068474,
+   "formMatches": 12
+  },
+  "lincoln-city": {
+   "att": -0.7648997609045227,
+   "def": -0.5657226255230156,
+   "dataTier": 3,
+   "weightedMatches": 76,
+   "formResidualPpg": 0.08542480203323653,
+   "formMatches": 12
+  },
+  "middlesbrough": {
+   "att": -0.3705372077607284,
+   "def": -0.3794643282560307,
+   "dataTier": 2,
+   "weightedMatches": 92,
+   "formResidualPpg": -0.275660349044022,
+   "formMatches": 12
+  },
+  "millwall": {
+   "att": -0.5977324895787536,
+   "def": -0.3239728491803702,
+   "dataTier": 2,
+   "weightedMatches": 92,
+   "formResidualPpg": 0.5866333858311145,
+   "formMatches": 12
+  },
+  "norwich-city": {
+   "att": -0.41330710573704954,
+   "def": -0.5135805751004962,
+   "dataTier": 2,
+   "weightedMatches": 92,
+   "formResidualPpg": 0.4766003894893897,
+   "formMatches": 12
+  },
+  "portsmouth": {
+   "att": -0.6583653228491984,
+   "def": -0.584992766937139,
+   "dataTier": 2,
+   "weightedMatches": 92,
+   "formResidualPpg": 0.19620784047146336,
+   "formMatches": 12
+  },
+  "preston-north-end": {
+   "att": -0.6514898578249063,
+   "def": -0.5248794023118148,
+   "dataTier": 2,
+   "weightedMatches": 92,
+   "formResidualPpg": -0.2955254188776505,
+   "formMatches": 12
+  },
+  "queens-park-rangers": {
+   "att": -0.5945312417333475,
+   "def": -0.6194926515215518,
+   "dataTier": 2,
+   "weightedMatches": 92,
+   "formResidualPpg": -0.27995356245807124,
+   "formMatches": 12
+  },
+  "sheffield-united": {
+   "att": -0.43686643297520455,
+   "def": -0.4679030864130006,
+   "dataTier": 2,
+   "weightedMatches": 89.6,
+   "formResidualPpg": -0.2682689333368931,
+   "formMatches": 12
+  },
+  "southampton": {
+   "att": -0.2927848221657747,
+   "def": -0.463011873745782,
+   "dataTier": 2,
+   "weightedMatches": 86.4,
+   "formResidualPpg": 0.8528304727359298,
+   "formMatches": 12
+  },
+  "stoke-city": {
+   "att": -0.7128387502708202,
+   "def": -0.4644563645963357,
+   "dataTier": 2,
+   "weightedMatches": 92,
+   "formResidualPpg": -0.5896051063353399,
+   "formMatches": 12
+  },
+  "swansea-city": {
+   "att": -0.582219773376444,
+   "def": -0.4915860505439845,
+   "dataTier": 2,
+   "weightedMatches": 92,
+   "formResidualPpg": 0.26934451890859085,
+   "formMatches": 12
+  },
+  "watford": {
+   "att": -0.6158776080235959,
+   "def": -0.5371866708313571,
+   "dataTier": 2,
+   "weightedMatches": 92,
+   "formResidualPpg": -0.5139914640360258,
+   "formMatches": 12
+  },
+  "west-bromwich-albion": {
+   "att": -0.6192675209121608,
+   "def": -0.37851713638585316,
+   "dataTier": 2,
+   "weightedMatches": 92,
+   "formResidualPpg": 0.08780137073167392,
+   "formMatches": 12
+  },
+  "west-ham-united": {
+   "att": -0.10209959894662372,
+   "def": -0.20100164277070504,
+   "dataTier": 1,
+   "weightedMatches": 76,
+   "formResidualPpg": 0.227617902386874,
+   "formMatches": 12
+  },
+  "wolverhampton-wanderers": {
+   "att": -0.31331281572455827,
+   "def": -0.22652932529648995,
+   "dataTier": 1,
+   "weightedMatches": 76,
+   "formResidualPpg": -0.014726403656835363,
+   "formMatches": 12
+  },
+  "wrexham": {
+   "att": -0.5367443487252377,
+   "def": -0.5404048154374353,
+   "dataTier": 2,
+   "weightedMatches": 85.1,
+   "formResidualPpg": 0.14375353969090246,
+   "formMatches": 12
+  },
+  "afc-wimbledon": {
+   "att": -1.0254052782068823,
+   "def": -0.6567552789747556,
+   "dataTier": 3,
+   "weightedMatches": 76,
+   "formResidualPpg": 0.30670767545711336,
+   "formMatches": 12
+  },
+  "barnsley": {
+   "att": -0.5970753206442271,
+   "def": -0.901145588046176,
+   "dataTier": 3,
+   "weightedMatches": 73,
+   "formResidualPpg": 0.4151046420011073,
+   "formMatches": 12
+  },
+  "blackpool": {
+   "att": -0.8069050535608844,
+   "def": -0.8178914168495729,
+   "dataTier": 3,
+   "weightedMatches": 76,
+   "formResidualPpg": -0.6560072262466974,
+   "formMatches": 12
+  },
+  "bradford-city": {
+   "att": -0.9518213679833111,
+   "def": -0.6996575392377451,
+   "dataTier": 3,
+   "weightedMatches": 76,
+   "formResidualPpg": -0.2718229921508651,
+   "formMatches": 12
+  },
+  "bromley": {
+   "att": -0.9495454519354674,
+   "def": -0.9434346391474684,
+   "dataTier": 4,
+   "weightedMatches": 48.3,
+   "formResidualPpg": 0.21223376452334697,
+   "formMatches": 12
+  },
+  "burton-albion": {
+   "att": -1.0813231625858006,
+   "def": -0.9425011149399516,
+   "dataTier": 3,
+   "weightedMatches": 76,
+   "formResidualPpg": -0.4833505797631806,
+   "formMatches": 12
+  },
+  "cambridge-united": {
+   "att": -1.167240684176887,
+   "def": -0.8904896306304582,
+   "dataTier": 4,
+   "weightedMatches": 69,
+   "formResidualPpg": 0.02554543069335205,
+   "formMatches": 12
+  },
+  "doncaster-rovers": {
+   "att": -0.9578675580042685,
+   "def": -0.9726796925566734,
+   "dataTier": 3,
+   "weightedMatches": 76,
+   "formResidualPpg": -0.04501089115102377,
+   "formMatches": 12
+  },
+  "huddersfield-town": {
+   "att": -0.7619409385163284,
+   "def": -0.6740873745775843,
+   "dataTier": 3,
+   "weightedMatches": 76,
+   "formResidualPpg": 0.28978832065153615,
+   "formMatches": 12
+  },
+  "leicester-city": {
+   "att": -0.4341930665954663,
+   "def": -0.4666441889405026,
+   "dataTier": 2,
+   "weightedMatches": 86.4,
+   "formResidualPpg": -0.5810208552105792,
+   "formMatches": 12
+  },
+  "leyton-orient": {
+   "att": -0.8037190102441846,
+   "def": -0.8241269018969336,
+   "dataTier": 3,
+   "weightedMatches": 76,
+   "formResidualPpg": -0.7387391072907562,
+   "formMatches": 12
+  },
+  "luton-town": {
+   "att": -0.6653770985624624,
+   "def": -0.5302878399836487,
+   "dataTier": 3,
+   "weightedMatches": 72.6,
+   "formResidualPpg": 0.34644831142932153,
+   "formMatches": 12
+  },
+  "mansfield-town": {
+   "att": -0.7898877112629125,
+   "def": -0.8651541950064673,
+   "dataTier": 3,
+   "weightedMatches": 75,
+   "formResidualPpg": -0.4006814585981456,
+   "formMatches": 12
+  },
+  "milton-keynes-dons": {
+   "att": -0.8216743449562248,
+   "def": -0.9895633303258565,
+   "dataTier": 4,
+   "weightedMatches": 69,
+   "formResidualPpg": 0.7368373671117249,
+   "formMatches": 12
+  },
+  "notts-county": {
+   "att": -0.7335903024461156,
+   "def": -0.9286375771112513,
+   "dataTier": 4,
+   "weightedMatches": 62.1,
+   "formResidualPpg": 0.4830546494891775,
+   "formMatches": 12
+  },
+  "oxford-united": {
+   "att": -0.7521754454751125,
+   "def": -0.5582414119361123,
+   "dataTier": 2,
+   "weightedMatches": 92,
+   "formResidualPpg": 0.26606958067095027,
+   "formMatches": 12
+  },
+  "peterborough-united": {
+   "att": -0.5490906979030297,
+   "def": -0.975982091422613,
+   "dataTier": 3,
+   "weightedMatches": 76,
+   "formResidualPpg": 0.35864801078344305,
+   "formMatches": 12
+  },
+  "plymouth-argyle": {
+   "att": -0.736993577994423,
+   "def": -0.8036708004361515,
+   "dataTier": 3,
+   "weightedMatches": 76,
+   "formResidualPpg": 0.01916962923493032,
+   "formMatches": 12
+  },
+  "reading": {
+   "att": -0.7655010397853934,
+   "def": -0.8123435241586661,
+   "dataTier": 3,
+   "weightedMatches": 76,
+   "formResidualPpg": -0.051525209991951204,
+   "formMatches": 12
+  },
+  "sheffield-wednesday": {
+   "att": -0.84658826166528,
+   "def": -0.7446020200468099,
+   "dataTier": 2,
+   "weightedMatches": 92,
+   "formResidualPpg": -0.27041365202079964,
+   "formMatches": 12
+  },
+  "stevenage": {
+   "att": -1.0252232977753115,
+   "def": -0.65989602524999,
+   "dataTier": 3,
+   "weightedMatches": 74,
+   "formResidualPpg": -0.5289768040628099,
+   "formMatches": 12
+  },
+  "stockport-county": {
+   "att": -0.681679055484362,
+   "def": -0.45107405209333273,
+   "dataTier": 3,
+   "weightedMatches": 77,
+   "formResidualPpg": 0.47755994281315406,
+   "formMatches": 12
+  },
+  "wigan-athletic": {
+   "att": -0.9664541257095164,
+   "def": -0.5949623338809978,
+   "dataTier": 3,
+   "weightedMatches": 76,
+   "formResidualPpg": -0.16822839781228627,
+   "formMatches": 12
+  },
+  "wycombe-wanderers": {
+   "att": -0.7630769793548497,
+   "def": -0.566906780158144,
+   "dataTier": 3,
+   "weightedMatches": 76,
+   "formResidualPpg": 0.3898423107105824,
+   "formMatches": 12
+  },
+  "accrington-stanley": {
+   "att": -1.195506757918332,
+   "def": -1.0488634977085558,
+   "dataTier": 4,
+   "weightedMatches": 69,
+   "formResidualPpg": -0.17740349585179635,
+   "formMatches": 12
+  },
+  "barnet": {
+   "att": -0.9976991509896558,
+   "def": -1.0021605018962223,
+   "dataTier": 4,
+   "weightedMatches": 48.3,
+   "formResidualPpg": -0.7516590930951846,
+   "formMatches": 12
+  },
+  "bristol-rovers": {
+   "att": -1.0090097267655902,
+   "def": -0.9925904216714129,
+   "dataTier": 4,
+   "weightedMatches": 69,
+   "formResidualPpg": 0.5076950923768782,
+   "formMatches": 12
+  },
+  "cheltenham-town": {
+   "att": -1.2851277246179134,
+   "def": -1.0838855749213963,
+   "dataTier": 4,
+   "weightedMatches": 69,
+   "formResidualPpg": -0.2561006002764617,
+   "formMatches": 12
+  },
+  "chesterfield": {
+   "att": -0.78455498288718,
+   "def": -1.0635336802063482,
+   "dataTier": 4,
+   "weightedMatches": 48.3,
+   "formResidualPpg": -0.08223456822793745,
+   "formMatches": 12
+  },
+  "colchester-united": {
+   "att": -1.1013266871810532,
+   "def": -1.0228613272902938,
+   "dataTier": 4,
+   "weightedMatches": 69,
+   "formResidualPpg": 0.0022554402101520967,
+   "formMatches": 12
+  },
+  "crawley-town": {
+   "att": -1.0706994269159136,
+   "def": -1.131302421561061,
+   "dataTier": 4,
+   "weightedMatches": 69,
+   "formResidualPpg": -0.8066924143393578,
+   "formMatches": 12
+  },
+  "crewe-alexandra": {
+   "att": -1.0587521058997877,
+   "def": -0.8458630713190997,
+   "dataTier": 4,
+   "weightedMatches": 69,
+   "formResidualPpg": 0.4190094582509016,
+   "formMatches": 12
+  },
+  "exeter-city": {
+   "att": -1.002590254090179,
+   "def": -0.7979215733907745,
+   "dataTier": 3,
+   "weightedMatches": 76,
+   "formResidualPpg": 0.2201415661564282,
+   "formMatches": 12
+  },
+  "fleetwood-town": {
+   "att": -1.0225857860889083,
+   "def": -0.952002689861035,
+   "dataTier": 4,
+   "weightedMatches": 69,
+   "formResidualPpg": 0.3127881242257296,
+   "formMatches": 12
+  },
+  "gillingham": {
+   "att": -1.2303745744151005,
+   "def": -0.7025255116027456,
+   "dataTier": 4,
+   "weightedMatches": 69,
+   "formResidualPpg": 0.5095992573887133,
+   "formMatches": 12
+  },
+  "grimsby-town": {
+   "att": -1.0152956360119245,
+   "def": -1.0957165766912957,
+   "dataTier": 4,
+   "weightedMatches": 69,
+   "formResidualPpg": -0.8956567893827599,
+   "formMatches": 12
+  },
+  "newport-county": {
+   "att": -1.1312604295145559,
+   "def": -1.1631768411454655,
+   "dataTier": 4,
+   "weightedMatches": 69,
+   "formResidualPpg": -0.10853331731906991,
+   "formMatches": 12
+  },
+  "northampton-town": {
+   "att": -1.1116135155266618,
+   "def": -0.80496166716798,
+   "dataTier": 3,
+   "weightedMatches": 76,
+   "formResidualPpg": -0.5475983694804292,
+   "formMatches": 12
+  },
+  "oldham-athletic": {
+   "att": -1.3854771126456709,
+   "def": -0.8125969329195304,
+   "dataTier": 4,
+   "weightedMatches": 48.3,
+   "formResidualPpg": -0.5002024050630149,
+   "formMatches": 12
+  },
+  "port-vale": {
+   "att": -1.1179462799583955,
+   "def": -0.8534471975273902,
+   "dataTier": 3,
+   "weightedMatches": 75,
+   "formResidualPpg": -0.3973502585574465,
+   "formMatches": 12
+  },
+  "rochdale": {
+   "att": -1.067211354442865,
+   "def": -0.8594104073995912,
+   "dataTier": 5,
+   "weightedMatches": 55.2,
+   "formResidualPpg": 0.7974666508384994,
+   "formMatches": 12
+  },
+  "rotherham-united": {
+   "att": -0.890224819054884,
+   "def": -0.7409340890311163,
+   "dataTier": 3,
+   "weightedMatches": 74,
+   "formResidualPpg": 0.38118706479341147,
+   "formMatches": 12
+  },
+  "salford-city": {
+   "att": -0.8212255268081381,
+   "def": -0.9860744210632828,
+   "dataTier": 4,
+   "weightedMatches": 69,
+   "formResidualPpg": 0.8388099536547758,
+   "formMatches": 12
+  },
+  "shrewsbury-town": {
+   "att": -1.2882099498942052,
+   "def": -0.9990491537679924,
+   "dataTier": 4,
+   "weightedMatches": 69,
+   "formResidualPpg": 0.15331645995732585,
+   "formMatches": 12
+  },
+  "swindon-town": {
+   "att": -0.8571787672337464,
+   "def": -1.0820064526441322,
+   "dataTier": 4,
+   "weightedMatches": 69,
+   "formResidualPpg": -0.3394069607713173,
+   "formMatches": 12
+  },
+  "tranmere-rovers": {
+   "att": -1.179313665196979,
+   "def": -1.0016068279585306,
+   "dataTier": 4,
+   "weightedMatches": 69,
+   "formResidualPpg": -0.4088044449916259,
+   "formMatches": 12
+  },
+  "walsall": {
+   "att": -0.9127075270462196,
+   "def": -0.8709442683021205,
+   "dataTier": 4,
+   "weightedMatches": 69,
+   "formResidualPpg": 0.18031901906519163,
+   "formMatches": 12
+  },
+  "york-city": {
+   "att": -0.8461780187053308,
+   "def": -0.9481864833897943,
+   "dataTier": 5,
+   "weightedMatches": 49.3,
+   "formResidualPpg": 0.4536234826861571,
+   "formMatches": 12
+  },
+  "afc-fylde": {
+   "att": -1.4784323781674316,
+   "def": -1.580042817462241,
+   "dataTier": 5,
+   "weightedMatches": 25.3,
+   "formResidualPpg": 0,
+   "formMatches": 0
+  },
+  "aldershot-town": {
+   "att": -1.1340658763069542,
+   "def": -1.6205142621515405,
+   "dataTier": 5,
+   "weightedMatches": 50.3,
+   "formResidualPpg": -0.1735200749323579,
+   "formMatches": 12
+  },
+  "altrincham": {
+   "att": -1.269648169260099,
+   "def": -1.343205479757194,
+   "dataTier": 5,
+   "weightedMatches": 50.3,
+   "formResidualPpg": -0.21342790092542496,
+   "formMatches": 12
+  },
+  "barrow": {
+   "att": -1.1946014712080244,
+   "def": -0.7762175913607635,
+   "dataTier": 4,
+   "weightedMatches": 69,
+   "formResidualPpg": 0.4062029646889072,
+   "formMatches": 12
+  },
+  "boreham-wood": {
+   "att": -1.0773096633674744,
+   "def": -1.0431174664509175,
+   "dataTier": 5,
+   "weightedMatches": 25,
+   "formResidualPpg": -0.2812080521983512,
+   "formMatches": 12
+  },
+  "boston-united": {
+   "att": -1.4967728268441918,
+   "def": -1.4192220056994536,
+   "dataTier": 5,
+   "weightedMatches": 50.3,
+   "formResidualPpg": -0.2951031453370195,
+   "formMatches": 12
+  },
+  "carlisle-united": {
+   "att": -1.0899410206190683,
+   "def": -1.0378788025511507,
+   "dataTier": 5,
+   "weightedMatches": 71,
+   "formResidualPpg": 0.8227708301748685,
+   "formMatches": 12
+  },
+  "eastleigh": {
+   "att": -1.351551956291588,
+   "def": -1.229637157447086,
+   "dataTier": 5,
+   "weightedMatches": 50.3,
+   "formResidualPpg": 0.32242261227065544,
+   "formMatches": 12
+  },
+  "fc-halifax-town": {
+   "att": -1.394526648064545,
+   "def": -1.1151441718926272,
+   "dataTier": 5,
+   "weightedMatches": 50.3,
+   "formResidualPpg": 0.11471062300914063,
+   "formMatches": 12
+  },
+  "forest-green-rovers": {
+   "att": -1.153939367005634,
+   "def": -0.9636016045928517,
+   "dataTier": 5,
+   "weightedMatches": 71,
+   "formResidualPpg": 0.5369299339006955,
+   "formMatches": 12
+  },
+  "gateshead": {
+   "att": -1.1536734825137234,
+   "def": -1.5667796313321614,
+   "dataTier": 5,
+   "weightedMatches": 50.3,
+   "formResidualPpg": -0.7069906627652313,
+   "formMatches": 12
+  },
+  "harrogate-town": {
+   "att": -1.2425174461499013,
+   "def": -1.128765626956587,
+   "dataTier": 4,
+   "weightedMatches": 69,
+   "formResidualPpg": -0.802794665885412,
+   "formMatches": 12
+  },
+  "hartlepool-united": {
+   "att": -1.342920214568958,
+   "def": -1.123539326665535,
+   "dataTier": 5,
+   "weightedMatches": 57.2,
+   "formResidualPpg": 0.04547615475490365,
+   "formMatches": 12
+  },
+  "scunthorpe-united": {
+   "att": -0.9043156470307584,
+   "def": -0.8447386070344323,
+   "dataTier": 5,
+   "weightedMatches": 24,
+   "formResidualPpg": 0.12645626270756197,
+   "formMatches": 12
+  },
+  "solihull-moors": {
+   "att": -1.293486765928252,
+   "def": -1.3893248774536224,
+   "dataTier": 5,
+   "weightedMatches": 50.3,
+   "formResidualPpg": 0.2982641167427093,
+   "formMatches": 12
+  },
+  "southend-united": {
+   "att": -1.2269934420294164,
+   "def": -0.8426505632018781,
+   "dataTier": 5,
+   "weightedMatches": 49.3,
+   "formResidualPpg": 0.8310791963319373,
+   "formMatches": 12
+  },
+  "sutton-united": {
+   "att": -1.2843680542847684,
+   "def": -1.376005646887978,
+   "dataTier": 5,
+   "weightedMatches": 71,
+   "formResidualPpg": -0.5906683250922312,
+   "formMatches": 12
+  },
+  "tamworth": {
+   "att": -1.4069466496709109,
+   "def": -1.4549367595892257,
+   "dataTier": 5,
+   "weightedMatches": 50.3,
+   "formResidualPpg": -0.532824694872637,
+   "formMatches": 12
+  },
+  "wealdstone": {
+   "att": -1.4277159066003504,
+   "def": -1.4148979718421038,
+   "dataTier": 5,
+   "weightedMatches": 49.3,
+   "formResidualPpg": -0.3536859237683663,
+   "formMatches": 12
+  },
+  "woking": {
+   "att": -1.4443608611776448,
+   "def": -1.1317197244777681,
+   "dataTier": 5,
+   "weightedMatches": 50.3,
+   "formResidualPpg": 0.04496548836908626,
+   "formMatches": 12
+  },
+  "yeovil-town": {
+   "att": -1.5363997493690216,
+   "def": -1.2685265281330929,
+   "dataTier": 5,
+   "weightedMatches": 50.3,
+   "formResidualPpg": -0.3269273701916871,
+   "formMatches": 12
+  }
+ }
+}

@@ -1,0 +1,9 @@
+node_modules/
+data/history/raw/
+calibration/tmp/
+*.log
+# Club crests are third-party trademarks. This repository is public, so generated crest
+# images are NOT committed; rebuild them locally with `npm run crests -- <pack-dir>`.
+assets/crests/*.webp
+assets/crests/192/
+dist/crests/

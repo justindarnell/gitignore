@@ -1,0 +1,21 @@
+{
+  "name": "soccer-world-sims",
+  "version": "0.5.0",
+  "private": true,
+  "description": "Long-term football world simulation sandbox (offline, browser-based).",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "node tools/build.mjs",
+    "test": "node --test --experimental-strip-types test/*.test.ts",
+    "history:fetch": "node tools/history/fetch.mjs",
+    "history:benchmarks": "node --experimental-strip-types tools/history/benchmarks.mjs",
+    "crests": "node tools/assets/convert-crests.mjs",
+    "calibrate": "node tools/calibrate/run.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "esbuild": "0.24.2",
+    "typescript": "^5.8.3"
+  }
+}

@@ -1,0 +1,702 @@
+{
+ "source": "FootyLogos.com 2026-27 competition packs (SVG)",
+ "credit": "Crests via FootyLogos.com (https://www.footylogos.com/). Club marks belong to their respective owners.",
+ "crests": {
+  "afc-bournemouth": {
+   "sourceFile": "premier-league/afc-bournemouth-logo-footylogos.svg",
+   "svgBytes": 43517,
+   "webp96Bytes": 3502,
+   "webp192Bytes": 6640
+  },
+  "arsenal": {
+   "sourceFile": "premier-league/arsenal-logo-footylogos.svg",
+   "svgBytes": 11508,
+   "webp96Bytes": 4548,
+   "webp192Bytes": 9568
+  },
+  "aston-villa": {
+   "sourceFile": "premier-league/aston-villa-logo-footylogos.svg",
+   "svgBytes": 20593,
+   "webp96Bytes": 3658,
+   "webp192Bytes": 8096
+  },
+  "brentford": {
+   "sourceFile": "premier-league/brentford-logo-footylogos.svg",
+   "svgBytes": 10013,
+   "webp96Bytes": 6182,
+   "webp192Bytes": 13208
+  },
+  "brighton-and-hove-albion": {
+   "sourceFile": "premier-league/brighton-and-hove-albion-logo-footylogos.svg",
+   "svgBytes": 9549,
+   "webp96Bytes": 4976,
+   "webp192Bytes": 9974
+  },
+  "chelsea": {
+   "sourceFile": "premier-league/chelsea-logo-footylogos.svg",
+   "svgBytes": 40107,
+   "webp96Bytes": 8836,
+   "webp192Bytes": 17194
+  },
+  "coventry-city": {
+   "sourceFile": "premier-league/coventry-city-logo-footylogos.svg",
+   "svgBytes": 258091,
+   "webp96Bytes": 5874,
+   "webp192Bytes": 15046
+  },
+  "crystal-palace": {
+   "sourceFile": "premier-league/crystal-palace-logo-footylogos.svg",
+   "svgBytes": 27194,
+   "webp96Bytes": 5016,
+   "webp192Bytes": 11856
+  },
+  "everton": {
+   "sourceFile": "premier-league/everton-logo-footylogos.svg",
+   "svgBytes": 65299,
+   "webp96Bytes": 7044,
+   "webp192Bytes": 18054
+  },
+  "fulham": {
+   "sourceFile": "premier-league/fulham-logo-footylogos.svg",
+   "svgBytes": 4459,
+   "webp96Bytes": 3050,
+   "webp192Bytes": 5928
+  },
+  "hull-city": {
+   "sourceFile": "premier-league/hull-city-logo-footylogos.svg",
+   "svgBytes": 97074,
+   "webp96Bytes": 4786,
+   "webp192Bytes": 11304
+  },
+  "ipswich-town": {
+   "sourceFile": "premier-league/ipswich-town-logo-footylogos.svg",
+   "svgBytes": 28089,
+   "webp96Bytes": 6164,
+   "webp192Bytes": 14182
+  },
+  "leeds-united": {
+   "sourceFile": "premier-league/leeds-united-logo-footylogos.svg",
+   "svgBytes": 27928,
+   "webp96Bytes": 4416,
+   "webp192Bytes": 8776
+  },
+  "liverpool": {
+   "sourceFile": "premier-league/liverpool-fc-logo-footylogos.svg",
+   "svgBytes": 11900,
+   "webp96Bytes": 3016,
+   "webp192Bytes": 6640
+  },
+  "manchester-city": {
+   "sourceFile": "premier-league/manchester-city-logo-footylogos.svg",
+   "svgBytes": 13493,
+   "webp96Bytes": 5722,
+   "webp192Bytes": 13464
+  },
+  "manchester-united": {
+   "sourceFile": "premier-league/manchester-united-logo-footylogos.svg",
+   "svgBytes": 27069,
+   "webp96Bytes": 6334,
+   "webp192Bytes": 14994
+  },
+  "newcastle-united": {
+   "sourceFile": "premier-league/newcastle-united-logo-footylogos.svg",
+   "svgBytes": 73815,
+   "webp96Bytes": 7248,
+   "webp192Bytes": 17558
+  },
+  "nottingham-forest": {
+   "sourceFile": "premier-league/nottingham-forest-logo-footylogos.svg",
+   "svgBytes": 20352,
+   "webp96Bytes": 2696,
+   "webp192Bytes": 5408
+  },
+  "sunderland": {
+   "sourceFile": "premier-league/sunderland-logo-footylogos.svg",
+   "svgBytes": 94165,
+   "webp96Bytes": 4372,
+   "webp192Bytes": 9730
+  },
+  "tottenham-hotspur": {
+   "sourceFile": "premier-league/tottenham-hotspur-logo-footylogos.svg",
+   "svgBytes": 10213,
+   "webp96Bytes": 2244,
+   "webp192Bytes": 4756
+  },
+  "birmingham-city": {
+   "sourceFile": "efl-championship/birmingham-city-logo-footylogos.svg",
+   "svgBytes": 19666,
+   "webp96Bytes": 4142,
+   "webp192Bytes": 8998
+  },
+  "blackburn-rovers": {
+   "sourceFile": "efl-championship/blackburn-rovers-logo-footylogos.svg",
+   "svgBytes": 35176,
+   "webp96Bytes": 6332,
+   "webp192Bytes": 15498
+  },
+  "bolton-wanderers": {
+   "sourceFile": "efl-championship/bolton-wanderers-logo-footylogos.svg",
+   "svgBytes": 14882,
+   "webp96Bytes": 3086,
+   "webp192Bytes": 6502
+  },
+  "bristol-city": {
+   "sourceFile": "efl-championship/bristol-city-logo-footylogos.svg",
+   "svgBytes": 6423,
+   "webp96Bytes": 4892,
+   "webp192Bytes": 10158
+  },
+  "burnley": {
+   "sourceFile": "efl-championship/burnley-logo-footylogos.svg",
+   "svgBytes": 28190,
+   "webp96Bytes": 3862,
+   "webp192Bytes": 8744
+  },
+  "cardiff-city": {
+   "sourceFile": "efl-championship/cardiff-city-logo-footylogos.svg",
+   "svgBytes": 20396,
+   "webp96Bytes": 5048,
+   "webp192Bytes": 11718
+  },
+  "charlton-athletic": {
+   "sourceFile": "efl-championship/charlton-athletic-logo-footylogos.svg",
+   "svgBytes": 7262,
+   "webp96Bytes": 4710,
+   "webp192Bytes": 9576
+  },
+  "derby-county": {
+   "sourceFile": "efl-championship/derby-county-logo-footylogos.svg",
+   "svgBytes": 4044,
+   "webp96Bytes": 2160,
+   "webp192Bytes": 4194
+  },
+  "lincoln-city": {
+   "sourceFile": "efl-championship/lincoln-city-logo-footylogos.svg",
+   "svgBytes": 2894,
+   "webp96Bytes": 3316,
+   "webp192Bytes": 7060
+  },
+  "middlesbrough": {
+   "sourceFile": "efl-championship/middlesbrough-logo-footylogos.svg",
+   "svgBytes": 24755,
+   "webp96Bytes": 6098,
+   "webp192Bytes": 15118
+  },
+  "millwall": {
+   "sourceFile": "efl-championship/millwall-logo-footylogos.svg",
+   "svgBytes": 84736,
+   "webp96Bytes": 7796,
+   "webp192Bytes": 16194
+  },
+  "norwich-city": {
+   "sourceFile": "efl-championship/norwich-city-logo-footylogos.svg",
+   "svgBytes": 16208,
+   "webp96Bytes": 3816,
+   "webp192Bytes": 7496
+  },
+  "portsmouth": {
+   "sourceFile": "efl-championship/portsmouth-logo-footylogos.svg",
+   "svgBytes": 12044,
+   "webp96Bytes": 5132,
+   "webp192Bytes": 11254
+  },
+  "preston-north-end": {
+   "sourceFile": "efl-championship/preston-north-end-logo-footylogos.svg",
+   "svgBytes": 74298,
+   "webp96Bytes": 4914,
+   "webp192Bytes": 12222
+  },
+  "queens-park-rangers": {
+   "sourceFile": "efl-championship/queens-park-rangers-logo-footylogos.svg",
+   "svgBytes": 18415,
+   "webp96Bytes": 5678,
+   "webp192Bytes": 12808
+  },
+  "sheffield-united": {
+   "sourceFile": "efl-championship/sheffield-united-logo-footylogos.svg",
+   "svgBytes": 12774,
+   "webp96Bytes": 5422,
+   "webp192Bytes": 11528
+  },
+  "southampton": {
+   "sourceFile": "efl-championship/southampton-logo-footylogos.svg",
+   "svgBytes": 25674,
+   "webp96Bytes": 5286,
+   "webp192Bytes": 11346
+  },
+  "stoke-city": {
+   "sourceFile": "efl-championship/stoke-city-logo-footylogos.svg",
+   "svgBytes": 10966,
+   "webp96Bytes": 3716,
+   "webp192Bytes": 6946
+  },
+  "swansea-city": {
+   "sourceFile": "efl-championship/swansea-city-logo-footylogos.svg",
+   "svgBytes": 6562,
+   "webp96Bytes": 2426,
+   "webp192Bytes": 4804
+  },
+  "watford": {
+   "sourceFile": "efl-championship/watford-logo-footylogos.svg",
+   "svgBytes": 9862,
+   "webp96Bytes": 3986,
+   "webp192Bytes": 7804
+  },
+  "west-bromwich-albion": {
+   "sourceFile": "efl-championship/west-bromwich-albion-logo-footylogos.svg",
+   "svgBytes": 48484,
+   "webp96Bytes": 4614,
+   "webp192Bytes": 10112
+  },
+  "west-ham-united": {
+   "sourceFile": "efl-championship/west-ham-united-logo-footylogos.svg",
+   "svgBytes": 11377,
+   "webp96Bytes": 3924,
+   "webp192Bytes": 7754
+  },
+  "wolverhampton-wanderers": {
+   "sourceFile": "efl-championship/wolverhampton-wanderers-logo-footylogos.svg",
+   "svgBytes": 588,
+   "webp96Bytes": 2876,
+   "webp192Bytes": 5200
+  },
+  "wrexham": {
+   "sourceFile": "efl-championship/wrexham-afc-logo-footylogos.svg",
+   "svgBytes": 127808,
+   "webp96Bytes": 6544,
+   "webp192Bytes": 15750
+  },
+  "afc-wimbledon": {
+   "sourceFile": "efl-league-one/afc-wimbledon-logo-footylogos.svg",
+   "svgBytes": 44878,
+   "webp96Bytes": 4054,
+   "webp192Bytes": 8328
+  },
+  "barnsley": {
+   "sourceFile": "efl-league-one/barnsley-logo-footylogos.svg",
+   "svgBytes": 328285,
+   "webp96Bytes": 5318,
+   "webp192Bytes": 12832
+  },
+  "blackpool": {
+   "sourceFile": "efl-league-one/blackpool-logo-footylogos.svg",
+   "svgBytes": 82647,
+   "webp96Bytes": 6170,
+   "webp192Bytes": 14890
+  },
+  "bradford-city": {
+   "sourceFile": "efl-league-one/bradford-city-logo-footylogos.svg",
+   "svgBytes": 15576,
+   "webp96Bytes": 3896,
+   "webp192Bytes": 8212
+  },
+  "bromley": {
+   "sourceFile": "efl-league-one/bromley-logo-footylogos.svg",
+   "svgBytes": 58099,
+   "webp96Bytes": 8682,
+   "webp192Bytes": 17906
+  },
+  "burton-albion": {
+   "sourceFile": "efl-league-one/burton-albion-logo-footylogos.svg",
+   "svgBytes": 40931,
+   "webp96Bytes": 5746,
+   "webp192Bytes": 12694
+  },
+  "cambridge-united": {
+   "sourceFile": "efl-league-one/cambridge-united-logo-footylogos.svg",
+   "svgBytes": 4266,
+   "webp96Bytes": 4026,
+   "webp192Bytes": 8148
+  },
+  "doncaster-rovers": {
+   "sourceFile": "efl-league-one/doncaster-rovers-logo-footylogos.svg",
+   "svgBytes": 87383,
+   "webp96Bytes": 3612,
+   "webp192Bytes": 8618
+  },
+  "huddersfield-town": {
+   "sourceFile": "efl-league-one/huddersfield-town-logo-footylogos.svg",
+   "svgBytes": 73832,
+   "webp96Bytes": 4218,
+   "webp192Bytes": 10234
+  },
+  "leicester-city": {
+   "sourceFile": "efl-league-one/leicester-logo-footylogos.svg",
+   "svgBytes": 33523,
+   "webp96Bytes": 6426,
+   "webp192Bytes": 16200
+  },
+  "leyton-orient": {
+   "sourceFile": "efl-league-one/leyton-orient-logo-footylogos.svg",
+   "svgBytes": 54056,
+   "webp96Bytes": 6466,
+   "webp192Bytes": 15590
+  },
+  "luton-town": {
+   "sourceFile": "efl-league-one/luton-town-logo-footylogos.svg",
+   "svgBytes": 46176,
+   "webp96Bytes": 5088,
+   "webp192Bytes": 11676
+  },
+  "mansfield-town": {
+   "sourceFile": "efl-league-one/mansfield-town-logo-footylogos.svg",
+   "svgBytes": 8319,
+   "webp96Bytes": 3068,
+   "webp192Bytes": 5682
+  },
+  "milton-keynes-dons": {
+   "sourceFile": "efl-league-one/milton-keynes-dons-logo-footylogos.svg",
+   "svgBytes": 470404,
+   "webp96Bytes": 7258,
+   "webp192Bytes": 14122
+  },
+  "notts-county": {
+   "sourceFile": "efl-league-one/notts-county-logo-footylogos.svg",
+   "svgBytes": 20164,
+   "webp96Bytes": 3448,
+   "webp192Bytes": 6560
+  },
+  "oxford-united": {
+   "sourceFile": "efl-league-one/oxford-united-logo-footylogos.svg",
+   "svgBytes": 23559,
+   "webp96Bytes": 4670,
+   "webp192Bytes": 9934
+  },
+  "peterborough-united": {
+   "sourceFile": "efl-league-one/peterborough-united-logo-footylogos.svg",
+   "svgBytes": 3190,
+   "webp96Bytes": 3764,
+   "webp192Bytes": 8152
+  },
+  "plymouth-argyle": {
+   "sourceFile": "efl-league-one/plymouth-argyle-logo-footylogos.svg",
+   "svgBytes": 27873,
+   "webp96Bytes": 4602,
+   "webp192Bytes": 9890
+  },
+  "reading": {
+   "sourceFile": "efl-league-one/reading-fc-logo-footylogos.svg",
+   "svgBytes": 31675,
+   "webp96Bytes": 5722,
+   "webp192Bytes": 12972
+  },
+  "sheffield-wednesday": {
+   "sourceFile": "efl-league-one/sheffield-wednesday-logo-footylogos.svg",
+   "svgBytes": 4543,
+   "webp96Bytes": 3570,
+   "webp192Bytes": 7480
+  },
+  "stevenage": {
+   "sourceFile": "efl-league-one/stevenage-logo-footylogos.svg",
+   "svgBytes": 12523,
+   "webp96Bytes": 5814,
+   "webp192Bytes": 12924
+  },
+  "stockport-county": {
+   "sourceFile": "efl-league-one/stockport-county-logo-footylogos.svg",
+   "svgBytes": 79224,
+   "webp96Bytes": 6090,
+   "webp192Bytes": 15008
+  },
+  "wigan-athletic": {
+   "sourceFile": "efl-league-one/wigan-athletic-logo-footylogos.svg",
+   "svgBytes": 18620,
+   "webp96Bytes": 5386,
+   "webp192Bytes": 12162
+  },
+  "wycombe-wanderers": {
+   "sourceFile": "efl-league-one/wycombe-wanderers-logo-footylogos.svg",
+   "svgBytes": 20453,
+   "webp96Bytes": 5036,
+   "webp192Bytes": 10744
+  },
+  "accrington-stanley": {
+   "sourceFile": "efl-league-two/accrington-stanley-logo-footylogos.svg",
+   "svgBytes": 180656,
+   "webp96Bytes": 5986,
+   "webp192Bytes": 14398
+  },
+  "barnet": {
+   "sourceFile": "efl-league-two/barnet-logo-footylogos.svg",
+   "svgBytes": 124197,
+   "webp96Bytes": 5104,
+   "webp192Bytes": 11592
+  },
+  "bristol-rovers": {
+   "sourceFile": "efl-league-two/bristol-rovers-logo-footylogos.svg",
+   "svgBytes": 45275,
+   "webp96Bytes": 4814,
+   "webp192Bytes": 10918
+  },
+  "cheltenham-town": {
+   "sourceFile": "efl-league-two/cheltenham-town-logo-footylogos.svg",
+   "svgBytes": 2449,
+   "webp96Bytes": 3404,
+   "webp192Bytes": 5876
+  },
+  "chesterfield": {
+   "sourceFile": "efl-league-two/chesterfield-logo-footylogos.svg",
+   "svgBytes": 7663,
+   "webp96Bytes": 4700,
+   "webp192Bytes": 10130
+  },
+  "colchester-united": {
+   "sourceFile": "efl-league-two/colchester-united-logo-footylogos.svg",
+   "svgBytes": 48372,
+   "webp96Bytes": 4396,
+   "webp192Bytes": 9624
+  },
+  "crawley-town": {
+   "sourceFile": "efl-league-two/crawley-town-logo-footylogos.svg",
+   "svgBytes": 73527,
+   "webp96Bytes": 4552,
+   "webp192Bytes": 9822
+  },
+  "crewe-alexandra": {
+   "sourceFile": "efl-league-two/crewe-alexandra-logo-footylogos.svg",
+   "svgBytes": 38918,
+   "webp96Bytes": 3918,
+   "webp192Bytes": 9340
+  },
+  "exeter-city": {
+   "sourceFile": "efl-league-two/exeter-city-logo-footylogos.svg",
+   "svgBytes": 70255,
+   "webp96Bytes": 5108,
+   "webp192Bytes": 12016
+  },
+  "fleetwood-town": {
+   "sourceFile": "efl-league-two/fleetwood-town-logo-footylogos.svg",
+   "svgBytes": 16657,
+   "webp96Bytes": 4852,
+   "webp192Bytes": 9504
+  },
+  "gillingham": {
+   "sourceFile": "efl-league-two/gillingham-logo-footylogos.svg",
+   "svgBytes": 20755,
+   "webp96Bytes": 3192,
+   "webp192Bytes": 6724
+  },
+  "grimsby-town": {
+   "sourceFile": "efl-league-two/grimsby-town-logo-footylogos.svg",
+   "svgBytes": 14327,
+   "webp96Bytes": 4468,
+   "webp192Bytes": 9106
+  },
+  "newport-county": {
+   "sourceFile": "efl-league-two/newport-county-logo-footylogos.svg",
+   "svgBytes": 12307,
+   "webp96Bytes": 5946,
+   "webp192Bytes": 12268
+  },
+  "northampton-town": {
+   "sourceFile": "efl-league-two/northampton-town-logo-footylogos.svg",
+   "svgBytes": 117030,
+   "webp96Bytes": 3984,
+   "webp192Bytes": 10182
+  },
+  "oldham-athletic": {
+   "sourceFile": "efl-league-two/oldham-athletic-logo-footylogos.svg",
+   "svgBytes": 18071,
+   "webp96Bytes": 3464,
+   "webp192Bytes": 7918
+  },
+  "port-vale": {
+   "sourceFile": "efl-league-two/port-vale-fc-logo-footylogos.svg",
+   "svgBytes": 55598,
+   "webp96Bytes": 5216,
+   "webp192Bytes": 11484
+  },
+  "rochdale": {
+   "sourceFile": "efl-league-two/rochdale-logo-footylogos.svg",
+   "svgBytes": 55410,
+   "webp96Bytes": 5208,
+   "webp192Bytes": 12372
+  },
+  "rotherham-united": {
+   "sourceFile": "efl-league-two/rotherham-united-logo-footylogos.svg",
+   "svgBytes": 5962,
+   "webp96Bytes": 4246,
+   "webp192Bytes": 8884
+  },
+  "salford-city": {
+   "sourceFile": "efl-league-two/salford-city-logo-footylogos.svg",
+   "svgBytes": 129889,
+   "webp96Bytes": 9630,
+   "webp192Bytes": 19978
+  },
+  "shrewsbury-town": {
+   "sourceFile": "efl-league-two/shrewsbury-town-logo-footylogos.svg",
+   "svgBytes": 103921,
+   "webp96Bytes": 6112,
+   "webp192Bytes": 15264
+  },
+  "swindon-town": {
+   "sourceFile": "efl-league-two/swindon-town-logo-footylogos.svg",
+   "svgBytes": 55120,
+   "webp96Bytes": 5238,
+   "webp192Bytes": 12664
+  },
+  "tranmere-rovers": {
+   "sourceFile": "efl-league-two/tranmere-rovers-logo-footylogos.svg",
+   "svgBytes": 125016,
+   "webp96Bytes": 6532,
+   "webp192Bytes": 15098
+  },
+  "walsall": {
+   "sourceFile": "efl-league-two/walsall-logo-footylogos.svg",
+   "svgBytes": 6301,
+   "webp96Bytes": 4748,
+   "webp192Bytes": 9590
+  },
+  "york-city": {
+   "sourceFile": "efl-league-two/york-city-logo-footylogos.svg",
+   "svgBytes": 23242,
+   "webp96Bytes": 4286,
+   "webp192Bytes": 8848
+  },
+  "afc-fylde": {
+   "sourceFile": "national-league/afc-fylde-logo-footylogos.svg",
+   "svgBytes": 19106,
+   "webp96Bytes": 5654,
+   "webp192Bytes": 12890
+  },
+  "aldershot-town": {
+   "sourceFile": "national-league/aldershot-town-logo-footylogos.svg",
+   "svgBytes": 67796,
+   "webp96Bytes": 6504,
+   "webp192Bytes": 15098
+  },
+  "altrincham": {
+   "sourceFile": "national-league/altrincham-logo-footylogos.svg",
+   "svgBytes": 409811,
+   "webp96Bytes": 8510,
+   "webp192Bytes": 24636
+  },
+  "barrow": {
+   "sourceFile": "national-league/barrow-afc-logo-footylogos.svg",
+   "svgBytes": 46671,
+   "webp96Bytes": 4228,
+   "webp192Bytes": 9150
+  },
+  "boreham-wood": {
+   "sourceFile": "national-league/boreham-wood-logo-footylogos.svg",
+   "svgBytes": 12556,
+   "webp96Bytes": 4670,
+   "webp192Bytes": 9788
+  },
+  "boston-united": {
+   "sourceFile": "national-league/boston-united-logo-footylogos.svg",
+   "svgBytes": 13120,
+   "webp96Bytes": 5414,
+   "webp192Bytes": 11976
+  },
+  "carlisle-united": {
+   "sourceFile": "national-league/carlisle-logo-footylogos.svg",
+   "svgBytes": 131479,
+   "webp96Bytes": 5178,
+   "webp192Bytes": 12744
+  },
+  "eastleigh": {
+   "sourceFile": "national-league/eastleigh-logo-footylogos.svg",
+   "svgBytes": 10835,
+   "webp96Bytes": 4740,
+   "webp192Bytes": 10242
+  },
+  "fc-halifax-town": {
+   "sourceFile": "national-league/halifax-town-logo-footylogos.svg",
+   "svgBytes": 33518,
+   "webp96Bytes": 5512,
+   "webp192Bytes": 12074
+  },
+  "forest-green-rovers": {
+   "sourceFile": "national-league/forest-green-rovers-logo-footylogos.svg",
+   "svgBytes": 34287,
+   "webp96Bytes": 5560,
+   "webp192Bytes": 12686
+  },
+  "gateshead": {
+   "sourceFile": "national-league/gateshead-logo-footylogos.svg",
+   "svgBytes": 47192,
+   "webp96Bytes": 4948,
+   "webp192Bytes": 11228
+  },
+  "harrogate-town": {
+   "sourceFile": "national-league/harrogate-town-logo-footylogos.svg",
+   "svgBytes": 34576,
+   "webp96Bytes": 5242,
+   "webp192Bytes": 11426
+  },
+  "hartlepool-united": {
+   "sourceFile": "national-league/hartlepool-logo-footylogos.svg",
+   "svgBytes": 13180,
+   "webp96Bytes": 3604,
+   "webp192Bytes": 7080
+  },
+  "hornchurch": {
+   "sourceFile": "national-league/hornchurch-logo-footylogos.svg",
+   "svgBytes": 159645,
+   "webp96Bytes": 7334,
+   "webp192Bytes": 19190
+  },
+  "kidderminster-harriers": {
+   "sourceFile": "national-league/kidderminster-harriers-logo-footylogos.svg",
+   "svgBytes": 9372,
+   "webp96Bytes": 3290,
+   "webp192Bytes": 7016
+  },
+  "scunthorpe-united": {
+   "sourceFile": "national-league/scunthorpe-logo-footylogos.svg",
+   "svgBytes": 20627,
+   "webp96Bytes": 4368,
+   "webp192Bytes": 9604
+  },
+  "solihull-moors": {
+   "sourceFile": "national-league/solihull-moors-logo-footylogos.svg",
+   "svgBytes": 10409,
+   "webp96Bytes": 5218,
+   "webp192Bytes": 11914
+  },
+  "southend-united": {
+   "sourceFile": "national-league/southend-logo-footylogos.svg",
+   "svgBytes": 29355,
+   "webp96Bytes": 6956,
+   "webp192Bytes": 16416
+  },
+  "sutton-united": {
+   "sourceFile": "national-league/sutton-united-logo-footylogos.svg",
+   "svgBytes": 45667,
+   "webp96Bytes": 5384,
+   "webp192Bytes": 12736
+  },
+  "tamworth": {
+   "sourceFile": "national-league/tamworth-logo-footylogos.svg",
+   "svgBytes": 22884,
+   "webp96Bytes": 5106,
+   "webp192Bytes": 11794
+  },
+  "wealdstone": {
+   "sourceFile": "national-league/wealdstone-logo-footylogos.svg",
+   "svgBytes": 54041,
+   "webp96Bytes": 6656,
+   "webp192Bytes": 15288
+  },
+  "woking": {
+   "sourceFile": "national-league/woking-logo-footylogos.svg",
+   "svgBytes": 11895,
+   "webp96Bytes": 5638,
+   "webp192Bytes": 12628
+  },
+  "worthing": {
+   "sourceFile": "national-league/worthing-logo-footylogos.svg",
+   "svgBytes": 12882,
+   "webp96Bytes": 6002,
+   "webp192Bytes": 13402
+  },
+  "yeovil-town": {
+   "sourceFile": "national-league/yeovil-logo-footylogos.svg",
+   "svgBytes": 27415,
+   "webp96Bytes": 4732,
+   "webp192Bytes": 10494
+  }
+ }
+}
