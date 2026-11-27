@@ -1,6 +1,6 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { createWorld, step, standings, rollover, pyramidRank } from '../src/engine/world.ts';
+import { createWorld, step, standings, rollover, pyramidRank, SAVE_SCHEMA } from '../src/engine/world.ts';
 import { simulate, absoluteTarget } from '../src/engine/sim.ts';
 import { runtime } from '../src/engine/runtime.ts';
 import { sortTable, emptyRow } from '../src/engine/table.ts';
@@ -329,5 +329,65 @@ describe('determinism, saves and bulk consistency', () => {
     v.settings.upsets = 2;
     runtime(v);
     assert.equal(JSON.stringify(v.history.leagues), hist);
+  });
+});
+
+describe('ownership ambition (0.6)', () => {
+  test('seeds come from the club database with provenance; everyone else is neutral', () => {
+    const w = createWorld({ seed: 'amb-seed' });
+    for (const c of clubsDb.clubs as any[]) {
+      const st = w.clubs.find(x => x.id === c.id)!;
+      assert.equal(st.ambition, c.ambition ?? 0);
+      assert.ok(typeof c.provenance.ambition === 'string' && c.provenance.ambition.length > 10, `${c.id} ambition provenance`);
+      if (c.ambition) assert.ok(c.provenance.ambition.startsWith('documented:'));
+      else assert.ok(c.provenance.ambition.startsWith('neutral default'));
+    }
+    assert.ok(w.clubs.find(c => c.id === 'newcastle-united')!.ambition >= 0.6);
+    assert.ok(w.clubs.find(c => c.id === 'sheffield-wednesday')!.ambition <= -0.6);
+  });
+  test('ambition stays in [-1, 1]; takeovers and sell-offs appear in timelines and news', () => {
+    const w = createWorld({ seed: 'amb-events', params: { ownerEventRate: 0.08 }, settings: { storage: 'essential' } });
+    simulate(w, { kind: 'seasons', n: 20 });
+    for (const c of w.clubs) assert.ok(c.ambition >= -1 && c.ambition <= 1, `${c.id} ${c.ambition}`);
+    const owner = Object.values(w.history.clubs).flatMap(h => h.events.filter(e => e.kind === 'owner'));
+    assert.ok(owner.some(e => e.tone === 1) && owner.some(e => e.tone === -1), 'both takeovers and sell-offs occur');
+    assert.ok(w.news.some(n => n.kind === 'owner'));
+    const changed = w.clubs.filter(c => c.ownerSince !== null && c.ownerSince >= 2027);
+    assert.ok(changed.length > 0, 'ownerSince updated on ownership change');
+  });
+  test('ownership events are switched off with ownerEventRate 0 (and draws stay deterministic)', () => {
+    const a = createWorld({ seed: 'amb-off', params: { ownerEventRate: 0 }, settings: { storage: 'essential' } });
+    simulate(a, { kind: 'seasons', n: 5 });
+    assert.ok(!Object.values(a.history.clubs).some(h => h.events.some(e => e.kind === 'owner')));
+    const b = createWorld({ seed: 'amb-off', params: { ownerEventRate: 0 }, settings: { storage: 'essential' } });
+    simulate(b, { kind: 'seasons', n: 5 });
+    assert.deepEqual(a.clubs, b.clubs);
+  });
+  test('ambitious promoted clubs receive more promotion investment at world creation', () => {
+    const base = createWorld({ seed: 'amb-promo', params: { ambPromo: 0 } });
+    const amb = createWorld({ seed: 'amb-promo', params: { ambPromo: 1 } });
+    const q = (w: World, id: string) => { const c = w.clubs.find(x => x.id === id)!; return c.attack + c.midfield + c.defence; };
+    assert.ok(q(amb, 'ipswich-town') > q(base, 'ipswich-town'), 'Ipswich (wealthy owners) invests more');
+    assert.equal(q(amb, 'arsenal'), q(base, 'arsenal'), 'non-promoted clubs unchanged');
+  });
+  test('calibrated default has no ownership changes; the experimental setting enables them', () => {
+    const def = createWorld({ seed: 'own-setting', settings: { storage: 'essential' } });
+    simulate(def, { kind: 'seasons', n: 10 });
+    assert.ok(!Object.values(def.history.clubs).some(h => h.events.some(e => e.kind === 'owner')), 'not adopted: off by default');
+    const exp = createWorld({ seed: 'own-setting', settings: { storage: 'essential', ownership: 1 } });
+    simulate(exp, { kind: 'seasons', n: 10 });
+    assert.ok(Object.values(exp.history.clubs).some(h => h.events.some(e => e.kind === 'owner')));
+  });
+  test('schema 1 saves migrate: ambition neutral, schema bumped', () => {
+    const w = createWorld({ seed: 'migrate' });
+    const raw = JSON.parse(exportWorld(w));
+    raw.schema = 1;
+    for (const c of raw.clubs) { delete c.ambition; delete c.ownerSince; }
+    delete raw.settings.ownership;
+    const up = importWorld(JSON.stringify(raw));
+    assert.equal(up.schema, SAVE_SCHEMA);
+    for (const c of up.clubs) { assert.equal(c.ambition, 0); assert.equal(c.ownerSince, null); }
+    assert.equal(up.settings.ownership, 0);
+    step(up); // migrated worlds simulate
   });
 });

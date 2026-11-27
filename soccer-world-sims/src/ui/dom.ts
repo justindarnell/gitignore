@@ -11,7 +11,11 @@ export const f0 = (x: number) => String(Math.round(x));
 export const pct = (x: number) => `${Math.round(x)}%`;
 export const signed = (x: number) => (x > 0 ? '+' : '') + x;
 
+declare const __CREST_IDS__: string[];
+/** Crests generated locally at build time (none in a fresh clone; see README). */
+const availableCrests = new Set<string>(typeof __CREST_IDS__ !== 'undefined' ? __CREST_IDS__ : []);
 const failedCrests = new Set<string>();
+export const crestsAvailable = () => availableCrests.size > 0;
 
 /** Fallback initials for a club without a badge. */
 export function initials(world: World, id: string): string {
@@ -24,7 +28,7 @@ export function initials(world: World, id: string): string {
 /** Crest image (stable URL, browser-cached, lazy); initials when missing or external. */
 export function crest(world: World, id: string, size: 'xs' | 'sm' | 'md' | 'lg' | 'xl' = 'sm'): string {
   const info = world.info[id];
-  if (!info || failedCrests.has(id)) return `<span class="crest crest-${size} crest-fallback" aria-hidden="true">${esc(initials(world, id))}</span>`;
+  if (!info || !availableCrests.has(id) || failedCrests.has(id)) return `<span class="crest crest-${size} crest-fallback" aria-hidden="true">${esc(initials(world, id))}</span>`;
   const src = size === 'xl' || size === 'lg' ? `crests/192/${id}.webp` : `crests/${id}.webp`;
   return `<img class="crest crest-${size}" src="${src}" alt="" loading="lazy" decoding="async" data-crest="${esc(id)}" data-initials="${esc(initials(world, id))}">`;
 }

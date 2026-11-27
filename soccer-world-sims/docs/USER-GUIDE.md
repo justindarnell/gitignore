@@ -41,6 +41,9 @@ The same seed and settings always produce the same history, however you split th
   * *Overall rating, reputation and stability* by season.
   * *Combined pyramid position* (1 = top of the Premier League, 116 = bottom of the National League),
     by season or by matchday.
+  The attributes card also shows **ownership ambition** (−100 asset-stripping … +100 wealthy takeover),
+  seeded from documented ownership situations in 2025/26 (e.g. Newcastle, Wrexham, Sheffield Wednesday)
+  and neutral for every other club.
   Move the mouse across a graph (or focus it and use the arrow keys) for a crosshair and details.
   Range buttons zoom to the last 10, 25 or 50 seasons.
 * **History**: rolls of honour for every competition, trophy totals, historical tables, promotions and
@@ -53,7 +56,7 @@ The same seed and settings always produce the same history, however you split th
 
 ## Settings
 
-All sliders default to **100%**, the calibrated, historically realistic model. Presets:
+All sliders default to **100%** (ownership dynamics: **0%**), the calibrated, historically realistic model. Presets:
 
 * **Dynamic**: more upsets, bigger swings and more events.
 * **Chaotic**: anything can happen; not realistic.
@@ -61,6 +64,9 @@ All sliders default to **100%**, the calibrated, historically realistic model. P
 
 Changes apply from the next match onward and are logged. Recorded history is never changed.
 **Random event frequency** at 0% disables events.
+**Ownership dynamics (experimental)** switches on takeovers and sell-offs that change how much clubs
+invest. It is off by default because calibration did not adopt it: it produces more lower-league risers,
+but historic giants are relegated too often (see CALIBRATION.md, "0.6: ownership ambition").
 
 **Historical storage** controls how much detail is kept: Essential, Standard (default) or Full.
 See TECHNICAL.md for sizes.

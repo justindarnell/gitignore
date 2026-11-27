@@ -32,7 +32,7 @@ export interface EventDef {
 export const EVENTS: EventDef[] = [
   { id: 'youth', tone: 1, text: 'Successful youth intake', weight: () => 1.0, effect: { quality: 0.8, era: 0.5 } },
   { id: 'recruitment', tone: 1, text: 'Recruitment breakthrough', weight: () => 1.0, effect: { quality: 2.0 } },
-  { id: 'investment', tone: 1, text: 'New ownership investment', weight: c => (c.reputation < 85 ? 0.9 : 0.3) * (c.tier >= 2 ? 1.2 : 1), effect: { quality: 1.5, era: 0.9, stability: 4 } },
+  { id: 'investment', tone: 1, text: 'Commercial investment boost', weight: c => (c.reputation < 85 ? 0.9 : 0.3) * (c.tier >= 2 ? 1.2 : 1), effect: { quality: 1.5, era: 0.9, stability: 4 } },
   { id: 'development', tone: 1, text: 'Exceptional development period', weight: () => 0.7, effect: { era: 1.2, quality: 0.5 } },
   { id: 'rebuild', tone: 1, text: 'Successful rebuilding period', weight: c => (c.declining || c.relegated ? 1.4 : 0.2), effect: { era: 1.1, stability: 3 } },
   { id: 'financial', tone: -1, text: 'Financial difficulties', weight: c => (c.relegated ? 1.6 : 0.8) * (1.4 - c.stability / 100), effect: { quality: -2.0, era: -0.5, stability: -6 } },

@@ -52,6 +52,12 @@ export interface EngineParams {
   stabRate: number;         // reversion speed of stability to its anchor
   eventRate: number;        // probability of a notable event per club-season
   eventScale: number;       // magnitude multiplier for event effects
+  // ---- ownership ambition (latent club trait, -1 asset-stripping .. +1 wealthy takeover)
+  ambPersist: number;       // yearly persistence of ambition (owners' appetite fades or is renewed)
+  ambTarget: number;        // rating points added to the structural target (and upkeep ceiling) at ambition +1
+  ambPromo: number;         // relative change of promotion investment per unit of ambition
+  ambUpside: number;        // extra upside of positive development shocks at ambition +1
+  ownerEventRate: number;   // probability of an ownership change (takeover or sell-off) per club-season
 }
 
 export const DEFAULT_PARAMS: EngineParams = {
@@ -97,11 +103,32 @@ export const DEFAULT_PARAMS: EngineParams = {
   stabRate: 0.08,
   eventRate: 0.1589,
   eventScale: 1,
+  ambPersist: 0.9,
+  ambTarget: 0,
+  ambPromo: 0,
+  ambUpside: 0,
+  ownerEventRate: 0,
 };
+
+/** The ownership-ambition mechanism switched off (the pre-0.6 model, used as a calibration baseline). */
+export const AMBITION_OFF: Partial<EngineParams> = { ambTarget: 0, ambPromo: 0, ambUpside: 0, ownerEventRate: 0 };
+
+/**
+ * Experimental ownership dynamics (not adopted by calibration, see docs/CALIBRATION.md): the best
+ * ownership-ambition finalist (rank 2 of calibration/results/amb-validate.json). It improved the
+ * combined holdout score but worsened the short-term group and over-relegated giants, so it is
+ * offered only as an opt-in setting. Setting `ownership` scales these effects (1 = finalist values).
+ */
+export const OWNERSHIP_EXPERIMENTAL = { ambPersist: 0.8797, ambTarget: 6.842, ambPromo: 1.0836, ambUpside: 1.8888, ownerEventRate: 0.0202 };
+
+/** Display bands for the ambition trait. */
+export function ambitionLabel(a: number): 'Wealthy & ambitious' | 'Steady' | 'Cautious' | 'Asset-stripping' {
+  return a >= 0.4 ? 'Wealthy & ambitious' : a >= -0.15 ? 'Steady' : a >= -0.55 ? 'Cautious' : 'Asset-stripping';
+}
 
 export const DEFAULT_SETTINGS: Settings = {
   realism: 1, upsets: 1, homeAdvantage: 1, seasonalVariability: 1, growth: 1,
-  events: 1, relegationImpact: 1, reputationProtection: 1, championshipFatigue: 1,
+  events: 1, relegationImpact: 1, reputationProtection: 1, championshipFatigue: 1, ownership: 0,
   storage: 'standard',
 };
 
@@ -122,6 +149,17 @@ export function effectiveParams(base: EngineParams, s: Settings): EngineParams {
     repDecayFactor: Math.min(1, base.repDecayFactor / Math.max(0.25, s.reputationProtection)),
     fatigueTitle: base.fatigueTitle * s.championshipFatigue,
     fatigueQuality: base.fatigueQuality * s.championshipFatigue,
+    ...ownershipParams(base, s.ownership ?? 0),
+  };
+}
+
+function ownershipParams(base: EngineParams, k: number): Partial<EngineParams> {
+  if (!(k > 0)) return {};
+  const E = OWNERSHIP_EXPERIMENTAL;
+  return {
+    ambPersist: base.ownerEventRate > 0 ? base.ambPersist : E.ambPersist,
+    ambTarget: base.ambTarget + k * E.ambTarget, ambPromo: base.ambPromo + k * E.ambPromo,
+    ambUpside: base.ambUpside + k * E.ambUpside, ownerEventRate: base.ownerEventRate + k * E.ownerEventRate,
   };
 }
 

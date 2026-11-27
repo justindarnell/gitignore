@@ -8,9 +8,16 @@ import { SHORT, LONG } from './targets.mjs';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const R = f => JSON.parse(readFileSync(join(root, 'calibration/results', f), 'utf8'));
 const v = R('validate.json'), v1 = existsSync(join(root, 'calibration/results/validate-round1.json')) ? R('validate-round1.json') : null;
-const sens = R('sensitivity.json'), short = R('short.json'), long = R('long.json');
+let sens = R('sensitivity.json'); const short = R('short.json'), long = R('long.json');
 const refineFiles = ['refine-round1.json', 'refine-round2.json', 'refine-round3.json', 'refine-round5.json', 'refine-round6.json', 'refine.json'].filter(f => existsSync(join(root, 'calibration/results', f)));
-const chosen = [...v.finalists].sort((a, b) => a.score - b.score)[0];
+const has = f => existsSync(join(root, 'calibration/results', f));
+const amb = has('amb-validate.json') ? R('amb-validate.json') : null;
+const ambRounds = ['amb-refine-round1.json', 'amb-refine-round2.json', 'amb-refine-round3.json', 'amb-refine-round4.json', 'amb-refine-round5.json', 'amb-refine.json'].filter(has).map(R);
+const adopted = amb?.adopted ? amb.finalists.find(f => f.rank === amb.adopted) : null;
+const v05 = [...v.finalists].sort((a, b) => a.score - b.score)[0];
+// The shipped model: the adopted 0.6 finalist, or the 0.5 selection if the change was rejected.
+const chosen = adopted ?? v05;
+const sensUsed = adopted && has('amb-sensitivity.json') ? R('amb-sensitivity.json') : null;
 const n = (x, d = 1) => x === undefined || x === null || Number.isNaN(x) ? '—' : Number(x).toFixed(d);
 const srcOf = m => [...SHORT, ...LONG].find(t => t.m === m)?.src ?? '';
 
@@ -22,6 +29,10 @@ seasons += refineSeasons;
 const valSeasons = (x) => x ? x.finalists.length * (Number(x.seeds.first.split('..')[1]) + 1 + Number(x.seeds.l50.split('..')[1]) * 50 + 50 + Number(x.seeds.l100.split('..')[1]) * 100 + 100) + 500 + 800 : 0;
 seasons += valSeasons(v) + valSeasons(v1);
 seasons += sens.rows.length * (8 * 60 + 100) + 8 * 60 + 100;
+// 0.6 ambition search + validation
+seasons += ambRounds.reduce((a, r) => a + r.results.length * (r.runsPerConfig * r.seasonsPerRun + 100), 0);
+if (amb) { const per = Number(amb.seeds.first.split('..')[1]) + 1 + (Number(amb.seeds.l50.split('..')[1]) + 1) * 50 + (Number(amb.seeds.l100.split('..')[1]) + 1) * 100; seasons += per * (amb.finalists.length + 1); }
+if (sensUsed) { seasons += sensUsed.rows.length * (8 * 60 + 100) + 8 * 60 + 100; sens = sensUsed; }
 const EARLIER = 96 * 150 + 3 * 120 * 6 * 60 + 2 * 300 * 6 * 60; // earlier short grid + superseded long searches (see log)
 
 const row = (d, agg) => {
@@ -46,9 +57,13 @@ engine headlessly in parallel worker threads and scores each candidate against h
 benchmarks computed from English league data (\`data/history/derived/benchmarks.json\`,
 produced by \`tools/history/benchmarks.mjs\`).
 
-* **Selected model:** finalist ${chosen.rank} of the second holdout validation.
-  Holdout score **${n(chosen.score, 3)}** (short-term ${n(chosen.short, 3)}, 50-year ${n(chosen.long50, 3)}, 100-year ${n(chosen.long100, 3)}).
-* **Uncalibrated starting model** on the same holdout seeds: short-term ${n(v.baseline.short, 3)}, 100-year ${n(v.baseline.long100, 3)}.
+${adopted ? `* **Selected model (0.6):** the 0.5 model plus *ownership ambition* (finalist ${adopted.rank} of the
+  ownership-ambition validation on the fresh \`${amb.holdout}*\` seeds). Holdout score **${n(adopted.score, 3)}**
+  (short-term ${n(adopted.short, 3)}, 50-year ${n(adopted.long50, 3)}, 100-year ${n(adopted.long100, 3)}), against
+  ${n(amb.baseline.score, 3)} (${n(amb.baseline.short, 3)} / ${n(amb.baseline.long50, 3)} / ${n(amb.baseline.long100, 3)}) for the 0.5 model on the same seeds.` : `* **Selected model:** finalist ${chosen.rank} of the second holdout validation.
+  Holdout score **${n(chosen.score, 3)}** (short-term ${n(chosen.short, 3)}, 50-year ${n(chosen.long50, 3)}, 100-year ${n(chosen.long100, 3)}).${amb ? `
+* The 0.6 ownership-ambition change was **not adopted**: no finalist met the adoption rule (see below).` : ''}`}
+* **Uncalibrated starting model** (0.5 search) on the \`holdout2-*\` seeds: short-term ${n(v.baseline.short, 3)}, 100-year ${n(v.baseline.long100, 3)}.
 * A score of 1.0 means a metric is on average one tolerance away from its historical target; scores are
   weighted means of squared z-values capped at 3σ (see \`tools/calibrate/targets.mjs\`).
 * About **${Math.round((seasons + EARLIER) / 1000)}k simulated seasons** in total across all phases
@@ -96,6 +111,56 @@ ${(() => { try { const c = R('check-holdout2.json'); return `short-term ${n(c.sh
 The tables below show the validated model as selected; the shipped default additionally includes
 this saturation (\`lambdaSoft\` 2.5, \`lambdaSpan\` 2.0).
 
+${amb ? `## 0.6: ownership ambition
+
+**Why.** Three weaknesses survived every 0.5 configuration: promoted clubs were too uniform (top-half
+finishes ≈10% vs 19% in history), lower-league clubs rarely rose to the top flight (≈12% within 25 years
+vs 19.6%), and long-run champions were slightly too weak (≈85 vs 87.5 points). All three point to a
+missing source of *persistent, club-specific* investment: in reality owners differ enormously.
+
+**Mechanism** (\`src/engine/evolution.ts\`). Every club has a slow latent trait *ambition* A in [−1, 1]
+(−1 asset-stripping, 0 steady, +1 wealthy takeover). Each season A ← ambPersist·A + 0.05·N(0,1); with
+probability \`ownerEventRate\` the club changes hands: a takeover (A = 0.5…1) or a sell-off to
+cost-cutting owners (A = −0.45…−0.95). Big clubs and clubs run down by previous owners attract wealthy
+buyers; relegated and unstable clubs attract asset-strippers. Ambition then
+* shifts the structural target and the squad-upkeep ceiling by \`ambTarget\`·A rating points,
+* scales promotion investment by (1 + \`ambPromo\`·A),
+* skews development shocks toward the upside for ambitious owners (\`ambUpside\`, mean-preserving), and
+* erodes stability when negative. Ownership changes appear in club timelines and the news.
+
+**Seeds.** 25 clubs start from documented ownership situations (e.g. Newcastle's 2021 PIF-led takeover,
+Wrexham 2021, Birmingham 2023, Sheffield Wednesday's 2025 crisis); all others start neutral. Each club's
+\`provenance.ambition\` in \`clubs.json\` records the evidence or "neutral default"; magnitudes are judgements
+(\`OWNERSHIP\` in \`tools/ratings/build-db.mjs\`).
+
+**Search.** ${ambRounds.length} rounds on the screening seeds (\`screen-refine-*\`, common random numbers),
+starting from the 0.5 \`DEFAULT_PARAMS\`: round 1 a ${ambRounds[0]?.results.length - 1}-point Latin hypercube over the five ambition
+parameters (everything else fixed), then joint local refinement of the ambition parameters and the
+interacting long-term parameters (${(ambRounds.at(-1)?.keys ?? []).filter(k => !k.startsWith('amb') && k !== 'ownerEventRate').join(', ')}) with shrinking steps.
+The 0.5 model (ambition switched off, \`AMBITION_OFF\`) was carried through every round as a reference.
+
+| Round | Candidates | Runs × seasons | Best screening score | 0.5 model (reference) |
+|---|---|---|---|---|
+${ambRounds.map(r => `| ${r.round} | ${r.results.length} | ${r.runsPerConfig} × ${r.seasonsPerRun} | ${n(r.results[0].score, 3)} | ${n(r.results.find(x => x.config.label)?.score, 3)} |`).join('\n')}
+
+**Validation and adoption rule.** The top ${amb.finalists.length} candidates and the 0.5 model were run on a **new**
+holdout seed prefix (\`${amb.holdout}\`: ${Number(amb.seeds.first.split('..')[1]) + 1} first seasons, ${Number(amb.seeds.l50.split('..')[1]) + 1} × 50-season and ${Number(amb.seeds.l100.split('..')[1]) + 1} × 100-season worlds).
+Rule, fixed before validation: *${amb.rule}*.
+
+| Model | Combined | Short | 50-year | 100-year | Adoptable |
+|---|---|---|---|---|---|
+| 0.5 model (ambition off) | ${n(amb.baseline.score, 3)} | ${n(amb.baseline.short, 3)} | ${n(amb.baseline.long50, 3)} | ${n(amb.baseline.long100, 3)} | reference |
+${amb.finalists.map(f => `| finalist ${f.rank}${f.rank === amb.adopted ? ' (**adopted**)' : ''} | ${n(f.score, 3)} | ${n(f.short, 3)} | ${n(f.long50, 3)} | ${n(f.long100, 3)} | ${f.adoptable ? 'yes' : 'no'} |`).join('\n')}
+
+${adopted ? `**Decision: adopted** (finalist ${adopted.rank}).` : '**Decision: not adopted.** No finalist improved the combined score without worsening a group. Every finalist raised lower-league mobility and title streaks toward history, but every one also relegated the era\'s giants far more often (see `lt.giants30RelegatedPct` below), and the best finalist (2) reduced first-season table spread because ambitious promoted clubs invest more. The shipped model keeps ambition switched off (`ambTarget`, `ambPromo`, `ambUpside` and `ownerEventRate` are 0; the ambition draws still happen, so the random stream differs from 0.5 but the model is statistically identical). Finalist 2 is offered as the opt-in, non-calibrated setting *Ownership dynamics (experimental)* (`OWNERSHIP_EXPERIMENTAL` in `params.ts`). It was not tuned further against these holdout seeds; a future structural change must be validated on a fresh seed prefix.'}
+
+Targeted weaknesses on the \`${amb.holdout}\` seeds (100-year worlds; 50-year in brackets):
+
+| Metric | Target | 0.5 model | ${adopted ? 'Adopted model' : 'Best finalist'} |
+|---|---|---|---|
+${(() => { const f = adopted ?? [...amb.finalists].sort((a, b) => a.score - b.score)[0]; const t = m => [...SHORT, ...LONG].find(x => x.m === m); return ['lt.promotedTopHalfPct', 'lt.lowerReachPL25Pct', 'lt.lowerReachPL50Pct', 'pl.pts1', 'lt.promotedSurvivalPct', 'lt.giants30RelegatedPct', 'lt.titleRetentionPct', 'lt.uniqueChampionsIn25', 'lt.plMeanRatingDrift'].map(m => `| ${m} | ${t(m)?.t ?? ''} | ${n(amb.baseline.long100Agg[m]?.mean, 2)} (${n(amb.baseline.long50Agg[m]?.mean, 2)}) | ${n(f.long100Agg[m]?.mean, 2)} (${n(f.long50Agg[m]?.mean, 2)}) |`).join('\n'); })()}
+` : ''}
+
 ## Why this model was chosen
 
 * Lowest combined holdout score of all finalists, with **no group sacrificed**: short-term and both
@@ -115,7 +180,7 @@ ${JSON.stringify(Object.fromEntries(Object.entries(chosen.params).map(([k, x]) =
 These are \`DEFAULT_PARAMS\` in \`src/engine/params.ts\`. User settings multiply a subset of them
 (\`effectiveParams\`), so 100% on every slider reproduces exactly this model.
 
-## Holdout results — short term (${chosen.shortAgg['pl.pts1'].n} first seasons, unseen seeds)
+## Holdout results — short term (${chosen.shortAgg['pl.pts1'].n} first seasons, unseen seeds${adopted ? `: \`${amb.holdout}\`` : ''})
 
 ${tbl(chosen.shortDetail, chosen.shortAgg)}
 
@@ -133,12 +198,14 @@ ${extra(chosen.long100Agg, ['lt.longestStreak', 'lt.streaks4plusPerCentury', 'lt
 
 ${tbl(chosen.long50Detail, chosen.long50Agg)}
 
-## Finalists compared (second holdout)
+## Finalists compared (0.5 search, second holdout)
 
 | Finalist | Combined | Short | 50-year | 100-year |
 |---|---|---|---|---|
 ${v.finalists.map(f => `| ${f.rank}${f === chosen ? ' (selected)' : ''} | ${n(f.score, 3)} | ${n(f.short, 3)} | ${n(f.long50, 3)} | ${n(f.long100, 3)} |`).join('\n')}
 | Uncalibrated start | — | ${n(v.baseline.short, 3)} | — | ${n(v.baseline.long100, 3)} |
+
+${adopted ? `These are the 0.5 finalists on \`holdout2-*\`; the 0.6 model was compared with finalist ${v05.rank} (the 0.5 selection) on the new \`${amb.holdout}*\` seeds above.` : ''}
 
 ${v1 ? `The first holdout round (before consecutive-title fatigue was added) selected a model with combined score ${n(Math.min(...v1.finalists.map(f => f.score)), 3)}; it still produced 5+-title streaks in some worlds, which motivated the extra mechanism.` : ''}
 
@@ -187,6 +254,11 @@ node tools/calibrate/run.mjs refine --top 6 --per 15 --runs 8 --seasons 80
 node tools/calibrate/run.mjs refine --from-refine --top 6 --per 12 --runs 12 --seasons 80 --step 0.05   # repeat
 node tools/calibrate/run.mjs validate --finalists 4 --firsts 500 --r50 12 --r100 10 --holdout holdout2-
 node tools/calibrate/run.mjs sensitivity
+# 0.6 ownership ambition
+node tools/calibrate/run.mjs amb-refine --from-default --configs 60 --runs 12 --seasons 80
+node tools/calibrate/run.mjs amb-refine --top 5 --per 10 --runs 12 --seasons 80 --step 0.1     # then 0.06, 0.035 with --runs 16
+node tools/calibrate/run.mjs amb-validate --finalists 4 --firsts 500 --r50 12 --r100 10 --holdout holdout3-
+node tools/calibrate/run.mjs sensitivity --source amb
 node tools/calibrate/report.mjs
 \`\`\`
 `;

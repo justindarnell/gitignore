@@ -21,10 +21,13 @@
    "stability": 53.49,
    "squadQuality": 77.85,
    "formEstimate": 58,
+   "ambition": 0.35,
+   "ownerSince": 2022,
    "provenance": {
     "ratings": "fit: 76 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.4 (9 top-flight seasons, 0 titles)",
     "stability": "volatility 5.9 ranks/yr, 4 division changes 2012-2024",
+    "ambition": "documented: Bill Foley (Black Knight) takeover, December 2022 (judgement: seed +0.35)",
     "form": "researched: +0.30 pts/game vs expectation over last 12 league games"
    }
   },
@@ -44,10 +47,13 @@
    "stability": 66.53,
    "squadQuality": 89.35,
    "formEstimate": 56.6,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 76 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 6.0 (109 top-flight seasons, 14 titles)",
     "stability": "volatility 1.3 ranks/yr, 0 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.25 pts/game vs expectation over last 12 league games"
    }
   },
@@ -67,10 +73,13 @@
    "stability": 58.77,
    "squadQuality": 79.58,
    "formEstimate": 42.1,
+   "ambition": 0.6,
+   "ownerSince": 2018,
    "provenance": {
     "ratings": "fit: 76 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 6.0 (112 top-flight seasons, 7 titles)",
     "stability": "volatility 4.8 ranks/yr, 2 division changes 2012-2024",
+    "ambition": "documented: Nassef Sawiris / Wes Edens (V Sports) takeover, July 2018; sustained investment (judgement: seed +0.60)",
     "form": "researched: -0.30 pts/game vs expectation over last 12 league games"
    }
   },
@@ -90,10 +99,13 @@
    "stability": 58.04,
    "squadQuality": 78.48,
    "formEstimate": 40.1,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 76 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.4 (10 top-flight seasons, 0 titles)",
     "stability": "volatility 5.4 ranks/yr, 2 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.37 pts/game vs expectation over last 12 league games"
    }
   },
@@ -113,10 +125,13 @@
    "stability": 59.95,
    "squadQuality": 78.92,
    "formEstimate": 60.3,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 76 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.5 (13 top-flight seasons, 0 titles)",
     "stability": "volatility 5.5 ranks/yr, 1 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.39 pts/game vs expectation over last 12 league games"
    }
   },
@@ -136,10 +151,13 @@
    "stability": 63.88,
    "squadQuality": 80.06,
    "formEstimate": 29.5,
+   "ambition": 0.6,
+   "ownerSince": 2022,
    "provenance": {
     "ratings": "fit: 76 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 6.0 (91 top-flight seasons, 6 titles)",
     "stability": "volatility 3.8 ranks/yr, 0 division changes 2012-2024",
+    "ambition": "documented: Todd Boehly / Clearlake Capital consortium takeover, May 2022; very high squad spending (judgement: seed +0.60)",
     "form": "researched: -0.77 pts/game vs expectation over last 12 league games"
    }
   },
@@ -159,10 +177,13 @@
    "stability": 52.83,
    "squadQuality": 69.53,
    "formEstimate": 59.6,
+   "ambition": 0.4,
+   "ownerSince": 2023,
    "provenance": {
     "ratings": "fit: 92 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 1.4 (34 top-flight seasons, 0 titles)",
     "stability": "volatility 8.3 ranks/yr, 3 division changes 2012-2024",
+    "ambition": "documented: Doug King bought the club from Sisu, 2023 (judgement: seed +0.40)",
     "form": "researched: +0.36 pts/game vs expectation over last 12 league games"
    }
   },
@@ -182,10 +203,13 @@
    "stability": 62.97,
    "squadQuality": 76.1,
    "formEstimate": 47.1,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 76 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 1.0 (26 top-flight seasons, 0 titles)",
     "stability": "volatility 2.8 ranks/yr, 1 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.11 pts/game vs expectation over last 12 league games"
    }
   },
@@ -205,10 +229,13 @@
    "stability": 65.16,
    "squadQuality": 76.13,
    "formEstimate": 44.7,
+   "ambition": 0.45,
+   "ownerSince": 2024,
    "provenance": {
     "ratings": "fit: 76 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 6.0 (123 top-flight seasons, 9 titles)",
     "stability": "volatility 2.6 ranks/yr, 0 division changes 2012-2024",
+    "ambition": "documented: The Friedkin Group takeover completed December 2024; new stadium 2025 (judgement: seed +0.45)",
     "form": "researched: -0.20 pts/game vs expectation over last 12 league games"
    }
   },
@@ -228,10 +255,13 @@
    "stability": 48.58,
    "squadQuality": 76.97,
    "formEstimate": 53.9,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 76 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 1.2 (31 top-flight seasons, 0 titles)",
     "stability": "volatility 6.8 ranks/yr, 6 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.15 pts/game vs expectation over last 12 league games"
    }
   },
@@ -251,10 +281,13 @@
    "stability": 47.84,
    "squadQuality": 63.28,
    "formEstimate": 43.7,
+   "ambition": 0.4,
+   "ownerSince": 2022,
    "provenance": {
     "ratings": "fit: 92 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.2 (5 top-flight seasons, 0 titles)",
     "stability": "volatility 7.4 ranks/yr, 6 division changes 2012-2024",
+    "ambition": "documented: Acun Ilicali takeover, January 2022 (judgement: seed +0.40)",
     "form": "researched: -0.24 pts/game vs expectation over last 12 league games"
    }
   },
@@ -274,10 +307,13 @@
    "stability": 54.39,
    "squadQuality": 68.93,
    "formEstimate": 50.3,
+   "ambition": 0.6,
+   "ownerSince": 2021,
    "provenance": {
     "ratings": "fit: 87.6 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 1.9 (27 top-flight seasons, 2 titles)",
     "stability": "volatility 6.9 ranks/yr, 3 division changes 2012-2024",
+    "ambition": "documented: Gamechanger 20 takeover April 2021; ORG investment 2023; back-to-back promotions 2023-24 (judgement: seed +0.60)",
     "form": "researched: +0.01 pts/game vs expectation over last 12 league games"
    }
   },
@@ -297,10 +333,13 @@
    "stability": 58.87,
    "squadQuality": 75.76,
    "formEstimate": 53.1,
+   "ambition": 0.5,
+   "ownerSince": 2023,
    "provenance": {
     "ratings": "fit: 82.8 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 3.4 (54 top-flight seasons, 3 titles)",
     "stability": "volatility 4.7 ranks/yr, 2 division changes 2012-2024",
+    "ambition": "documented: 49ers Enterprises completed takeover, July 2023 (judgement: seed +0.50)",
     "form": "researched: +0.12 pts/game vs expectation over last 12 league games"
    }
   },
@@ -320,10 +359,13 @@
    "stability": 65.43,
    "squadQuality": 83.43,
    "formEstimate": 41.4,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 76 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 6.0 (111 top-flight seasons, 20 titles)",
     "stability": "volatility 2.3 ranks/yr, 0 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.32 pts/game vs expectation over last 12 league games"
    }
   },
@@ -343,10 +385,13 @@
    "stability": 66.99,
    "squadQuality": 87.64,
    "formEstimate": 52.2,
+   "ambition": 0.6,
+   "ownerSince": 2008,
    "provenance": {
     "ratings": "fit: 76 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 6.0 (97 top-flight seasons, 10 titles)",
     "stability": "volatility 0.9 ranks/yr, 0 division changes 2012-2024",
+    "ambition": "documented: Abu Dhabi United Group / City Football Group ownership since 2008, sustained investment (judgement: seed +0.60)",
     "form": "researched: +0.08 pts/game vs expectation over last 12 league games"
    }
   },
@@ -366,10 +411,13 @@
    "stability": 64.15,
    "squadQuality": 79.48,
    "formEstimate": 68.4,
+   "ambition": -0.2,
+   "ownerSince": 2005,
    "provenance": {
     "ratings": "fit: 76 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 6.0 (101 top-flight seasons, 20 titles)",
     "stability": "volatility 3.5 ranks/yr, 0 division changes 2012-2024",
+    "ambition": "documented: Leveraged Glazer ownership since 2005; INEOS minority stake 2024 followed by cost-cutting (judgement: seed -0.20)",
     "form": "researched: +0.69 pts/game vs expectation over last 12 league games"
    }
   },
@@ -389,10 +437,13 @@
    "stability": 59.88,
    "squadQuality": 80.14,
    "formEstimate": 39.4,
+   "ambition": 0.8,
+   "ownerSince": 2021,
    "provenance": {
     "ratings": "fit: 76 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 5.4 (94 top-flight seasons, 4 titles)",
     "stability": "volatility 3.8 ranks/yr, 2 division changes 2012-2024",
+    "ambition": "documented: PIF-led consortium takeover, October 2021 (judgement: seed +0.80)",
     "form": "researched: -0.40 pts/game vs expectation over last 12 league games"
    }
   },
@@ -412,10 +463,13 @@
    "stability": 59.67,
    "squadQuality": 76.86,
    "formEstimate": 54.1,
+   "ambition": 0.55,
+   "ownerSince": 2017,
    "provenance": {
     "ratings": "fit: 76 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 2.8 (60 top-flight seasons, 1 titles)",
     "stability": "volatility 5.8 ranks/yr, 1 division changes 2012-2024",
+    "ambition": "documented: Evangelos Marinakis takeover, May 2017; heavy investment since 2022 promotion (judgement: seed +0.55)",
     "form": "researched: +0.16 pts/game vs expectation over last 12 league games"
    }
   },
@@ -435,10 +489,13 @@
    "stability": 53.84,
    "squadQuality": 70.99,
    "formEstimate": 63.5,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 84 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 5.9 (87 top-flight seasons, 6 titles)",
     "stability": "volatility 7.4 ranks/yr, 3 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.51 pts/game vs expectation over last 12 league games"
    }
   },
@@ -458,10 +515,13 @@
    "stability": 65.07,
    "squadQuality": 77.15,
    "formEstimate": 41.2,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 76 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 4.4 (91 top-flight seasons, 2 titles)",
     "stability": "volatility 2.7 ranks/yr, 0 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.33 pts/game vs expectation over last 12 league games"
    }
   },
@@ -481,10 +541,13 @@
    "stability": 65.59,
    "squadQuality": 63.87,
    "formEstimate": 44.9,
+   "ambition": 0.7,
+   "ownerSince": 2023,
    "provenance": {
     "ratings": "fit: 92 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 2.3 (57 top-flight seasons, 0 titles)",
     "stability": "volatility 4.9 ranks/yr, 1 division changes 2012-2024; subjective: Significant recent ownership investment (Knighthead).",
+    "ambition": "documented: Knighthead Capital takeover, July 2023; major investment (judgement: seed +0.70)",
     "form": "researched: -0.19 pts/game vs expectation over last 12 league games"
    }
   },
@@ -504,10 +567,13 @@
    "stability": 56.85,
    "squadQuality": 61.35,
    "formEstimate": 50.1,
+   "ambition": -0.3,
+   "ownerSince": 2010,
    "provenance": {
     "ratings": "fit: 92 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 4.1 (72 top-flight seasons, 3 titles)",
     "stability": "volatility 6.5 ranks/yr, 2 division changes 2012-2024",
+    "ambition": "documented: Venky's ownership since 2010; prolonged under-investment (judgement: seed -0.30)",
     "form": "researched: +0.01 pts/game vs expectation over last 12 league games"
    }
   },
@@ -527,10 +593,13 @@
    "stability": 50.39,
    "squadQuality": 58.71,
    "formEstimate": 64.8,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 77 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 2.9 (73 top-flight seasons, 0 titles)",
     "stability": "volatility 6.9 ranks/yr, 5 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.55 pts/game vs expectation over last 12 league games"
    }
   },
@@ -550,10 +619,13 @@
    "stability": 57.95,
    "squadQuality": 63.65,
    "formEstimate": 41,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 92 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.4 (9 top-flight seasons, 0 titles)",
     "stability": "volatility 5.5 ranks/yr, 2 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.34 pts/game vs expectation over last 12 league games"
    }
   },
@@ -573,10 +645,13 @@
    "stability": 50.77,
    "squadQuality": 71.16,
    "formEstimate": 34.3,
+   "ambition": -0.25,
+   "ownerSince": 2020,
    "provenance": {
     "ratings": "fit: 81.6 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 3.2 (61 top-flight seasons, 2 titles)",
     "stability": "volatility 4.8 ranks/yr, 6 division changes 2012-2024",
+    "ambition": "documented: ALK Capital leveraged takeover, December 2020 (judgement: seed -0.25)",
     "form": "researched: -0.59 pts/game vs expectation over last 12 league games"
    }
   },
@@ -596,10 +671,13 @@
    "stability": 52.76,
    "squadQuality": 62.63,
    "formEstimate": 63.7,
+   "ambition": -0.25,
+   "ownerSince": 2010,
    "provenance": {
     "ratings": "fit: 76 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.7 (17 top-flight seasons, 0 titles)",
     "stability": "volatility 6.6 ranks/yr, 4 division changes 2012-2024",
+    "ambition": "documented: Vincent Tan ownership; reduced spending in recent seasons (judgement: seed -0.25)",
     "form": "researched: +0.52 pts/game vs expectation over last 12 league games"
    }
   },
@@ -619,10 +697,13 @@
    "stability": 53.66,
    "squadQuality": 58.98,
    "formEstimate": 45.7,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 92 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 1.0 (26 top-flight seasons, 0 titles)",
     "stability": "volatility 7.6 ranks/yr, 3 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.16 pts/game vs expectation over last 12 league games"
    }
   },
@@ -642,10 +723,13 @@
    "stability": 53.67,
    "squadQuality": 63.45,
    "formEstimate": 59.3,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 92 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 3.0 (65 top-flight seasons, 1 titles)",
     "stability": "volatility 5.8 ranks/yr, 2 division changes 2012-2024; subjective: Administration in 2021/22; since stabilised under new ownership.",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.35 pts/game vs expectation over last 12 league games"
    }
   },
@@ -665,10 +749,13 @@
    "stability": 55.83,
    "squadQuality": 58.99,
    "formEstimate": 52.3,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 76 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 7.4 ranks/yr, 2 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.09 pts/game vs expectation over last 12 league games"
    }
   },
@@ -688,10 +775,13 @@
    "stability": 58.87,
    "squadQuality": 67.29,
    "formEstimate": 42.6,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 92 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 2.4 (61 top-flight seasons, 0 titles)",
     "stability": "volatility 4.7 ranks/yr, 2 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.28 pts/game vs expectation over last 12 league games"
    }
   },
@@ -711,10 +801,13 @@
    "stability": 57.03,
    "squadQuality": 64.83,
    "formEstimate": 65.6,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 92 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.1 (2 top-flight seasons, 0 titles)",
     "stability": "volatility 6.3 ranks/yr, 2 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.59 pts/game vs expectation over last 12 league games"
    }
   },
@@ -734,10 +827,13 @@
    "stability": 47.22,
    "squadQuality": 64.76,
    "formEstimate": 62.7,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 92 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 1.1 (27 top-flight seasons, 0 titles)",
     "stability": "volatility 6.2 ranks/yr, 7 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.48 pts/game vs expectation over last 12 league games"
    }
   },
@@ -757,10 +853,13 @@
    "stability": 54.85,
    "squadQuality": 60.24,
    "formEstimate": 55.2,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 92 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 2.1 (33 top-flight seasons, 2 titles)",
     "stability": "volatility 6.5 ranks/yr, 3 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.20 pts/game vs expectation over last 12 league games"
    }
   },
@@ -780,10 +879,13 @@
    "stability": 60.23,
    "squadQuality": 61.19,
    "formEstimate": 42.1,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 92 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 2.6 (46 top-flight seasons, 2 titles)",
     "stability": "volatility 5.3 ranks/yr, 1 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.30 pts/game vs expectation over last 12 league games"
    }
   },
@@ -803,10 +905,13 @@
    "stability": 56.59,
    "squadQuality": 60.66,
    "formEstimate": 42.5,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 92 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.9 (23 top-flight seasons, 0 titles)",
     "stability": "volatility 4.9 ranks/yr, 3 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.28 pts/game vs expectation over last 12 league games"
    }
   },
@@ -826,10 +931,13 @@
    "stability": 50.67,
    "squadQuality": 65.07,
    "formEstimate": 42.8,
+   "ambition": 0.4,
+   "ownerSince": 2024,
    "provenance": {
     "ratings": "fit: 89.6 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 2.9 (63 top-flight seasons, 1 titles)",
     "stability": "volatility 6.7 ranks/yr, 5 division changes 2012-2024",
+    "ambition": "documented: COH Sports consortium takeover completed December 2024 (judgement: seed +0.40)",
     "form": "researched: -0.27 pts/game vs expectation over last 12 league games"
    }
   },
@@ -849,10 +957,13 @@
    "stability": 60.15,
    "squadQuality": 67.2,
    "formEstimate": 72.7,
+   "ambition": 0.4,
+   "ownerSince": 2022,
    "provenance": {
     "ratings": "fit: 86.4 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 1.9 (47 top-flight seasons, 0 titles)",
     "stability": "volatility 3.5 ranks/yr, 2 division changes 2012-2024",
+    "ambition": "documented: Sport Republic takeover, January 2022 (judgement: seed +0.40)",
     "form": "researched: +0.85 pts/game vs expectation over last 12 league games"
    }
   },
@@ -872,10 +983,13 @@
    "stability": 62.42,
    "squadQuality": 61.18,
    "formEstimate": 34.3,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 92 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 2.5 (62 top-flight seasons, 0 titles)",
     "stability": "volatility 3.3 ranks/yr, 1 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.59 pts/game vs expectation over last 12 league games"
    }
   },
@@ -895,10 +1009,13 @@
    "stability": 60.68,
    "squadQuality": 62.66,
    "formEstimate": 57.2,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 92 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.4 (9 top-flight seasons, 0 titles)",
     "stability": "volatility 4.8 ranks/yr, 1 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.27 pts/game vs expectation over last 12 league games"
    }
   },
@@ -918,10 +1035,13 @@
    "stability": 53.49,
    "squadQuality": 61.53,
    "formEstimate": 36.3,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 92 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.6 (14 top-flight seasons, 0 titles)",
     "stability": "volatility 5.9 ranks/yr, 4 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.51 pts/game vs expectation over last 12 league games"
    }
   },
@@ -941,10 +1061,13 @@
    "stability": 56.77,
    "squadQuality": 63.75,
    "formEstimate": 52.3,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 92 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 3.6 (81 top-flight seasons, 1 titles)",
     "stability": "volatility 4.8 ranks/yr, 3 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.09 pts/game vs expectation over last 12 league games"
    }
   },
@@ -964,10 +1087,13 @@
    "stability": 63.23,
    "squadQuality": 73.67,
    "formEstimate": 56.1,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 76 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 2.7 (68 top-flight seasons, 0 titles)",
     "stability": "volatility 4.3 ranks/yr, 0 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.23 pts/game vs expectation over last 12 league games"
    }
   },
@@ -987,10 +1113,13 @@
    "stability": 55.49,
    "squadQuality": 70.29,
    "formEstimate": 49.6,
+   "ambition": -0.3,
+   "ownerSince": 2016,
    "provenance": {
     "ratings": "fit: 76 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 4.0 (71 top-flight seasons, 3 titles)",
     "stability": "volatility 5.9 ranks/yr, 3 division changes 2012-2024",
+    "ambition": "documented: Fosun ownership; net player sales and reduced spending 2023-25 (judgement: seed -0.30)",
     "form": "researched: -0.01 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1010,10 +1139,13 @@
    "stability": 62.3,
    "squadQuality": 62.61,
    "formEstimate": 53.8,
+   "ambition": 0.8,
+   "ownerSince": 2021,
    "provenance": {
     "ratings": "fit: 85.1 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 7.0 ranks/yr, 2 division changes 2012-2024; subjective: Well-funded, stable ownership; three consecutive promotions 2023-2025.",
+    "ambition": "documented: Ryan Reynolds and Rob McElhenney takeover, February 2021; Allyn family investment 2024; three successive promotions (judgement: seed +0.80)",
     "form": "researched: +0.14 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1033,10 +1165,13 @@
    "stability": 56.94,
    "squadQuality": 53.97,
    "formEstimate": 58.2,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 76 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 6.4 ranks/yr, 2 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.31 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1056,10 +1191,13 @@
    "stability": 48.92,
    "squadQuality": 56.6,
    "formEstimate": 61.1,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 73 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (1 top-flight seasons, 0 titles)",
     "stability": "volatility 8.3 ranks/yr, 5 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.42 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1079,10 +1217,13 @@
    "stability": 48.65,
    "squadQuality": 54.79,
    "formEstimate": 32.5,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 76 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 1.1 (28 top-flight seasons, 0 titles)",
     "stability": "volatility 8.5 ranks/yr, 5 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.66 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1102,10 +1243,13 @@
    "stability": 56.85,
    "squadQuality": 54.41,
    "formEstimate": 42.8,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 76 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.5 (12 top-flight seasons, 0 titles)",
     "stability": "volatility 6.5 ranks/yr, 2 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.27 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1125,10 +1269,13 @@
    "stability": 58.3,
    "squadQuality": 50.96,
    "formEstimate": 55.7,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 48.3 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 7.0 ranks/yr, 1 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.21 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1148,10 +1295,13 @@
    "stability": 56.32,
    "squadQuality": 49.09,
    "formEstimate": 37.1,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 76 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 5.2 ranks/yr, 3 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.48 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1171,10 +1321,13 @@
    "stability": 56.74,
    "squadQuality": 48.6,
    "formEstimate": 50.7,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 69 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 6.6 ranks/yr, 2 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.03 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1194,10 +1347,13 @@
    "stability": 48.28,
    "squadQuality": 50.42,
    "formEstimate": 48.8,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 76 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 8.8 ranks/yr, 5 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.05 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1217,10 +1373,13 @@
    "stability": 52.74,
    "squadQuality": 57.49,
    "formEstimate": 57.7,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 76 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 2.5 (32 top-flight seasons, 3 titles)",
     "stability": "volatility 8.4 ranks/yr, 3 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.29 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1240,10 +1399,13 @@
    "stability": 48.32,
    "squadQuality": 65.13,
    "formEstimate": 34.5,
+   "ambition": -0.35,
+   "ownerSince": 2010,
    "provenance": {
     "ratings": "fit: 86.4 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 2.6 (56 top-flight seasons, 1 titles)",
     "stability": "volatility 5.2 ranks/yr, 3 division changes 2012-2024; subjective: PSR breach charges and 2025/26 points deduction; relegated twice in three seasons.",
+    "ambition": "documented: King Power ownership under PSR constraints and charges (judgement: seed -0.35)",
     "form": "researched: -0.58 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1263,10 +1425,13 @@
    "stability": 49.37,
    "squadQuality": 54.75,
    "formEstimate": 30.3,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 76 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (1 top-flight seasons, 0 titles)",
     "stability": "volatility 9.7 ranks/yr, 4 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.74 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1286,10 +1451,13 @@
    "stability": 48.32,
    "squadQuality": 60.92,
    "formEstimate": 59.2,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 72.6 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.7 (17 top-flight seasons, 0 titles)",
     "stability": "volatility 8.8 ranks/yr, 5 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.35 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1309,10 +1477,13 @@
    "stability": 56.8,
    "squadQuality": 54.36,
    "formEstimate": 39.3,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 75 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 6.5 ranks/yr, 2 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.40 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1332,10 +1503,13 @@
    "stability": 48.19,
    "squadQuality": 52.13,
    "formEstimate": 69.6,
+   "ambition": 0.5,
+   "ownerSince": 2024,
    "provenance": {
     "ratings": "fit: 69 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 8.9 ranks/yr, 5 division changes 2012-2024",
+    "ambition": "documented: Fahad Al Ghanim takeover, 2024; high spending for the division (judgement: seed +0.50)",
     "form": "researched: +0.74 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1355,10 +1529,13 @@
    "stability": 51.47,
    "squadQuality": 54.25,
    "formEstimate": 62.9,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 62.1 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 1.2 (30 top-flight seasons, 0 titles)",
     "stability": "volatility 9.6 ranks/yr, 3 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.48 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1378,10 +1555,13 @@
    "stability": 55.02,
    "squadQuality": 59.28,
    "formEstimate": 57.1,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 92 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.1 (3 top-flight seasons, 0 titles)",
     "stability": "volatility 8.2 ranks/yr, 2 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.27 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1401,10 +1581,13 @@
    "stability": 57.23,
    "squadQuality": 56.21,
    "formEstimate": 59.6,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 76 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 4.3 ranks/yr, 3 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.36 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1424,10 +1607,13 @@
    "stability": 51.93,
    "squadQuality": 55.99,
    "formEstimate": 50.5,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 76 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 7.3 ranks/yr, 4 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.02 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1447,10 +1633,13 @@
    "stability": 45.92,
    "squadQuality": 55.46,
    "formEstimate": 48.6,
+   "ambition": -0.25,
+   "ownerSince": 2025,
    "provenance": {
     "ratings": "fit: 76 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.1 (3 top-flight seasons, 0 titles)",
     "stability": "volatility 9.2 ranks/yr, 2 division changes 2012-2024; subjective: Prolonged ownership turmoil and points deductions 2022-2025.",
+    "ambition": "documented: Years of unpaid bills and points deductions under Dai Yongge; sale to Rob Couhig in 2025 (judgement: seed -0.25)",
     "form": "researched: -0.05 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1470,10 +1659,13 @@
    "stability": 36.5,
    "squadQuality": 55.27,
    "formEstimate": 42.8,
+   "ambition": -0.85,
+   "ownerSince": 2015,
    "provenance": {
     "ratings": "fit: 92 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 4.2 (66 top-flight seasons, 4 titles)",
     "stability": "volatility 5.0 ranks/yr, 2 division changes 2012-2024; subjective: Ownership/financial crisis and points deduction during 2025/26.",
+    "ambition": "documented: Dejphon Chansiri: unpaid wages, transfer embargoes and administration during 2025/26 (judgement: seed -0.85)",
     "form": "researched: -0.27 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1493,10 +1685,13 @@
    "stability": 53.55,
    "squadQuality": 53.93,
    "formEstimate": 35.9,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 74 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 9.5 ranks/yr, 2 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.53 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1516,10 +1711,13 @@
    "stability": 56.3,
    "squadQuality": 61.82,
    "formEstimate": 62.7,
+   "ambition": 0.5,
+   "ownerSince": 2020,
    "provenance": {
     "ratings": "fit: 77 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 7.0 ranks/yr, 2 division changes 2012-2024",
+    "ambition": "documented: Mark Stott takeover, January 2020; two promotions since (judgement: seed +0.50)",
     "form": "researched: +0.48 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1539,10 +1737,13 @@
    "stability": 41.83,
    "squadQuality": 55.69,
    "formEstimate": 45.5,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 76 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.3 (8 top-flight seasons, 0 titles)",
     "stability": "volatility 9.3 ranks/yr, 8 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.17 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1562,10 +1763,13 @@
    "stability": 53.75,
    "squadQuality": 59,
    "formEstimate": 60.4,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 76 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 7.5 ranks/yr, 3 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.39 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1585,10 +1789,13 @@
    "stability": 55.48,
    "squadQuality": 45.94,
    "formEstimate": 45.3,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 69 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.2 (5 top-flight seasons, 0 titles)",
     "stability": "volatility 7.8 ranks/yr, 2 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.18 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1608,10 +1815,13 @@
    "stability": 54.3,
    "squadQuality": 49.43,
    "formEstimate": 30,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 48.3 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 7.0 ranks/yr, 3 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.75 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1631,10 +1841,13 @@
    "stability": 51.18,
    "squadQuality": 49.41,
    "formEstimate": 63.5,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 69 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 6.2 ranks/yr, 5 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.51 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1654,10 +1867,13 @@
    "stability": 52.08,
    "squadQuality": 44.16,
    "formEstimate": 43.2,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 69 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 7.2 ranks/yr, 4 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.26 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1677,10 +1893,13 @@
    "stability": 52.3,
    "squadQuality": 51.6,
    "formEstimate": 47.8,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 48.3 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 7.0 ranks/yr, 4 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.08 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1700,10 +1919,13 @@
    "stability": 59.58,
    "squadQuality": 47.65,
    "formEstimate": 50.1,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 69 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 5.8 ranks/yr, 1 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.00 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1723,10 +1945,13 @@
    "stability": 55.84,
    "squadQuality": 46.54,
    "formEstimate": 28.5,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 69 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 7.4 ranks/yr, 2 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.81 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1746,10 +1971,13 @@
    "stability": 53.29,
    "squadQuality": 50.79,
    "formEstimate": 61.2,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 69 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 7.9 ranks/yr, 3 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.42 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1769,10 +1997,13 @@
    "stability": 59.77,
    "squadQuality": 52.28,
    "formEstimate": 55.9,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 76 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 5.7 ranks/yr, 1 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.22 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1792,10 +2023,13 @@
    "stability": 53.27,
    "squadQuality": 49.79,
    "formEstimate": 58.3,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 69 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 9.8 ranks/yr, 2 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.31 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1815,10 +2049,13 @@
    "stability": 56.85,
    "squadQuality": 50.39,
    "formEstimate": 63.6,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 69 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 6.5 ranks/yr, 2 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.51 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1838,10 +2075,13 @@
    "stability": 53.93,
    "squadQuality": 47.84,
    "formEstimate": 26.1,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 69 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.5 (12 top-flight seasons, 0 titles)",
     "stability": "volatility 7.3 ranks/yr, 3 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.90 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1861,10 +2101,13 @@
    "stability": 59.4,
    "squadQuality": 45.22,
    "formEstimate": 47.1,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 69 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 6.0 ranks/yr, 1 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.11 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1884,10 +2127,13 @@
    "stability": 48.01,
    "squadQuality": 50.62,
    "formEstimate": 35.4,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 76 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (1 top-flight seasons, 0 titles)",
     "stability": "volatility 9.1 ranks/yr, 5 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.55 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1907,10 +2153,13 @@
    "stability": 56.6,
    "squadQuality": 46.6,
    "formEstimate": 36.7,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 48.3 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.5 (12 top-flight seasons, 0 titles)",
     "stability": "volatility 4.0 ranks/yr, 2 division changes 2012-2024; subjective: Long period of instability prior to 2025 return to EFL.",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.50 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1930,10 +2179,13 @@
    "stability": 50.01,
    "squadQuality": 49.84,
    "formEstimate": 39.4,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 75 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 9.1 ranks/yr, 4 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.40 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1953,10 +2205,13 @@
    "stability": 53.42,
    "squadQuality": 50.48,
    "formEstimate": 71.3,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 55.2 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 7.8 ranks/yr, 3 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.80 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1976,10 +2231,13 @@
    "stability": 42.94,
    "squadQuality": 54.7,
    "formEstimate": 60.2,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 74 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 6.4 ranks/yr, 9 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.38 pts/game vs expectation over last 12 league games"
    }
   },
@@ -1999,10 +2257,13 @@
    "stability": 58.3,
    "squadQuality": 52.18,
    "formEstimate": 72.4,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 69 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 7.0 ranks/yr, 1 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.84 pts/game vs expectation over last 12 league games"
    }
   },
@@ -2022,10 +2283,13 @@
    "stability": 57.58,
    "squadQuality": 45.32,
    "formEstimate": 54.1,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 69 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 5.8 ranks/yr, 2 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.15 pts/game vs expectation over last 12 league games"
    }
   },
@@ -2045,10 +2309,13 @@
    "stability": 54.67,
    "squadQuality": 50.3,
    "formEstimate": 40.9,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 69 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (1 top-flight seasons, 0 titles)",
     "stability": "volatility 6.7 ranks/yr, 3 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.34 pts/game vs expectation over last 12 league games"
    }
   },
@@ -2068,10 +2335,13 @@
    "stability": 48.51,
    "squadQuality": 46.84,
    "formEstimate": 39.1,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 69 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 8.6 ranks/yr, 5 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.41 pts/game vs expectation over last 12 league games"
    }
   },
@@ -2091,10 +2361,13 @@
    "stability": 59.49,
    "squadQuality": 52.52,
    "formEstimate": 54.8,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 69 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 5.9 ranks/yr, 1 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.18 pts/game vs expectation over last 12 league games"
    }
   },
@@ -2114,10 +2387,13 @@
    "stability": 58.3,
    "squadQuality": 52.37,
    "formEstimate": 62.1,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 49.3 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 7.0 ranks/yr, 1 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.45 pts/game vs expectation over last 12 league games"
    }
   },
@@ -2137,10 +2413,13 @@
    "stability": 60.3,
    "squadQuality": 34.31,
    "formEstimate": 50,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 25.3 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 7.0 ranks/yr, 0 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.00 pts/game vs expectation over last 0 league games"
    }
   },
@@ -2160,10 +2439,13 @@
    "stability": 58.3,
    "squadQuality": 38.65,
    "formEstimate": 45.4,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 50.3 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 7.0 ranks/yr, 1 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.17 pts/game vs expectation over last 12 league games"
    }
   },
@@ -2183,10 +2465,13 @@
    "stability": 60.3,
    "squadQuality": 40.67,
    "formEstimate": 44.3,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 50.3 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 7.0 ranks/yr, 0 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.21 pts/game vs expectation over last 12 league games"
    }
   },
@@ -2206,10 +2491,13 @@
    "stability": 58.3,
    "squadQuality": 49.85,
    "formEstimate": 60.8,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 69 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 7.0 ranks/yr, 1 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.41 pts/game vs expectation over last 12 league games"
    }
   },
@@ -2229,10 +2517,13 @@
    "stability": 60.3,
    "squadQuality": 47.71,
    "formEstimate": 42.5,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 25 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 7.0 ranks/yr, 0 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.28 pts/game vs expectation over last 12 league games"
    }
   },
@@ -2252,10 +2543,13 @@
    "stability": 60.3,
    "squadQuality": 36.34,
    "formEstimate": 42.1,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 50.3 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 7.0 ranks/yr, 0 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.30 pts/game vs expectation over last 12 league games"
    }
   },
@@ -2275,10 +2569,13 @@
    "stability": 51.73,
    "squadQuality": 47.6,
    "formEstimate": 71.9,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 71 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (1 top-flight seasons, 0 titles)",
     "stability": "volatility 9.3 ranks/yr, 3 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.82 pts/game vs expectation over last 12 league games"
    }
   },
@@ -2298,10 +2595,13 @@
    "stability": 60.3,
    "squadQuality": 41.13,
    "formEstimate": 58.6,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 50.3 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 7.0 ranks/yr, 0 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.32 pts/game vs expectation over last 12 league games"
    }
   },
@@ -2321,10 +2621,13 @@
    "stability": 60.3,
    "squadQuality": 42.15,
    "formEstimate": 53.1,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 50.3 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 7.0 ranks/yr, 0 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.11 pts/game vs expectation over last 12 league games"
    }
   },
@@ -2344,10 +2647,13 @@
    "stability": 49.92,
    "squadQuality": 47.75,
    "formEstimate": 64.3,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 71 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 9.2 ranks/yr, 4 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.54 pts/game vs expectation over last 12 league games"
    }
   },
@@ -2367,10 +2673,13 @@
    "stability": 60.3,
    "squadQuality": 39.14,
    "formEstimate": 31.1,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 50.3 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 7.0 ranks/yr, 0 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.71 pts/game vs expectation over last 12 league games"
    }
   },
@@ -2390,10 +2699,13 @@
    "stability": 58.3,
    "squadQuality": 44.12,
    "formEstimate": 28.6,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 69 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 7.0 ranks/yr, 1 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.80 pts/game vs expectation over last 12 league games"
    }
   },
@@ -2413,10 +2725,13 @@
    "stability": 52.3,
    "squadQuality": 42.76,
    "formEstimate": 51.2,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 57.2 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 7.0 ranks/yr, 4 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.05 pts/game vs expectation over last 12 league games"
    }
   },
@@ -2436,10 +2751,13 @@
    "stability": 60.3,
    "squadQuality": 36.6,
    "formEstimate": 50,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "estimate: No 2024-26 National League data; promoted via National League South play-offs. Set to NL mean minus 0.15 log units.",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 7.0 ranks/yr, 0 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "no data: neutral"
    }
   },
@@ -2459,10 +2777,13 @@
    "stability": 60.3,
    "squadQuality": 37.46,
    "formEstimate": 50,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "estimate: Last NL season 2023/24 (not in fit window); promoted via National League North play-offs. NL mean minus 0.12.",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 7.0 ranks/yr, 0 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "no data: neutral"
    }
   },
@@ -2482,10 +2803,13 @@
    "stability": 51.08,
    "squadQuality": 53.01,
    "formEstimate": 53.4,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 24 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 8.1 ranks/yr, 4 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.13 pts/game vs expectation over last 12 league games"
    }
   },
@@ -2505,10 +2829,13 @@
    "stability": 60.3,
    "squadQuality": 39.67,
    "formEstimate": 58,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 50.3 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 7.0 ranks/yr, 0 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.30 pts/game vs expectation over last 12 league games"
    }
   },
@@ -2528,10 +2855,13 @@
    "stability": 52.65,
    "squadQuality": 48.43,
    "formEstimate": 72.2,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 49.3 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 8.5 ranks/yr, 3 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.83 pts/game vs expectation over last 12 league games"
    }
   },
@@ -2551,10 +2881,13 @@
    "stability": 56.3,
    "squadQuality": 39.99,
    "formEstimate": 34.2,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 71 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 7.0 ranks/yr, 2 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.59 pts/game vs expectation over last 12 league games"
    }
   },
@@ -2574,10 +2907,13 @@
    "stability": 60.3,
    "squadQuality": 37.12,
    "formEstimate": 35.8,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 50.3 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 7.0 ranks/yr, 0 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.53 pts/game vs expectation over last 12 league games"
    }
   },
@@ -2597,10 +2933,13 @@
    "stability": 60.3,
    "squadQuality": 37.39,
    "formEstimate": 40.6,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 49.3 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 7.0 ranks/yr, 0 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.35 pts/game vs expectation over last 12 league games"
    }
   },
@@ -2620,10 +2959,13 @@
    "stability": 60.3,
    "squadQuality": 41.2,
    "formEstimate": 51.2,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 50.3 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 7.0 ranks/yr, 0 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: +0.04 pts/game vs expectation over last 12 league games"
    }
   },
@@ -2643,10 +2985,13 @@
    "stability": 60.3,
    "squadQuality": 38.03,
    "formEstimate": 50,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "estimate: No National League history; National League South champions 2025/26. NL mean minus 0.10.",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 7.0 ranks/yr, 0 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "no data: neutral"
    }
   },
@@ -2666,10 +3011,13 @@
    "stability": 50.1,
    "squadQuality": 37.93,
    "formEstimate": 41.3,
+   "ambition": 0,
+   "ownerSince": null,
    "provenance": {
     "ratings": "fit: 50.3 weighted league matches 2022/23-2025/26",
     "reputation": "researched: weighted pyramid level 1996-2025 + pedigree 0.0 (0 top-flight seasons, 0 titles)",
     "stability": "volatility 9.0 ranks/yr, 4 division changes 2012-2024",
+    "ambition": "neutral default: no decisive documented ownership change",
     "form": "researched: -0.33 pts/game vs expectation over last 12 league games"
    }
   }

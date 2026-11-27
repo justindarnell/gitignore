@@ -5,7 +5,7 @@ A long-term football world simulation sandbox. Start from the real 2026/27 Engli
 without managing a team. Clubs rise, dynasties form and fade, giants stumble and underdogs win
 trophies, all driven by a statistically calibrated engine rather than scripted outcomes.
 
-Version **0.5.0**, a clean rebuild of the 0.1–0.4.3 prototypes.
+Version **0.6.0**. 0.5 was a clean rebuild of the 0.1–0.4.3 prototypes.
 
 ## Play
 
@@ -38,7 +38,7 @@ See [docs/USER-GUIDE.md](docs/USER-GUIDE.md) for the full guide.
 | History | Rolls of honour, trophy totals, historical tables, movements, records, most improved/declined, best/worst matches, timelines, news |
 | Saves | IndexedDB slots, autosave, export/import (gzip), schema versioning, three storage levels |
 | Calibration | ~1.1M simulated seasons across grid, Latin-hypercube and local searches, holdout validation and sensitivity analysis — [report](docs/CALIBRATION.md) |
-| Tests | 28 engine tests (`npm test`) + 34 end-to-end browser checks from `file://` |
+| Tests | 34 engine tests (`npm test`) + 35 end-to-end browser checks from `file://` |
 
 ## Develop
 

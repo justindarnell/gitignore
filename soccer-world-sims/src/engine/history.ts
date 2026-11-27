@@ -1,5 +1,5 @@
 import type { Runtime } from './runtime.ts';
-import type { ClubHistory, CompactMatch, CupSeasonRecord, LeagueSeasonRecord, Match, MatchRecord, NewsItem, TableRow, World } from './types.ts';
+import type { ClubHistory, TimelineKind, CompactMatch, CupSeasonRecord, LeagueSeasonRecord, Match, MatchRecord, NewsItem, TableRow, World } from './types.ts';
 import { COUNTRIES } from './runtime.ts';
 
 const MAX_RECORDS = 8;
@@ -76,7 +76,7 @@ export function pushNews(world: World, item: Omit<NewsItem, 'season'> & { season
   if (world.news.length > MAX_NEWS) world.news.splice(0, world.news.length - MAX_NEWS);
 }
 
-function addEvent(world: World, id: string, text: string, kind: 'event' | 'honour' | 'move' | 'milestone', tone: 1 | 0 | -1): void {
+function addEvent(world: World, id: string, text: string, kind: TimelineKind, tone: 1 | 0 | -1): void {
   const h = world.history.clubs[id];
   if (h) h.events.push({ season: world.season.year, text, kind, tone });
 }

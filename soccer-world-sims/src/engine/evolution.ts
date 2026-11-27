@@ -3,6 +3,11 @@ import type { World } from './types.ts';
 import { chooseEvent, type EventContext } from './events.ts';
 import { addEvent, pushNews } from './history.ts';
 
+const AMBITION_NOISE = 0.05;
+/** Takeover/sell-off text by tone (shown in timelines and news). */
+const TAKEOVER_TEXT = 'Takeover: new owners arrive with major investment plans';
+const SELLOFF_TEXT = 'Sold to new owners who strip assets and cut spending';
+
 /**
  * End-of-season club development. Squad quality Q (mean of attack/midfield/defence) moves by
  *
@@ -13,6 +18,13 @@ import { addEvent, pushNews } from './history.ts';
  *      + promotion / relegation shocks    relegation softened by stability
  *      - title drain, - ceiling upkeep    championship renewal costs, diminishing returns at the top
  *      + random events
+ *
+ * Ownership ambition A (-1 asset-stripping .. +1 wealthy takeover) is a slow latent trait:
+ *   A' = ambPersist * A + small noise, with occasional ownership changes (takeovers set A high,
+ *   sell-offs to asset-strippers set it low). It shifts the structural target and the upkeep
+ *   ceiling by ambTarget * A, scales promotion investment by (1 + ambPromo * A), and widens
+ *   only the UPSIDE of development shocks for ambitious owners (ambUpside). Negative ambition
+ *   also erodes stability.
  *
  * where the target T = repWeight * reputation + (1 - repWeight) * economics, and economics
  * blends the next division's average level with the level of the club's own finishing rank.
@@ -64,15 +76,36 @@ export function evolveClubs(world: World, rt: Runtime): void {
     const newRank = newL === oldL ? offset[oldL] + pos : promoted ? offset[newL] + size[newL] : offset[newL] + 1;
     const rankLevel = world.levelCurve[Math.min(newRank - 1, world.levelCurve.length - 1)];
     const econ = (1 - p.rankEconomics) * divLevel[newL] + p.rankEconomics * rankLevel;
-    const T = p.repWeight * c.reputation + (1 - p.repWeight) * econ;
-    // Development cycles: stable institutions swing less; promotion brings momentum.
+    // ---- Ownership ambition: slow drift plus occasional ownership changes. The draws are made
+    // for every club every season, so the random stream does not depend on the parameters.
+    c.ambition = clamp(p.ambPersist * (c.ambition ?? 0) + AMBITION_NOISE * rng.normal(), -1, 1);
+    const uOwner = rng.next(), uKind = rng.next(), uSize = rng.next();
+    let ownerChange: 1 | -1 | 0 = 0;
+    if (uOwner < p.ownerEventRate) {
+      // Buyers favour clubs whose standing exceeds their current level (fallen big clubs) and
+      // rescue clubs run down by previous owners; relegation and turmoil invite asset-strippers.
+      const attract = clamp((c.reputation - achieved) / 10, -1, 1);
+      // Big clubs attract wealthy buyers; asset-strippers mostly target smaller clubs.
+      const size = clamp((c.reputation - 55) / 35, -0.5, 1);
+      const pTake = clamp(0.5 + 0.2 * attract + 0.25 * size + (c.ambition < -0.3 ? 0.2 : 0) - (relegated ? 0.15 : 0) - (c.stability < 30 ? 0.1 : 0), 0.15, 0.92);
+      ownerChange = uKind < pTake ? 1 : -1;
+      c.ambition = ownerChange > 0 ? 0.5 + 0.5 * uSize : -0.45 - 0.5 * uSize;
+      c.ownerSince = s.year + 1;
+    }
+    const amb = c.ambition;
+    const T = p.repWeight * c.reputation + (1 - p.repWeight) * econ + p.ambTarget * amb;
+    // Development cycles: stable institutions swing less; promotion brings momentum; ambitious
+    // owners skew the shock toward the upside (a big spending spree can transform a club) while
+    // keeping its mean: z + u * (max(z, 0) - E[max(z, 0)]), E[max(z, 0)] = 1/sqrt(2 pi).
     const damp = clamp(1 + p.stabilityDamping * (0.5 - c.stability / 100), 0.3, 1.7);
-    c.era = p.eraPersist * c.era + p.eraSD * damp * rng.normal() + (promoted ? p.promoEra : relegated ? -p.promoEra : 0);
+    const z0 = rng.normal();
+    const z = z0 + p.ambUpside * Math.max(0, amb) * (Math.max(0, z0) - 0.3989);
+    c.era = p.eraPersist * c.era + p.eraSD * damp * z + (promoted ? p.promoEra : relegated ? -p.promoEra : 0);
     // Clubs below their structural level recover faster than over-achievers regress.
     const pull = p.revert * (Q < T ? p.recoverBoost : 1);
     let dQ = pull * (T - Q) + c.era + p.perfEffect * surprise + p.qualityNoise * rng.normal();
-    // Promotion investment varies by club (ambitious owners vs. cautious budgets).
-    if (promoted) dQ += p.promoBoost * Math.max(0, 1 + p.promoVar * rng.normal());
+    // Promotion investment varies by club: ambitious owners spend, cautious ones bank the money.
+    if (promoted) dQ += p.promoBoost * Math.max(0, 1 + p.promoVar * rng.normal() + p.ambPromo * amb);
     if (relegated) dQ -= p.relegHit * clamp(1.25 - c.stability / 100, 0.3, 1.2);
     c.fatigue *= p.fatigueDecay;
     if (c.id === championOfTop) {
@@ -82,10 +115,21 @@ export function evolveClubs(world: World, rt: Runtime): void {
       c.fatigue += p.fatigueTitle + p.fatigueStreak * Math.max(0, streak - 1);
       dQ -= p.fatigueQuality;
     }
-    if (Q > p.ceiling) dQ -= p.ceilingCost * (Q - p.ceiling);
+    const ceiling = p.ceiling + p.ambTarget * Math.max(0, amb);
+    if (Q > ceiling) dQ -= p.ceilingCost * (Q - ceiling);
+
+    // ---- Ownership changes are reported; asset-stripping erodes institutional stability.
+    let dStab = 2.5 * Math.min(0, amb) + (ownerChange > 0 ? -2 : ownerChange < 0 ? -6 : 0);
+    if (ownerChange) {
+      addEvent(world, c.id, ownerChange > 0 ? TAKEOVER_TEXT : SELLOFF_TEXT, 'owner', ownerChange);
+      if (c.reputation >= 60 || tierOf[newL] <= 3) {
+        const nm = world.info[c.id].short;
+        pushNews(world, { date, kind: 'owner', clubs: [c.id], importance: c.reputation >= 80 ? 4 : tierOf[newL] <= 2 ? 3 : 2,
+          text: ownerChange > 0 ? `${nm} taken over: new owners promise major investment.` : `${nm} sold to owners intent on cutting costs; supporters fear asset-stripping.` });
+      }
+    }
 
     // ---- Random events
-    let dStab = 0;
     if (p.eventRate > 0 && rng.next() < p.eventRate * (1 + (50 - c.stability) / 200)) {
       const ctx: EventContext = { tier: tierOf[newL], reputation: c.reputation, stability: c.stability, surprise, declining: c.era < -0.5, relegated, promoted };
       const ev = chooseEvent(ctx, rng.next());

@@ -13,8 +13,8 @@ import type {
 import clubsDb from '../data/england/clubs.json' with { type: 'json' };
 import { ENGLAND_PREVIOUS } from '../data/england/config.ts';
 
-export const ENGINE_VERSION = '0.5.0';
-export const SAVE_SCHEMA = 1;
+export const ENGINE_VERSION = '0.6.0';
+export const SAVE_SCHEMA = 2;
 
 export interface CreateOptions {
   seed?: string;
@@ -44,6 +44,7 @@ export function createWorld(opts: CreateOptions = {}): World {
       attack: c.attack, midfield: c.midfield, defence: c.defence,
       reputation: c.reputation, stability: c.stability, stabilityAnchor: c.stability,
       era: 0, fatigue: 0, seasonOffset: 0, luck: 0, form: 0, carry: 0,
+      ambition: c.ambition ?? 0, ownerSince: c.ownerSince ?? null,
     });
   }
   const params = { ...DEFAULT_PARAMS, ...opts.params };
@@ -51,7 +52,7 @@ export function createWorld(opts: CreateOptions = {}): World {
     for (const c of db.clubs) {
       const st = clubs.find(x => x.id === c.id)!;
       const prev = c.previousDivision ?? c.division;
-      const d = prev > c.division ? params.promoBoost : prev < c.division ? -params.relegHit * Math.max(0.3, Math.min(1.2, 1.25 - c.stability / 100)) : 0;
+      const d = prev > c.division ? params.promoBoost * Math.max(0, 1 + params.ambPromo * (c.ambition ?? 0)) : prev < c.division ? -params.relegHit * Math.max(0.3, Math.min(1.2, 1.25 - c.stability / 100)) : 0;
       st.attack += d; st.midfield += d; st.defence += d;
     }
   }
@@ -79,6 +80,7 @@ interface DbClub {
   id: string; name: string; short: string; code: string; country: string; division: number; crest: string;
   attack: number; midfield: number; defence: number; reputation: number; stability: number; formEstimate: number;
   previousDivision?: number;
+  ambition?: number; ownerSince?: number | null;
 }
 
 export const overall = (c: { attack: number; midfield: number; defence: number }) => (c.attack + c.midfield + c.defence) / 3;

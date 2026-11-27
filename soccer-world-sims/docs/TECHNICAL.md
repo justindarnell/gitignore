@@ -106,6 +106,22 @@ era   = eraPersist·era + eraSD·damp(stability)·N + promotion momentum
   Negative effects are scaled by stability. Users can change event frequency or set it to 0.
 * Style deviations (attack vs defence) drift slowly and revert toward balance.
 
+### Ownership ambition (0.6, off by default)
+
+`ambition` is a slow latent club trait in [−1, 1] (−1 asset-stripping, 0 steady, +1 wealthy takeover),
+seeded from documented ownership situations (`OWNERSHIP` in `tools/ratings/build-db.mjs`, provenance in
+`clubs.json`). Each season `A ← ambPersist·A + 0.05·N(0,1)`, and with probability `ownerEventRate` the club
+changes hands: a takeover (A = 0.5…1) or a sell-off (A = −0.45…−0.95), with takeovers likelier at big or
+run-down clubs and sell-offs likelier after relegation or turmoil. Ambition shifts the structural target
+and upkeep ceiling (`ambTarget`·A), scales promotion investment (`1 + ambPromo·A`), skews development shocks
+toward the upside without changing their mean (`ambUpside`) and erodes stability when negative. Ownership
+changes are written to club timelines (kind `owner`) and the news.
+
+Calibration did **not** adopt the mechanism (CALIBRATION.md), so `DEFAULT_PARAMS` has `ambTarget`,
+`ambPromo`, `ambUpside` and `ownerEventRate` at 0. The draws still happen every season, so turning the
+mechanism on does not shift the rest of the random stream. The **Ownership dynamics** setting adds
+`k ×` the best finalist's values (`OWNERSHIP_EXPERIMENTAL`).
+
 Every channel is bounded and mean-reverting. Success raises reputation and revenue, but fatigue,
 ceiling upkeep and reversion stop "winning makes you win forever". Failure lowers them, but recovery
 toward reputation and asymmetric reversion stop irreversible collapse.
@@ -141,6 +157,8 @@ more goals conceded, then home defeats ahead of away defeats, then the earlier m
   store holds slot metadata (name, seed, season, date, size). Autosave writes after every simulation.
 * Export downloads `.sws.json.gz` (gzip via `CompressionStream`, or plain JSON when that is
   unavailable). Import accepts both.
+* Every save has `schema` (currently 2). Migration 1 → 2 (0.6) gives every club neutral ownership
+  ambition (`ambition` 0, `ownerSince` null) and the new `ownership` setting at 0.
 * Every save has `schema`. `upgradeWorld` runs registered migrations (`MIGRATIONS[n]: n → n+1`) and
   fills defaults for new fields. Saves from a newer schema are rejected with a clear message.
 * Browsers that block storage for `file://` pages get an on-screen message pointing to export/import.
@@ -161,18 +179,27 @@ Measured in this container (Node 22, headless Chromium):
 | `dist/app.js` | 197 KB minified (engine + UI + embedded worker) |
 | Crests | 116 × 96 px WebP = 568 KB (plus 192 px copies for profile headers) |
 
+Re-measured for 0.6 with `node --expose-gc --experimental-strip-types tools/perf.mjs` on a slower
+container. 0.5 and 0.6 were measured on the same machine so they are directly comparable:
+
+| 100 seasons | 0.5 | 0.6 (goal 1: ownership ambition) |
+|---|---|---|
+| Essential | 0.78 s · 2.71 MB (0.40 MB gz) | 0.76 s · 2.72 MB (0.41 MB gz) |
+| Standard | 1.99 s · 5.51 MB (0.94 MB gz) | 2.07 s · 5.53 MB (0.95 MB gz) |
+| Full | 1.93 s · 15.25 MB (2.15 MB gz) | 1.80 s · 15.26 MB (2.15 MB gz) |
+
 Crests are separate cached image files referenced by stable URLs and lazy-loaded. Nothing is embedded
 as base64 in the HTML, which was the 0.4.x performance problem. Charts draw to canvas with per-pixel
 min/max decimation, so matchday-level histories (~4,600 points per century) render instantly.
 
 ## Testing
 
-* `npm test`: 28 engine tests covering database integrity, fixture counts and uniqueness, home/away
+* `npm test`: 34 engine tests covering database integrity, fixture counts and uniqueness, home/away
   balance, clash-free calendar, scoring, tiebreakers, promotion/relegation counts, play-off brackets
   (including the six-team Championship format), FA Cup and EFL Cup structure, single winners,
   history consistency, graph data, best/worst ranking rules, attribute bounds, determinism,
   save/load equivalence, bulk vs step-by-step equivalence, and pause/resume equivalence.
-* `node tools/browser-test.mjs`: 34 end-to-end checks in headless Chromium against `dist/` opened via
+* `node tools/browser-test.mjs`: 35 end-to-end checks in headless Chromium against `dist/` opened via
   `file://`, with all network requests blocked. Covers navigation, club links, graph hover and tooltips,
   decimal formatting, badge loading, matchday controls, competitions, history pages, settings, saves
   and reload, a 100-season bulk run with pause/resume and cancel, responsiveness, memory, phone-width

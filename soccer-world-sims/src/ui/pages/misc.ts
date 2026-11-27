@@ -9,7 +9,7 @@ import type { SaveMeta } from '../../persistence/save.ts';
 export const newsPage: Page = ({ world, args, state }) => {
   const kind = args[0] ?? state.newsKind;
   state.newsKind = kind;
-  const kinds = [['all', 'All'], ['title', 'Titles'], ['cup', 'Cups'], ['promotion', 'Promotions'], ['relegation', 'Relegations'], ['event', 'Club events'], ['milestone', 'Milestones']];
+  const kinds = [['all', 'All'], ['title', 'Titles'], ['cup', 'Cups'], ['promotion', 'Promotions'], ['relegation', 'Relegations'], ['event', 'Club events'], ['owner', 'Ownership'], ['milestone', 'Milestones']];
   const items = world.news.filter(n => kind === 'all' || n.kind === kind).slice(-400).reverse();
   const bySeason = new Map<number, typeof items>();
   for (const n of items) { if (!bySeason.has(n.season)) bySeason.set(n.season, []); bySeason.get(n.season)!.push(n); }
@@ -36,6 +36,7 @@ const SETTINGS: { key: keyof Settings; label: string; help: string; max?: number
   { key: 'relegationImpact', label: 'Relegation impact', help: 'Squad loss on relegation (softened by stability).' },
   { key: 'reputationProtection', label: 'Reputation protection', help: 'How strongly institutional standing pulls clubs back to their level.' },
   { key: 'championshipFatigue', label: 'Championship fatigue', help: 'Difficulty of sustaining title-winning performance.' },
+  { key: 'ownership', label: 'Ownership dynamics (experimental)', help: 'Takeovers and sell-offs that change club investment. 0% = calibrated default. Not adopted by calibration: more lower-league risers, but historic giants are relegated too often.' },
 ];
 
 export const settingsPage: Page = ({ world }) => {

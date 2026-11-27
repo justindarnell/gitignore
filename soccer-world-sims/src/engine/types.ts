@@ -121,6 +121,10 @@ export interface ClubState {
   stabilityAnchor: number;
   /** Rating points carried into next season's performance by events (e.g. coaching turmoil). */
   carry: number;
+  /** Ownership ambition, a slow latent trait: -1 asset-stripping, 0 steady, +1 wealthy takeover. */
+  ambition: number;
+  /** Season of the last ownership change (null = before the simulation / unknown). */
+  ownerSince: number | null;
 }
 
 export interface Match {
@@ -205,6 +209,8 @@ export interface Settings {
   relegationImpact: number;   // 0..2
   reputationProtection: number; // 0..2
   championshipFatigue: number;  // 0..2
+  /** 0..2 experimental ownership dynamics (0 = calibrated default: ownership ambition off). */
+  ownership: number;
   storage: 'essential' | 'standard' | 'full';
 }
 
@@ -246,13 +252,31 @@ export interface MatchRecord {
   home: string; away: string; hg: number; ag: number; et?: boolean; pens?: [number, number];
 }
 
+export type TimelineKind = 'event' | 'honour' | 'move' | 'milestone' | 'owner';
+
 export interface ClubHistory {
   best: MatchRecord[];   // biggest wins, ranked
   worst: MatchRecord[];  // heaviest defeats, ranked
-  events: { season: number; text: string; kind: 'event' | 'honour' | 'move' | 'milestone'; tone: 1 | 0 | -1 }[];
+  events: { season: number; text: string; kind: TimelineKind; tone: 1 | 0 | -1 }[];
   /** Matchday-level positions per season: season -> [leagueId, positions...] (Standard+). */
   positions: Record<number, [string, ...number[]]>;
 }
+
+/** An automatically detected narrative of a season (see stories.ts). */
+export interface Story {
+  kind: string;            // 'final-day', 'collapse', 'giant-killing', 'record-points', ...
+  league?: string;
+  text: string;
+  clubs: string[];
+  importance: number;      // 1..5 (5 = headline)
+}
+
+/** A derby / rivalry between two clubs (country configuration). */
+export interface DerbyConfig { id: string; name: string; clubs: [string, string] }
+
+/** Head-to-head aggregate between two clubs (key "a|b" with a < b):
+ *  [played, wins a, draws, wins b, goals a, goals b]. Counts every competitive match. */
+export type H2H = [number, number, number, number, number, number];
 
 export interface NewsItem { season: number; date: string; text: string; clubs: string[]; kind: string; importance: number }
 

@@ -3,6 +3,7 @@ import { club, crest, esc, f1, f0, bar, tabs, empty, scoreText } from '../dom.ts
 import { leagues, league, standings, seasonLabel, compLabel, form, trophies, positionNow, overall, zoneOf, clubIndex } from '../data.ts';
 import { mountChart, type Band } from '../components/chart.ts';
 import { pyramidRank } from '../../engine/world.ts';
+import { ambitionLabel } from '../../engine/params.ts';
 import type { MatchRecord, World } from '../../engine/types.ts';
 
 // ---------------------------------------------------------------- directory
@@ -15,18 +16,18 @@ export const clubsPage: Page = ({ world, state }) => {
   }).filter(r => (!f.q || r.info.name.toLowerCase().includes(f.q.toLowerCase())) && (!f.league || r.league === f.league));
   const key: Record<string, (r: typeof rows[number]) => number | string> = {
     ovr: r => r.ovr, att: r => r.c.attack, mid: r => r.c.midfield, def: r => r.c.defence, rep: r => r.c.reputation, sta: r => r.c.stability,
-    name: r => r.info.name, pos: r => r.tier * 100 + r.pos,
+    name: r => r.info.name, pos: r => r.tier * 100 + r.pos, own: r => r.c.ambition,
   };
   const k = key[f.sort] ?? key.ovr;
   rows.sort((a, b) => { const x = k(a), y = k(b); return (typeof x === 'string' ? x.localeCompare(y as string) : (x as number) - (y as number)) * (f.sort === 'name' || f.sort === 'pos' ? 1 : -1) * f.dir; });
   const th = (id: string, label: string, cls = 'num') => `<th class="${cls} sortable${f.sort === id ? ' sorted' : ''}"><button data-action="sort-clubs" data-key="${id}">${label}${f.sort === id ? (f.dir === 1 ? ' ▾' : ' ▴') : ''}</button></th>`;
-  const html = `<div class="page-head"><h1>Clubs</h1><p class="muted">${world.clubs.length} playable clubs · ratings 0–100 · overall is the mean of attack, midfield and defence</p></div>
+  const html = `<div class="page-head"><h1>Clubs</h1><p class="muted">${world.clubs.length} playable clubs · ratings 0–100 · overall is the mean of attack, midfield and defence · OWN = ownership ambition (−100 to +100)</p></div>
     <div class="toolbar"><input type="search" placeholder="Search clubs" value="${esc(f.q)}" data-input="clubs-q" aria-label="Search clubs">
       <select data-change="clubs-league" aria-label="Division"><option value="">All divisions</option>${ls.map(l => `<option value="${l.id}"${f.league === l.id ? ' selected' : ''}>${esc(l.name)}</option>`).join('')}</select>
       <span class="muted small">${rows.length} shown</span></div>
     <section class="card"><div class="table-wrap"><table class="table">
-      <thead><tr>${th('name', 'Club', '')}${th('pos', 'Division', '')}${th('ovr', 'OVR')}${th('att', 'ATT')}${th('mid', 'MID')}${th('def', 'DEF')}${th('rep', 'REP')}${th('sta', 'STA')}<th class="hide-sm">Form</th></tr></thead>
-      <tbody>${rows.map(r => `<tr><td>${club(world, r.c.id, { short: false })}</td><td class="nowrap"><span class="pos zone-${zoneOf(league(world, r.league), r.pos, r.tier + 1)}">${r.pos}</span> ${esc(league(world, r.league).name)}</td><td class="num strong">${f0(r.ovr)}</td><td class="num">${f0(r.c.attack)}</td><td class="num">${f0(r.c.midfield)}</td><td class="num">${f0(r.c.defence)}</td><td class="num">${f1(r.c.reputation)}</td><td class="num">${f1(r.c.stability)}</td><td class="hide-sm">${form(world, r.c.id).map(x => `<span class="form form-${x}">${x}</span>`).join('')}</td></tr>`).join('')}</tbody></table></div></section>`;
+      <thead><tr>${th('name', 'Club', '')}${th('pos', 'Division', '')}${th('ovr', 'OVR')}${th('att', 'ATT')}${th('mid', 'MID')}${th('def', 'DEF')}${th('rep', 'REP')}${th('sta', 'STA')}${th('own', 'OWN')}<th class="hide-sm">Form</th></tr></thead>
+      <tbody>${rows.map(r => `<tr><td>${club(world, r.c.id, { short: false })}</td><td class="nowrap"><span class="pos zone-${zoneOf(league(world, r.league), r.pos, r.tier + 1)}">${r.pos}</span> ${esc(league(world, r.league).name)}</td><td class="num strong">${f0(r.ovr)}</td><td class="num">${f0(r.c.attack)}</td><td class="num">${f0(r.c.midfield)}</td><td class="num">${f0(r.c.defence)}</td><td class="num">${f1(r.c.reputation)}</td><td class="num">${f1(r.c.stability)}</td><td class="num" title="${esc(ambitionLabel(r.c.ambition))}">${r.c.ambition > 0.005 ? '+' : ''}${Math.round(r.c.ambition * 100)}</td><td class="hide-sm">${form(world, r.c.id).map(x => `<span class="form form-${x}">${x}</span>`).join('')}</td></tr>`).join('')}</tbody></table></div></section>`;
   return { title: 'Clubs', html };
 };
 
@@ -88,7 +89,8 @@ export const clubPage: Page = ({ world, args, state }) => {
       <dt>Defence</dt><dd>${bar(c.defence)}<span>${f1(c.defence)}</span></dd>
       <dt>Reputation</dt><dd>${bar(c.reputation, 100, 'alt')}<span>${f1(c.reputation)}</span></dd>
       <dt>Stability</dt><dd>${bar(c.stability, 100, 'alt2')}<span>${f1(c.stability)}</span></dd></dl>
-      <p class="muted small">Reputation: long-term standing and pull. Stability: resilience to disruption. Both change slowly; season form is temporary.</p></section>
+      ${ownerLine(c.ambition, c.ownerSince)}
+      <p class="muted small">Reputation: long-term standing and pull. Stability: resilience to disruption. Ownership ambition (−100 asset-stripping … +100 wealthy takeover) drives investment and changes with takeovers and sell-offs. All change slowly; season form is temporary.</p></section>
     <section class="card"><h2>${esc(seasonLabel(world.season.year))} season</h2>
       <table class="table compact"><thead><tr><th></th><th class="num">P</th><th class="num">W</th><th class="num">D</th><th class="num">L</th><th class="num">GF</th><th class="num">GA</th><th class="num">Pts</th></tr></thead><tbody>
       <tr><td>${esc(l.short)}</td><td class="num">${now.row.p}</td><td class="num">${now.row.w}</td><td class="num">${now.row.d}</td><td class="num">${now.row.l}</td><td class="num">${now.row.gf}</td><td class="num">${now.row.ga}</td><td class="num strong">${now.row.pts}</td></tr>
@@ -175,6 +177,17 @@ export const clubPage: Page = ({ world, args, state }) => {
   };
   return { title: info.name, html, mount };
 };
+
+/** Ownership ambition: label badge plus a diverging meter (display scale -100..+100). */
+export function ownerLine(ambition: number, since: number | null): string {
+  const a = Math.round((ambition ?? 0) * 100);
+  const label = ambitionLabel(ambition ?? 0);
+  const cls = label === 'Wealthy & ambitious' ? 'pos' : label === 'Steady' ? 'neu' : label === 'Cautious' ? 'warn' : 'neg';
+  const left = a < 0 ? 50 + a / 2 : 50, width = Math.abs(a) / 2;
+  return `<div class="owner-line"><span class="dt">Ownership</span><span class="owner-badge owner-${cls}">${esc(label)}</span>
+    <span class="meter diverging" role="img" aria-label="Ownership ambition ${a}"><span style="left:${left}%;width:${width}%"></span></span><span class="strong num">${a > 0 ? '+' : ''}${a}</span>
+    ${since !== null && since !== undefined ? `<span class="muted small">owners since ${since}</span>` : ''}</div>`;
+}
 
 export function ordinalSuffix(n: number): string { const v = n % 100; return v >= 11 && v <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] ?? 'th'; }
 void standings; void tabs;

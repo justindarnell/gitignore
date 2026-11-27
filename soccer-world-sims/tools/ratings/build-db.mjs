@@ -6,6 +6,8 @@
 //   reputation      : RESEARCHED  - recency-weighted pyramid level 1996/97-2025/26 + all-time pedigree
 //   stability       : MIXED       - pyramid-rank volatility (researched) + documented subjective notes
 //   formEstimate    : RESEARCHED  - opposition-adjusted points residual, last 12 league games of 2025/26
+//   ambition        : DOCUMENTED / NEUTRAL - ownership ambition seeded from documented ownership
+//                     changes (OWNERSHIP below); every other club starts neutral (0)
 //
 // Scale: 1 rating point = RATING_LOG log-goal units. The engine uses the same constant, so a
 // 10-point attack-vs-defence gap multiplies expected goals by exp(10 * RATING_LOG).
@@ -34,6 +36,40 @@ const STABILITY_NOTES = {
   wrexham: [6, 'Well-funded, stable ownership; three consecutive promotions 2023-2025.'],
   'birmingham-city': [5, 'Significant recent ownership investment (Knighthead).'],
   'oldham-athletic': [-3, 'Long period of instability prior to 2025 return to EFL.'],
+};
+
+// ---- ownership ambition seeds (-1 asset-stripping ... 0 steady ... +1 wealthy takeover).
+// Only clubs with a documented, decisive ownership situation as of 2025/26 get a non-zero seed;
+// everyone else starts neutral. Magnitudes are judgements: recent wealthy takeovers +0.6..+0.8,
+// long-established wealthy owners +0.5..+0.6, ambitious but smaller-scale owners +0.35..+0.5,
+// leveraged or constrained owners -0.2..-0.35, owners in open financial crisis -0.85.
+// The engine lets these decay (ambPersist) and adds its own ownership-change events.
+export const OWNERSHIP = {
+  'newcastle-united': [0.8, 2021, 'PIF-led consortium takeover, October 2021'],
+  'manchester-city': [0.6, 2008, 'Abu Dhabi United Group / City Football Group ownership since 2008, sustained investment'],
+  chelsea: [0.6, 2022, 'Todd Boehly / Clearlake Capital consortium takeover, May 2022; very high squad spending'],
+  'aston-villa': [0.6, 2018, 'Nassef Sawiris / Wes Edens (V Sports) takeover, July 2018; sustained investment'],
+  'nottingham-forest': [0.55, 2017, 'Evangelos Marinakis takeover, May 2017; heavy investment since 2022 promotion'],
+  'leeds-united': [0.5, 2023, '49ers Enterprises completed takeover, July 2023'],
+  everton: [0.45, 2024, 'The Friedkin Group takeover completed December 2024; new stadium 2025'],
+  'ipswich-town': [0.6, 2021, 'Gamechanger 20 takeover April 2021; ORG investment 2023; back-to-back promotions 2023-24'],
+  'coventry-city': [0.4, 2023, 'Doug King bought the club from Sisu, 2023'],
+  'hull-city': [0.4, 2022, 'Acun Ilicali takeover, January 2022'],
+  'afc-bournemouth': [0.35, 2022, 'Bill Foley (Black Knight) takeover, December 2022'],
+  southampton: [0.4, 2022, 'Sport Republic takeover, January 2022'],
+  'sheffield-united': [0.4, 2024, 'COH Sports consortium takeover completed December 2024'],
+  'birmingham-city': [0.7, 2023, 'Knighthead Capital takeover, July 2023; major investment'],
+  wrexham: [0.8, 2021, 'Ryan Reynolds and Rob McElhenney takeover, February 2021; Allyn family investment 2024; three successive promotions'],
+  'stockport-county': [0.5, 2020, 'Mark Stott takeover, January 2020; two promotions since'],
+  'milton-keynes-dons': [0.5, 2024, 'Fahad Al Ghanim takeover, 2024; high spending for the division'],
+  'manchester-united': [-0.2, 2005, 'Leveraged Glazer ownership since 2005; INEOS minority stake 2024 followed by cost-cutting'],
+  'wolverhampton-wanderers': [-0.3, 2016, 'Fosun ownership; net player sales and reduced spending 2023-25'],
+  burnley: [-0.25, 2020, 'ALK Capital leveraged takeover, December 2020'],
+  'leicester-city': [-0.35, 2010, 'King Power ownership under PSR constraints and charges'],
+  'blackburn-rovers': [-0.3, 2010, "Venky's ownership since 2010; prolonged under-investment"],
+  'cardiff-city': [-0.25, 2010, 'Vincent Tan ownership; reduced spending in recent seasons'],
+  reading: [-0.25, 2025, 'Years of unpaid bills and points deductions under Dai Yongge; sale to Rob Couhig in 2025'],
+  'sheffield-wednesday': [-0.85, 2015, 'Dejphon Chansiri: unpaid wages, transfer embargoes and administration during 2025/26'],
 };
 
 // ---- historical tables for reputation / stability
@@ -118,6 +154,7 @@ for (const x of fitted) {
   const form = 50 + 20 * Math.max(-1.5, Math.min(1.5, resid / 0.75));
   const rep = reputation(x.c.id);
   const st = stabilityOf(x.c.id);
+  const own = OWNERSHIP[x.c.id];
   out.push({
     id: x.c.id, name: x.c.name, short: x.c.short, code: x.c.code, country: 'ENG', division: x.c.div,
     // Division in 2025/26 (6 = below the National League). Used to apply the engine's normal
@@ -129,10 +166,13 @@ for (const x of fitted) {
     stability: +st.stability.toFixed(2),
     squadQuality: +((attack + midfield + defence) / 3).toFixed(2),
     formEstimate: +form.toFixed(1),
+    ambition: own ? own[0] : 0,
+    ownerSince: own ? own[1] : null,
     provenance: {
       ratings: x.src === 'fit' ? `fit: ${f.weightedMatches} weighted league matches 2022/23-2025/26` : `estimate: ${ESTIMATES[x.c.id].note}`,
       reputation: `researched: weighted pyramid level 1996-2025 + pedigree ${rep.pedigree.toFixed(1)} (${rep.tfSeasons} top-flight seasons, ${rep.titles} titles)`,
       stability: `volatility ${st.volatility.toFixed(1)} ranks/yr, ${st.divChanges} division changes 2012-2024` + (st.note ? `; subjective: ${st.note}` : ''),
+      ambition: own ? `documented: ${own[2]} (judgement: seed ${own[0] > 0 ? '+' : ''}${own[0].toFixed(2)})` : 'neutral default: no decisive documented ownership change',
       form: f ? `researched: ${resid >= 0 ? '+' : ''}${resid.toFixed(2)} pts/game vs expectation over last ${f.formMatches} league games` : 'no data: neutral',
     },
   });
@@ -141,5 +181,5 @@ mkdirSync(join(root, 'src/data/england'), { recursive: true });
 writeFileSync(join(root, 'src/data/england/clubs.json'), JSON.stringify({ schema: 1, season: '2026/27', ratingLog: RATING_LOG, midfieldWeight: W, generated: new Date().toISOString().slice(0, 10), clubs: out }, null, 1));
 for (const d of [1, 2, 3, 4, 5]) {
   console.log('--- tier', d);
-  for (const c of out.filter(c => c.division === d).sort((a, b) => b.squadQuality - a.squadQuality)) console.log(c.short.padEnd(15), 'A', c.attack.toFixed(1), 'M', c.midfield.toFixed(1), 'D', c.defence.toFixed(1), 'Q', c.squadQuality.toFixed(1), 'Rep', c.reputation.toFixed(1), 'St', c.stability.toFixed(1), 'F', c.formEstimate);
+  for (const c of out.filter(c => c.division === d).sort((a, b) => b.squadQuality - a.squadQuality)) console.log(c.short.padEnd(15), 'A', c.attack.toFixed(1), 'M', c.midfield.toFixed(1), 'D', c.defence.toFixed(1), 'Q', c.squadQuality.toFixed(1), 'Rep', c.reputation.toFixed(1), 'St', c.stability.toFixed(1), 'F', c.formEstimate, 'Amb', c.ambition);
 }

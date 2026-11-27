@@ -29,7 +29,9 @@ export function saveMeta(world: World, id: string): SaveMeta {
 
 /** Schema migrations: each entry upgrades a save from version N to N+1. */
 const MIGRATIONS: Record<number, (w: any) => any> = {
-  // 1 -> 2: (example for future versions)
+  // 1 -> 2 (0.6.0): ownership ambition. Saves from 0.5 have no ownership data, so every club
+  // starts neutral (steady owners); the engine's ownership events take over from there.
+  1: w => { for (const c of w.clubs) { c.ambition ??= 0; c.ownerSince ??= null; } return w; },
 };
 
 export class SaveError extends Error {}

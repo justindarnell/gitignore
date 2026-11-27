@@ -197,6 +197,15 @@ details.round { margin-bottom: 10px; }
 .meter > span { display: block; height: 100%; border-radius: 99px; background: var(--series-1); }
 .meter.alt > span { background: var(--series-2); }
 .meter.alt2 > span { background: var(--series-3); }
+.owner-line { display: flex; align-items: center; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+.owner-line .dt { color: var(--text-muted); width: 90px; }
+.owner-line .meter { min-width: 80px; }
+.meter.diverging { position: relative; background: linear-gradient(90deg, var(--surface-3) 49.5%, var(--text-muted) 49.5%, var(--text-muted) 50.5%, var(--surface-3) 50.5%); }
+.meter.diverging > span { position: absolute; top: 0; bottom: 0; background: var(--series-2); }
+.owner-badge { font-size: 12px; padding: 2px 8px; border-radius: 99px; background: var(--surface-3); white-space: nowrap; }
+.owner-badge.owner-pos { color: var(--z-promoted); }
+.owner-badge.owner-warn { color: var(--z-champion); }
+.owner-badge.owner-neg { color: var(--z-relegated); }
 .honours { list-style: none; padding: 0; margin: 0; }
 .honours li { display: flex; gap: 12px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
 .honours .count { font-size: 22px; font-weight: 800; min-width: 30px; color: var(--z-champion); }

@@ -4,7 +4,7 @@
 import { createRequire } from 'node:module';
 import { join, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, existsSync } from 'node:fs';
 
 const { chromium } = createRequire(import.meta.url)('playwright');
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -32,8 +32,11 @@ const t = async (fn) => { const t0 = Date.now(); await fn(); return Date.now() -
 const loadMs = await t(async () => { await page.goto(url); await page.waitForSelector('.page-head h1'); });
 check('loads from file:// and renders overview', (await page.textContent('#season-label')) === '2026/27', `${loadMs} ms`);
 await page.waitForTimeout(300);
+const crestsBuilt = existsSync(join(root, 'dist', 'crests'));
 const crestsLoaded = await page.$$eval('img.crest', imgs => imgs.filter(i => i.complete && i.naturalWidth > 0).length);
-check('club badges load as local images', crestsLoaded > 10, `${crestsLoaded} crests rendered`);
+const initialsShown = await page.$$eval('.crest-fallback', e => e.length);
+if (crestsBuilt) check('club badges load as local images', crestsLoaded > 10, `${crestsLoaded} crests rendered`);
+else check('club badges fall back to initials when crests are not generated', crestsLoaded === 0 && initialsShown > 10, `${initialsShown} initials badges (no crests in dist/)`);
 await shot('01-overview-start');
 
 // ---- matchday controls
@@ -119,6 +122,7 @@ await page.goto(url + '#/club/liverpool');
 await page.waitForSelector('#chart-ratings canvas');
 const decimals = await page.$$eval('.attrs dd > span:last-child', s => s.map(x => x.textContent));
 check('attributes display at most one decimal place', decimals.every(d => /^\d{1,3}(\.\d)?$/.test(d)), decimals.join(', '));
+check('club profile shows ownership ambition', /Ownership[\s\S]*(Wealthy|Steady|Cautious|Asset)/.test(await page.textContent('.owner-line')));
 const allText = await page.textContent('#main');
 check('no long floating-point numbers anywhere on the profile', !/\d+\.\d{3,}/.test(allText));
 const canvas = await page.$('#chart-position canvas');

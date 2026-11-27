@@ -11,11 +11,12 @@ produced by `tools/history/benchmarks.mjs`).
 
 * **Selected model:** finalist 1 of the second holdout validation.
   Holdout score **0.296** (short-term 0.206, 50-year 0.371, 100-year 0.401).
-* **Uncalibrated starting model** on the same holdout seeds: short-term 0.643, 100-year 2.132.
+* The 0.6 ownership-ambition change was **not adopted**: no finalist met the adoption rule (see below).
+* **Uncalibrated starting model** (0.5 search) on the `holdout2-*` seeds: short-term 0.643, 100-year 2.132.
 * A score of 1.0 means a metric is on average one tolerance away from its historical target; scores are
   weighted means of squared z-values capped at 3σ (see `tools/calibrate/targets.mjs`).
-* About **1123k simulated seasons** in total across all phases
-  (763k recorded in the result files plus ~360k from earlier screening runs that were superseded when the model structure changed).
+* About **1411k simulated seasons** in total across all phases
+  (1051k recorded in the result files plus ~360k from earlier screening runs that were superseded when the model structure changed).
 
 ## Method
 
@@ -58,6 +59,70 @@ Typical matches are untouched. Re-checked on the same `holdout2` seeds (`check-h
 short-term 0.188 (was 0.206), 100-year 0.379 (was 0.401); FA Cup 7+-goal margins now match history (≈59 vs 60 per 10,000 ties).
 The tables below show the validated model as selected; the shipped default additionally includes
 this saturation (`lambdaSoft` 2.5, `lambdaSpan` 2.0).
+
+## 0.6: ownership ambition
+
+**Why.** Three weaknesses survived every 0.5 configuration: promoted clubs were too uniform (top-half
+finishes ≈10% vs 19% in history), lower-league clubs rarely rose to the top flight (≈12% within 25 years
+vs 19.6%), and long-run champions were slightly too weak (≈85 vs 87.5 points). All three point to a
+missing source of *persistent, club-specific* investment: in reality owners differ enormously.
+
+**Mechanism** (`src/engine/evolution.ts`). Every club has a slow latent trait *ambition* A in [−1, 1]
+(−1 asset-stripping, 0 steady, +1 wealthy takeover). Each season A ← ambPersist·A + 0.05·N(0,1); with
+probability `ownerEventRate` the club changes hands: a takeover (A = 0.5…1) or a sell-off to
+cost-cutting owners (A = −0.45…−0.95). Big clubs and clubs run down by previous owners attract wealthy
+buyers; relegated and unstable clubs attract asset-strippers. Ambition then
+* shifts the structural target and the squad-upkeep ceiling by `ambTarget`·A rating points,
+* scales promotion investment by (1 + `ambPromo`·A),
+* skews development shocks toward the upside for ambitious owners (`ambUpside`, mean-preserving), and
+* erodes stability when negative. Ownership changes appear in club timelines and the news.
+
+**Seeds.** 25 clubs start from documented ownership situations (e.g. Newcastle's 2021 PIF-led takeover,
+Wrexham 2021, Birmingham 2023, Sheffield Wednesday's 2025 crisis); all others start neutral. Each club's
+`provenance.ambition` in `clubs.json` records the evidence or "neutral default"; magnitudes are judgements
+(`OWNERSHIP` in `tools/ratings/build-db.mjs`).
+
+**Search.** 4 rounds on the screening seeds (`screen-refine-*`, common random numbers),
+starting from the 0.5 `DEFAULT_PARAMS`: round 1 a 60-point Latin hypercube over the five ambition
+parameters (everything else fixed), then joint local refinement of the ambition parameters and the
+interacting long-term parameters (promoBoost, relegHit, revert, eraSD, promoEra, repWeight, rankEconomics, ceiling, ceilingCost) with shrinking steps.
+The 0.5 model (ambition switched off, `AMBITION_OFF`) was carried through every round as a reference.
+
+| Round | Candidates | Runs × seasons | Best screening score | 0.5 model (reference) |
+|---|---|---|---|---|
+| 1 | 61 | 12 × 80 | 0.254 | 0.331 |
+| 2 | 56 | 12 × 80 | 0.254 | 0.331 |
+| 3 | 56 | 16 × 80 | 0.257 | 0.350 |
+| 4 | 55 | 16 × 80 | 0.257 | 0.350 |
+
+**Validation and adoption rule.** The top 4 candidates and the 0.5 model were run on a **new**
+holdout seed prefix (`holdout3-`: 500 first seasons, 12 × 50-season and 10 × 100-season worlds).
+Rule, fixed before validation: *adopt only if combined holdout score improves and no group (short, 50-year, 100-year) is worse than the current model on the same seeds*.
+
+| Model | Combined | Short | 50-year | 100-year | Adoptable |
+|---|---|---|---|---|---|
+| 0.5 model (ambition off) | 0.282 | 0.193 | 0.395 | 0.346 | reference |
+| finalist 1 | 0.302 | 0.208 | 0.368 | 0.426 | no |
+| finalist 2 | 0.270 | 0.223 | 0.293 | 0.341 | no |
+| finalist 3 | 0.293 | 0.180 | 0.504 | 0.309 | no |
+| finalist 4 | 0.302 | 0.198 | 0.440 | 0.372 | no |
+
+**Decision: not adopted.** No finalist improved the combined score without worsening a group. Every finalist raised lower-league mobility and title streaks toward history, but every one also relegated the era's giants far more often (see `lt.giants30RelegatedPct` below), and the best finalist (2) reduced first-season table spread because ambitious promoted clubs invest more. The shipped model keeps ambition switched off (`ambTarget`, `ambPromo`, `ambUpside` and `ownerEventRate` are 0; the ambition draws still happen, so the random stream differs from 0.5 but the model is statistically identical). Finalist 2 is offered as the opt-in, non-calibrated setting *Ownership dynamics (experimental)* (`OWNERSHIP_EXPERIMENTAL` in `params.ts`). It was not tuned further against these holdout seeds; a future structural change must be validated on a fresh seed prefix.
+
+Targeted weaknesses on the `holdout3-` seeds (100-year worlds; 50-year in brackets):
+
+| Metric | Target | 0.5 model | Best finalist |
+|---|---|---|---|
+| lt.promotedTopHalfPct | 19 | 10.54 (10.47) | 11.39 (10.42) |
+| lt.lowerReachPL25Pct | 19.6 | 10.56 (12.04) | 13.61 (12.27) |
+| lt.lowerReachPL50Pct | 27.7 | 22.92 (24.07) | 26.67 (26.16) |
+| pl.pts1 | 87.5 | 85.33 (85.33) | 85.77 (85.67) |
+| lt.promotedSurvivalPct | 52 | 54.97 (55.38) | 55.37 (53.99) |
+| lt.giants30RelegatedPct | 35 | 39.69 (29.44) | 51.69 (46.67) |
+| lt.titleRetentionPct | 27 | 24.65 (23.13) | 26.26 (28.06) |
+| lt.uniqueChampionsIn25 | 7.5 | 7.68 (7.33) | 7.99 (7.69) |
+| lt.plMeanRatingDrift | 0 | 1.56 (1.42) | 2.56 (2.49) |
+
 
 ## Why this model was chosen
 
@@ -256,7 +321,7 @@ These are `DEFAULT_PARAMS` in `src/engine/params.ts`. User settings multiply a s
 | lt.lowerWinTitle50Pct | 0.80 ± 0.80 | **0.35** | 0.0 – 1.4 | -0.57 | Tier 3-4 clubs winning the title within 50y: 0.78% |
 | lt.plMeanRatingDrift | 0.00 ± 2.00 | **1.80** | 1.1 – 3.4 | 0.90 | Mean PL rating should not inflate/deflate over a century |
 
-## Finalists compared (second holdout)
+## Finalists compared (0.5 search, second holdout)
 
 | Finalist | Combined | Short | 50-year | 100-year |
 |---|---|---|---|---|
@@ -265,6 +330,8 @@ These are `DEFAULT_PARAMS` in `src/engine/params.ts`. User settings multiply a s
 | 3 | 0.307 | 0.199 | 0.439 | 0.390 |
 | 4 | 0.353 | 0.224 | 0.506 | 0.460 |
 | Uncalibrated start | — | 0.643 | — | 2.132 |
+
+
 
 The first holdout round (before consecutive-title fatigue was added) selected a model with combined score 0.395; it still produced 5+-title streaks in some worlds, which motivated the extra mechanism.
 
@@ -344,5 +411,10 @@ node tools/calibrate/run.mjs refine --top 6 --per 15 --runs 8 --seasons 80
 node tools/calibrate/run.mjs refine --from-refine --top 6 --per 12 --runs 12 --seasons 80 --step 0.05   # repeat
 node tools/calibrate/run.mjs validate --finalists 4 --firsts 500 --r50 12 --r100 10 --holdout holdout2-
 node tools/calibrate/run.mjs sensitivity
+# 0.6 ownership ambition
+node tools/calibrate/run.mjs amb-refine --from-default --configs 60 --runs 12 --seasons 80
+node tools/calibrate/run.mjs amb-refine --top 5 --per 10 --runs 12 --seasons 80 --step 0.1     # then 0.06, 0.035 with --runs 16
+node tools/calibrate/run.mjs amb-validate --finalists 4 --firsts 500 --r50 12 --r100 10 --holdout holdout3-
+node tools/calibrate/run.mjs sensitivity --source amb
 node tools/calibrate/report.mjs
 ```

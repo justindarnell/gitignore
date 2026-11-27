@@ -5,6 +5,8 @@
 //   node tools/calibrate/run.mjs refine     local search around the best long-phase candidates
 //   node tools/calibrate/run.mjs validate   holdout validation of the finalists (unused seeds)
 //   node tools/calibrate/run.mjs sensitivity  one-at-a-time sensitivity of the selected model
+//   node tools/calibrate/run.mjs amb-refine   (0.6) refine the ownership-ambition parameters from DEFAULT_PARAMS
+//   node tools/calibrate/run.mjs amb-validate (0.6) holdout comparison: ambition finalists vs the current model
 //
 // Screening uses the SAME seeds for every configuration (common random numbers) to reduce
 // comparison noise; validation uses a disjoint set of holdout seeds to limit overfitting.
@@ -14,7 +16,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Pool, aggregate, means } from './pool.mjs';
 import { SHORT, LONG, scoreGroup } from './targets.mjs';
-import { DEFAULT_PARAMS } from '../../src/engine/params.ts';
+import { DEFAULT_PARAMS, AMBITION_OFF } from '../../src/engine/params.ts';
 import { Rng } from '../../src/engine/rng.ts';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -73,7 +75,13 @@ const SPACE = {
   qualityNoise: [0.3, 1.6], perfEffect: [0, 2.5], promoBoost: [0, 5], relegHit: [0, 5],
   fatigueTitle: [0, 3], fatigueQuality: [0, 2], fatigueStreak: [0, 3], promoVar: [0, 1.5], ceiling: [80, 92], ceilingCost: [0, 0.6],
   repRate: [0.03, 0.15], repDecayFactor: [0.4, 1], eventRate: [0.05, 0.25],
+  // 0.6: ownership ambition
+  ambPersist: [0.8, 0.97], ambTarget: [0, 8], ambPromo: [0, 1.5], ambUpside: [0, 2], ownerEventRate: [0, 0.06],
 };
+const AMB_KEYS = ['ambPersist', 'ambTarget', 'ambPromo', 'ambUpside', 'ownerEventRate'];
+// Existing long-term parameters re-tuned jointly with ambition (they interact with promotion
+// investment and the structural target); everything else stays at DEFAULT_PARAMS.
+const AMB_JOINT = [...AMB_KEYS, 'promoBoost', 'relegHit', 'revert', 'eraSD', 'promoEra', 'repWeight', 'rankEconomics', 'ceiling', 'ceilingCost'];
 function bestShort() {
   if (!existsSync(join(outDir, 'short.json'))) return {};
   return load('short.json').results[0].config;
@@ -174,8 +182,10 @@ if (phase === 'check') {
 
 // ---------------------------------------------------------------------------------- sensitivity
 if (phase === 'sensitivity') {
-  const v = load('validate.json');
-  const chosen = [...v.finalists].sort((a, b) => a.score - b.score)[0].params;
+  // --source amb: the 0.6 model adopted by amb-validate (written to amb-sensitivity.json).
+  const amb = sarg('source', '') === 'amb';
+  const v = load(amb ? 'amb-validate.json' : 'validate.json');
+  const chosen = amb ? v.finalists.find(f => f.rank === v.adopted)?.params ?? v.baseline.params : [...v.finalists].sort((a, b) => a.score - b.score)[0].params;
   const keys = [...new Set(['strength', 'seasonSD', 'matchNoise', ...Object.keys(SPACE)])];
   const runs = arg('runs', 8), seasons = arg('seasons', 60);
   const ref = await evalLong(chosen, runs, seasons, 'sens-');
@@ -191,7 +201,85 @@ if (phase === 'sensitivity') {
       log('sens', key, f, 'long', L.score.score.toFixed(3), 'short', S.score.score.toFixed(3));
     }
   }
-  save('sensitivity.json', { phase, chosen, reference: { long: ref.score.score, short: refS.score.score, metrics: ref.m }, rows });
+  save(amb ? 'amb-sensitivity.json' : 'sensitivity.json', { phase, chosen, reference: { long: ref.score.score, short: refS.score.score, metrics: ref.m }, rows });
+}
+
+// ---------------------------------------------------------------------------------- 0.6: ambition
+async function evalJoint(params, runs, seasons) {
+  const L = await evalLong(params, runs, seasons, 'screen-refine-');
+  const S = await evalShort(params, 100, 'screen-refine-first-');
+  return { score: 0.5 * L.score.score + 0.5 * S.score.score, long: L.score.score, short: S.score.score, metrics: { ...S.m, ...prefix(L.m, 'long:') },
+    detail: [...S.score.detail.map(d => ({ ...d, g: 'short' })), ...L.score.detail.map(d => ({ ...d, g: 'long' }))] };
+}
+if (phase === 'amb-refine') {
+  const runs = arg('runs', 12), seasons = arg('seasons', 80), per = arg('per', 10), top = arg('top', 5), stepSize = arg('step', 0.1);
+  const fresh = process.argv.includes('--from-default') || !existsSync(join(outDir, 'amb-refine.json'));
+  const prev = fresh ? null : load('amb-refine.json');
+  const round = prev ? prev.round + 1 : 1;
+  if (prev) save(`amb-refine-round${prev.round}.json`, prev);
+  const cands = [];
+  if (fresh) {
+    // Round 1: the current model with ambition off, plus a Latin hypercube over the ambition
+    // parameters with every other parameter at DEFAULT_PARAMS.
+    cands.push({ ...AMBITION_OFF, label: 'current model (ambition off)' });
+    const n = arg('configs', 60), rng = Rng.fromSeed('amb-lhs-1');
+    const perms = AMB_KEYS.map(() => rng.shuffle(Array.from({ length: n }, (_, i) => i)));
+    for (let i = 0; i < n; i++) cands.push(Object.fromEntries(AMB_KEYS.map((k, j) => { const [lo, hi] = SPACE[k]; return [k, +(lo + (hi - lo) * (perms[j][i] + rng.next()) / n).toFixed(4)]; })));
+  } else {
+    const rng = Rng.fromSeed('amb-refine-' + round);
+    for (const r of prev.results.slice(0, top)) {
+      cands.push(r.config);
+      if (r.config.label) continue; // never perturb the reference model
+      for (let k = 0; k < per; k++) {
+        const c = { ...r.config };
+        for (const key of AMB_JOINT) { const [lo, hi] = SPACE[key]; c[key] = +Math.max(lo, Math.min(hi, (r.config[key] ?? DEFAULT_PARAMS[key]) + stepSize * (hi - lo) * rng.normal())).toFixed(4); }
+        cands.push(c);
+      }
+    }
+    if (!cands.some(c => c.label)) cands.push(prev.results.find(r => r.config.label)?.config ?? { ...AMBITION_OFF, label: 'current model (ambition off)' });
+  }
+  const results = [];
+  for (const [i, c] of cands.entries()) {
+    const { label, ...cfg } = c;
+    const r = await evalJoint({ ...DEFAULT_PARAMS, ...cfg }, runs, seasons);
+    results.push({ config: c, ...r });
+    if ((i + 1) % 10 === 0) log(`amb-refine r${round} ${i + 1}/${cands.length}`, 'best', Math.min(...results.map(x => x.score)).toFixed(3));
+  }
+  results.sort((a, b) => a.score - b.score);
+  save('amb-refine.json', { phase, round, runsPerConfig: runs, seasonsPerRun: seasons, step: stepSize, keys: fresh ? AMB_KEYS : AMB_JOINT, results });
+  const ref = results.find(r => r.config.label);
+  log('reference (ambition off)', ref.score.toFixed(3), 'L', ref.long.toFixed(3), 'S', ref.short.toFixed(3));
+  for (const r of results.slice(0, 6)) log('TOP', r.score.toFixed(3), 'L', r.long.toFixed(3), 'S', r.short.toFixed(3), JSON.stringify(r.config));
+}
+
+if (phase === 'amb-validate') {
+  const prev = load('amb-refine.json');
+  const k = arg('finalists', 4), firsts = arg('firsts', 500), r50 = arg('r50', 12), r100 = arg('r100', 10);
+  const evalAll = async (params) => {
+    const S = await evalShort(params, firsts, HOLDOUT + 'first-');
+    const L50 = await evalLong(params, r50, 50, HOLDOUT + '50-');
+    const L100 = await evalLong(params, r100, 100, HOLDOUT + '100-');
+    return { score: 0.5 * S.score.score + 0.25 * L50.score.score + 0.25 * L100.score.score, short: S.score.score, long50: L50.score.score, long100: L100.score.score,
+      shortAgg: S.agg, long50Agg: L50.agg, long100Agg: L100.agg, shortDetail: S.score.detail, long50Detail: L50.score.detail, long100Detail: L100.score.detail, champions100: L100.champions };
+  };
+  const baseParams = { ...DEFAULT_PARAMS, ...AMBITION_OFF };
+  const baseline = { label: 'current model (ambition off)', params: baseParams, ...(await evalAll(baseParams)) };
+  log('baseline', baseline.score.toFixed(3), 'S', baseline.short.toFixed(3), 'L50', baseline.long50.toFixed(3), 'L100', baseline.long100.toFixed(3));
+  const finalists = [];
+  for (const [i, r] of prev.results.filter(r => !r.config.label).slice(0, k).entries()) {
+    const params = { ...DEFAULT_PARAMS, ...r.config };
+    const f = { rank: i + 1, config: r.config, screen: r.score, params, ...(await evalAll(params)) };
+    // Adoption rule (decided before looking at holdout results): the combined holdout score must
+    // improve and none of the three groups may get worse than the current model on the same seeds.
+    f.adoptable = f.score < baseline.score && f.short <= baseline.short && f.long50 <= baseline.long50 && f.long100 <= baseline.long100;
+    finalists.push(f);
+    log(`finalist ${i + 1}`, f.score.toFixed(3), 'S', f.short.toFixed(3), 'L50', f.long50.toFixed(3), 'L100', f.long100.toFixed(3), f.adoptable ? 'ADOPTABLE' : 'rejected');
+  }
+  const ok = finalists.filter(f => f.adoptable).sort((a, b) => a.score - b.score);
+  save('amb-validate.json', { phase, holdout: HOLDOUT, seeds: { first: `${HOLDOUT}first-0..${firsts - 1}`, l50: `${HOLDOUT}50-0..${r50 - 1}`, l100: `${HOLDOUT}100-0..${r100 - 1}` },
+    rule: 'adopt only if combined holdout score improves and no group (short, 50-year, 100-year) is worse than the current model on the same seeds',
+    baseline, finalists, adopted: ok[0]?.rank ?? null });
+  log(ok.length ? `ADOPT finalist ${ok[0].rank}` : 'NO finalist satisfies the adoption rule');
 }
 
 function prefix(o, p) { return Object.fromEntries(Object.entries(o).map(([k, v]) => [p + k, v])); }
