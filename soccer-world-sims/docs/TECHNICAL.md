@@ -180,6 +180,16 @@ across eras; sizes, promotion and relegation counts, play-off formats, names and
   Conference, renamings and the later play-off formats (COMPETITIONS.md). The 2026/27 configuration has no changes.
 * The UI shows past tables with their own season's zones and lists the changes on the standings page.
 
+## Economic path of historical starts (0.7)
+
+The economic level curve (rating level by pyramid rank) drives clubs' structural targets. A start can declare a
+`levelPath` (`starts.ts`): the curve moves from the start's fitted curve toward another start's fitted curve, mapped by
+quantile onto this pyramid's ranks, with weight `levelPathAmount · t^levelPathShape`, t = (season − from) / (to − from),
+clamped to [0, 1] (`levelCurveAt` in `evolution.ts`). The 1992/93 start's path targets the 2025/26 curve over
+1992–2025. Calibration against real 1992–2024 outcomes chose amount 1, shape 0: the 2025/26 structure from the first
+season. Worlds without a path, including every 2026/27 world, keep a fixed curve. Saves store the path (`levelPath`,
+schema 7; earlier saves migrate to none).
+
 ## Experiments (0.7)
 
 `src/engine/experiments.ts` runs many alternative futures of one world and summarises them.
@@ -258,7 +268,7 @@ more goals conceded, then home defeats ahead of away defeats, then the earlier m
   store holds slot metadata (name, seed, season, date, size). Autosave writes after every simulation.
 * Export downloads `.sws.json.gz` (gzip via `CompressionStream`, or plain JSON when that is
   unavailable). Import accepts both.
-* Every save has `schema` (currently 6). Migration 5 → 6 (0.7) points 1992 worlds saved before the playable Conference
+* Every save has `schema` (currently 7). Migration 6 → 7 (0.7) adds `levelPath: null` (a fixed economic curve). Migration 5 → 6 (0.7) points 1992 worlds saved before the playable Conference
   (92 clubs) at the frozen 1992/93 configuration (`ENG1992-0.6`, `config1992-frozen.ts`), so they continue exactly as
   before. Migration 4 → 5 (0.7) keeps a save's model: it sets the new
   relative-ownership parameters to 0 and writes the old experimental *Ownership dynamics* setting (k × the 0.6
@@ -321,7 +331,7 @@ min/max decimation, so matchday-level histories (~4,600 points per century) rend
 
 ## Testing
 
-* `npm test`: 64 engine tests covering database integrity, fixture counts and uniqueness, home/away
+* `npm test`: 66 engine tests covering database integrity, fixture counts and uniqueness, home/away
   balance, clash-free calendar, scoring, tiebreakers, promotion/relegation counts, play-off brackets
   (including the six-team Championship format), FA Cup and EFL Cup structure, single winners,
   history consistency, graph data, best/worst ranking rules, attribute bounds, determinism,

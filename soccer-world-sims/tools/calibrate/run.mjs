@@ -18,6 +18,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Pool, aggregate, means } from './pool.mjs';
 import { SHORT, LONG, scoreGroup } from './targets.mjs';
+import { scoreRuns, scalesFrom } from './real92.mjs';
 import { DEFAULT_PARAMS, AMBITION_OFF, MODEL_06 } from '../../src/engine/params.ts';
 import { Rng } from '../../src/engine/rng.ts';
 
@@ -299,6 +300,70 @@ if (phase === 'amb-validate' || phase === 'own-validate') {
     baseline, finalists, adopted: ok[0]?.rank ?? null });
   log(ok.length ? `ADOPT finalist ${ok[0].rank}` : 'NO finalist satisfies the adoption rule');
 }
+
+// ---------------------------------------------------------------------------------- 0.7: the 1992/93 start
+// Out-of-sample test and start-specific calibration against real 1992/93-2024/25 outcomes
+// (data/history/derived/real-1992.json from tools/history/real1992.mjs; scoring in real92.mjs).
+//   start92-grid      grid over the economic path (levelPathAmount x levelPathShape), scored on window A
+//                     (1992-2008) only; the reference model (fixed curve) sets the CRPS scales
+//   start92-validate  the best grid configurations and the reference on holdout seeds, all windows
+// Score per window = 0.5 * agg / agg(reference) + 0.5 * club / club(reference): 1 = the reference model.
+const REAL92 = existsSync(join(root, 'data/history/derived/real-1992.json')) ? JSON.parse(readFileSync(join(root, 'data/history/derived/real-1992.json'), 'utf8')) : null;
+async function eval92(params, runs, seedPrefix) {
+  const res = await pool.run(Array.from({ length: runs }, (_, i) => ({ seed: seedPrefix + i, seasons: 33, params, start: '1992', real92: true })));
+  return Object.fromEntries(Object.keys(REAL92.metrics).map(w => [w, res.map(r => r.metrics[w])]));
+}
+const score92 = (runs, ref, scales) => Object.fromEntries(Object.keys(REAL92.metrics).map(w => {
+  const s = scoreRuns(runs[w], REAL92.metrics[w], scales[w]);
+  const r = ref?.[w];
+  return [w, { ...s, total: r ? 0.5 * s.agg / r.agg + 0.5 * s.club / r.club : 1 }];
+}));
+if (phase === 'start92-grid') {
+  const runs = arg('runs', 24);
+  const refRuns = await eval92({ ...DEFAULT_PARAMS, levelPathAmount: 0 }, runs, 'screen92-');
+  const scales = Object.fromEntries(Object.keys(refRuns).map(w => [w, scalesFrom(refRuns[w])]));
+  const ref = score92(refRuns, null, scales);
+  const results = [{ config: { levelPathAmount: 0, levelPathShape: 1, label: 'reference: fixed 1992 curve' }, score: score92(refRuns, ref, scales) }];
+  // --amounts / --shapes: comma lists (round 2 refines round 1; the previous file is kept as start92-grid-round<n>.json).
+  const list = (k, d) => (sarg(k, d)).split(',').map(Number);
+  const prevGrid = existsSync(join(outDir, 'start92-grid.json')) ? load('start92-grid.json') : null;
+  if (prevGrid) save(`start92-grid-round${prevGrid.round ?? 1}.json`, prevGrid);
+  const round = prevGrid ? (prevGrid.round ?? 1) + 1 : 1;
+  for (const amount of list('amounts', '0.25,0.5,0.75,1,1.25')) for (const shape of list('shapes', '0.35,0.6,1,1.6,2.5')) {
+    const cfg = { levelPathAmount: amount, levelPathShape: shape };
+    const r = await eval92({ ...DEFAULT_PARAMS, ...cfg }, runs, 'screen92-');
+    results.push({ config: cfg, score: score92(r, ref, scales) });
+    log('start92-grid', JSON.stringify(cfg), 'A', results.at(-1).score.A.total.toFixed(3), '(agg', (results.at(-1).score.A.agg / ref.A.agg).toFixed(3), 'club', (results.at(-1).score.A.club / ref.A.club).toFixed(3) + ')');
+  }
+  results.sort((a, b) => a.score.A.total - b.score.A.total);
+  save('start92-grid.json', { phase, round, runsPerConfig: runs, seasonsPerRun: 33, seeds: `screen92-0..${runs - 1}`, searchWindow: 'A', windows: WINDOWS92(), scales, results });
+  for (const r of results.slice(0, 5)) log('TOP', JSON.stringify(r.config), 'A', r.score.A.total.toFixed(3), 'B', r.score.B.total.toFixed(3), 'full', r.score.full.total.toFixed(3));
+}
+if (phase === 'start92-validate') {
+  const prev = load('start92-grid.json');
+  const k = arg('finalists', 3), runs = arg('runs', 60), H92 = sarg('holdout', 'holdout92-');
+  const refRuns = await eval92({ ...DEFAULT_PARAMS, levelPathAmount: 0 }, runs, H92);
+  const scales = Object.fromEntries(Object.keys(refRuns).map(w => [w, scalesFrom(refRuns[w])]));
+  const ref = score92(refRuns, null, scales);
+  const baseline = { config: { levelPathAmount: 0, levelPathShape: 1 }, score: score92(refRuns, ref, scales) };
+  const finalists = [];
+  for (const [i, r] of prev.results.filter(r => !r.config.label).slice(0, k).entries()) {
+    const runsF = await eval92({ ...DEFAULT_PARAMS, ...r.config }, runs, H92);
+    const sc = score92(runsF, ref, scales);
+    // Adoption rule (fixed before validation): on the holdout seeds the score must improve over the reference
+    // (fixed 1992 curve) for the full period AND for the later window B (2009-2024, never used by the search),
+    // and club-level skill over the full period must not get worse.
+    const adoptable = sc.full.total < 1 && sc.B.total < 1 && sc.full.club <= ref.full.club;
+    finalists.push({ rank: i + 1, config: r.config, screen: r.score.A.total, score: sc, adoptable });
+    log(`finalist ${i + 1}`, JSON.stringify(r.config), 'full', sc.full.total.toFixed(3), 'B', sc.B.total.toFixed(3), 'A', sc.A.total.toFixed(3), adoptable ? 'ADOPTABLE' : 'rejected');
+  }
+  const ok = finalists.filter(f => f.adoptable).sort((a, b) => a.score.full.total - b.score.full.total);
+  save('start92-validate.json', { phase, holdout: H92, runs, seeds: `${H92}0..${runs - 1}`, windows: WINDOWS92(),
+    rule: 'adopt only if, on holdout seeds, the score improves over the fixed-curve reference for the full period 1992-2024 and for the unseen window 2009-2024, and club-level skill over the full period is not worse',
+    baseline, finalists, adopted: ok[0]?.rank ?? null });
+  log(ok.length ? `ADOPT finalist ${ok[0].rank}` : 'NO finalist satisfies the adoption rule');
+}
+function WINDOWS92() { return REAL92?.windows; }
 
 function prefix(o, p) { return Object.fromEntries(Object.entries(o).map(([k, v]) => [p + k, v])); }
 await pool.close();

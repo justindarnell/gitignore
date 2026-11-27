@@ -14,7 +14,7 @@ import type {
 import { STARTS } from '../data/england/starts.ts';
 
 export const ENGINE_VERSION = '0.7.0';
-export const SAVE_SCHEMA = 6;
+export const SAVE_SCHEMA = 7;
 
 export interface CreateOptions {
   seed?: string;
@@ -60,14 +60,21 @@ export function createWorld(opts: CreateOptions = {}): World {
       st.attack += d; st.midfield += d; st.defence += d;
     }
   }
-  // The fixed economic "level curve": the rating a club at each pyramid rank typically has.
+  // The economic "level curve": the rating a club at each pyramid rank typically has.
   const levelCurve = clubs.map(overall).sort((a, b) => b - a);
+  // Historical starts can move toward a later start's curve (0.7): the target is that start's fitted curve
+  // (database ratings, before summer moves) mapped onto this pyramid's ranks by quantile.
+  let levelPath: World['levelPath'] = null;
+  if (start.levelPath) {
+    const t = (STARTS[start.levelPath.target].db as unknown as { clubs: DbClub[] }).clubs.map(overall).sort((a, b) => b - a);
+    levelPath = { target: levelCurve.map((_, r) => t[Math.round(r * (t.length - 1) / Math.max(1, levelCurve.length - 1))]), from: start.levelPath.from, to: start.levelPath.to };
+  }
   const world: World = {
     schema: SAVE_SCHEMA, engineVersion: ENGINE_VERSION,
     name: opts.name ?? 'New world', seed, created: new Date().toISOString(), country: start.country, start: start.id,
     interventions: [], lineage: { id: `root:${start.id}:${seed}` },
     rng: rng.state(), params, settings: { ...DEFAULT_SETTINGS, ...opts.settings }, settingsLog: [],
-    info, clubs, levelCurve,
+    info, clubs, levelCurve, levelPath,
     season: undefined as unknown as SeasonState,
     history: { snapshots: [], leagues: [], cups: [], clubs: {}, matches: {}, records: { biggestWins: [] }, stories: [], h2h: {}, h2hSince: opts.startYear ?? start.year, derbyMeetings: {} },
     news: [],

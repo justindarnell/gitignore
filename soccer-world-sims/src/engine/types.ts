@@ -328,8 +328,13 @@ export interface World {
   settingsLog: { season: number; slot: number; settings: Settings }[];
   info: Record<string, ClubInfo>;
   clubs: ClubState[];
-  /** Fixed economic level curve: rating level by pyramid rank (index 0 = rank 1). */
+  /** Economic level curve at the start: rating level by pyramid rank (index 0 = rank 1). */
   levelCurve: number[];
+  /**
+   * (0.7) Optional path of the economic curve: from `levelCurve` toward `target` between seasons `from` and `to`
+   * (amount and shape are the parameters levelPathAmount / levelPathShape). Null: the curve is fixed.
+   */
+  levelPath: { target: number[]; from: number; to: number } | null;
   season: SeasonState;
   history: History;
   news: NewsItem[];

@@ -65,6 +65,9 @@ export interface EngineParams {
   ambLift: number;          // rating points a fully ambitious owner adds to the target of a club with full headroom
   ambDrop: number;          // rating points asset-stripping (ambition -1) removes from the target of a club with full headroom
   ambRepRef: number;        // reputation at and above which ownership no longer shifts the target (headroom 0)
+  // ---- 0.7 economic path of historical starts (only for worlds with a levelPath, e.g. the 1992/93 start)
+  levelPathAmount: number;  // share of the way from the start's economic curve to the target curve reached at the end
+  levelPathShape: number;   // timing exponent: 1 = linear, >1 = late divergence, <1 = early divergence, 0 = from the first season
 }
 
 export const DEFAULT_PARAMS: EngineParams = {
@@ -118,6 +121,10 @@ export const DEFAULT_PARAMS: EngineParams = {
   ambLift: 1.8291,
   ambDrop: 7.515,
   ambRepRef: 81.4162,
+  // 0.7 goal 4 (calibration/results/start92-validate.json): 1992/93 worlds take the fitted 2025/26 economic
+  // structure from their first season (amount 1, shape 0); the timing could not be identified from 1992-2008.
+  levelPathAmount: 1,
+  levelPathShape: 0,
 };
 
 /**

@@ -40,10 +40,13 @@
 
 ## Sandbox and the 1992/93 start
 
-* The engine parameters were calibrated on the 2026/27 pyramid. The 1992 world has not been calibrated
-  separately. Its fitted divisions are much closer in strength, so it is more open than 2026 worlds (17–21
-  different champions in 60 seasons in three test worlds, and mid-sized clubs can build long title runs).
-  Treat it as a sandbox, not a validated reconstruction.
+* The 1992 world was tested out of sample against real 1992/93–2024/25 outcomes and given its own economic path
+  (0.7, CALIBRATION.md "0.7: the 1992/93 start"): it now uses the fitted 2025/26 spread of money by pyramid rank from
+  its first season. It is still more open than the Premier League era: about 11 different champions in its first 33
+  seasons (real: 7), a weaker dominant club, champion points about 82 per 38 games (real: 87), and 13–17 champions in
+  60 seasons (a 2026 world: about 12). Treat it as a calibrated sandbox, not a reconstruction.
+* Because the Conference is the bottom of the playable pyramid, almost every 1992 Conference club reaches the Football
+  League within 33 seasons (about 18 of 22; real: 6).
 * Rules change over time as dated configuration (0.7): the 1995 cut to 20 clubs, Conference relegation, two up/two
   down from 2002/03, renamings and later play-off formats. Not modelled: ground-criteria refusals of Conference
   promotion (1993/94–1995/96), the Conference's growth to 24 and the sixth tier below it, FA Cup replays, and later

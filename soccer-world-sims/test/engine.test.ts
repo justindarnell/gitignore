@@ -808,3 +808,28 @@ describe('dated rule changes (0.7)', () => {
     assert.equal(up.history.leagues[1][3].relegated.length, 0, 'frozen rules: no Conference relegation');
   });
 });
+
+describe('economic path of the 1992/93 start (0.7)', () => {
+  test('the 1992 world moves its economic curve toward the 2026 one; the 2026 world keeps a fixed curve', async () => {
+    const { levelCurveAt } = await import('../src/engine/evolution.ts');
+    const w92 = createWorld({ seed: 'path92', start: '1992' }), w26 = createWorld({ seed: 'path26' });
+    assert.equal(w26.levelPath, null);
+    assert.ok(w92.levelPath && w92.levelPath.target.length === w92.levelCurve.length && w92.levelPath.from === 1992 && w92.levelPath.to === 2025);
+    const p = { levelPathAmount: 1, levelPathShape: 1 };
+    assert.deepEqual(levelCurveAt(w92, p, 1992), w92.levelCurve, 'starts at the fitted 1992 curve');
+    assert.deepEqual(levelCurveAt(w92, p, 2025), w92.levelPath!.target, 'reaches the target by the end');
+    assert.deepEqual(levelCurveAt(w92, p, 2060), w92.levelPath!.target, 'and stays there');
+    const mid = levelCurveAt(w92, p, 2008), bottom = w92.levelCurve.length - 1;
+    assert.ok(mid[bottom] < w92.levelCurve[bottom] && mid[bottom] > w92.levelPath!.target[bottom], 'halfway in between');
+    assert.ok(w92.levelPath!.target[0] - w92.levelPath!.target[bottom] > w92.levelCurve[0] - w92.levelCurve[bottom], 'the 2026 pyramid is more spread out');
+    assert.deepEqual(levelCurveAt(w92, { levelPathAmount: 0, levelPathShape: 1 }, 2025), w92.levelCurve, 'amount 0 = fixed curve');
+    assert.deepEqual(levelCurveAt(w26, p, 2040), w26.levelCurve);
+  });
+  test('schema 6 saves migrate to a fixed curve', () => {
+    const raw = JSON.parse(exportWorld(createWorld({ seed: 'mig7', start: '1992' })));
+    raw.schema = 6; delete raw.levelPath;
+    const up = importWorld(JSON.stringify(raw));
+    assert.equal(up.schema, SAVE_SCHEMA); assert.equal(up.levelPath, null);
+    simulate(up, { kind: 'seasons', n: 1 });
+  });
+});

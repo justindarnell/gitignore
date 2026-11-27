@@ -39,8 +39,8 @@ See [docs/USER-GUIDE.md](docs/USER-GUIDE.md) for the full guide.
 | History | Rolls of honour, trophy totals, historical tables, movements, records, most improved/declined, best/worst matches, timelines, news |
 | Stories | Story of the season (final-day races, collapses, great escapes, runs, records, giant-killings), eras and dynasties, golden ages, decades bump chart, title-race charts, derbies and head-to-head records |
 | Saves | IndexedDB slots, autosave, export/import (gzip), schema versioning, three storage levels |
-| Calibration | ~1.1M simulated seasons across grid, Latin-hypercube and local searches, holdout validation and sensitivity analysis — [report](docs/CALIBRATION.md) |
-| Tests | 64 engine tests (`npm test`) + 63 end-to-end browser checks from `file://` |
+| Calibration | ~1.9M simulated seasons across grid, Latin-hypercube and local searches, holdout validation and sensitivity analysis; the 1992/93 start tested out of sample against real 1992–2024 outcomes — [report](docs/CALIBRATION.md) |
+| Tests | 66 engine tests (`npm test`) + 63 end-to-end browser checks from `file://` |
 
 ## Develop
 

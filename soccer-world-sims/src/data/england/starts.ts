@@ -12,6 +12,8 @@ export interface StartDef {
   db: { clubs: any[] };
   /** Final rankings of the season before the start (a function, so bundlers can drop unused data). */
   previous: () => { rankings: Record<string, string[]>; relegated: Record<string, string[]> };
+  /** (0.7) Move the economic curve toward another start's fitted curve between two seasons. */
+  levelPath?: { target: string; from: number; to: number };
 }
 
 export const STARTS: Record<string, StartDef> = {
@@ -19,5 +21,9 @@ export const STARTS: Record<string, StartDef> = {
   '1992': {
     id: '1992', label: '1992/93 (first Premier League season, 92 clubs, four divisions)', year: 1992, country: 'ENG1992', db: clubs1992 as any,
     previous: () => ({ rankings: (clubs1992 as any).previousRankings, relegated: {} }),
+    // The Premier League era widened the gaps between and within divisions: the economic curve moves toward the
+    // fitted 2025/26 curve by 2025/26 (amount and timing calibrated against real 1992-2024 outcomes, see
+    // docs/CALIBRATION.md "0.7: the 1992/93 start").
+    levelPath: { target: '2026', from: 1992, to: 2025 },
   },
 };

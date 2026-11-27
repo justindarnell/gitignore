@@ -17,8 +17,8 @@ produced by `tools/history/benchmarks.mjs`).
 * **Uncalibrated starting model** (0.5 search) on the `holdout2-*` seeds: short-term 0.643, 100-year 2.132.
 * A score of 1.0 means a metric is on average one tolerance away from its historical target; scores are
   weighted means of squared z-values capped at 3σ (see `tools/calibrate/targets.mjs`).
-* About **1802k simulated seasons** in total across all phases
-  (1442k recorded in the result files plus ~360k from earlier screening runs that were superseded when the model structure changed).
+* About **1860k simulated seasons** in total across all phases
+  (1500k recorded in the result files plus ~360k from earlier screening runs that were superseded when the model structure changed).
 
 ## Method
 
@@ -195,6 +195,96 @@ spread over many metrics; the weaknesses this change targeted moved only modestl
   `ambRepRef`, so ownership never shifts their own target). The relegation rate of each era's top five
   (`lt.giants30RelegatedPct`) is better over 50 years and worse over 100. It is based on few cohorts per world
   and is the noisiest scored metric, but over 100 years it remains well above its target (see remaining weaknesses).
+
+## 0.7: the 1992/93 start (out-of-sample test and calibration)
+
+**Why.** The 1992/93 start used the parameters calibrated for 2026/27 and was not checked against what
+actually happened. Its world was far more open than the Premier League era: about 13 different champions in
+its first 33 seasons, against 7 in reality (1992/93–2024/25).
+
+**Real targets** (`tools/history/real1992.mjs` → `data/history/derived/real-1992.json`): 11 aggregate outcomes of
+1992/93–2024/25 and two club-level outcomes for each of the 114 clubs of 1992/93 (top-flight seasons, mean tier), measured
+by the same code for real and simulated seasons (`tools/calibrate/real92.mjs`). Three windows: **A** 1992–2008 (used by
+the search), **B** 2009–2024 (never seen by the search) and the full period.
+
+**Scoring.** Reality is a single draw, so each outcome is scored by the continuous ranked probability score (CRPS) of
+the real value against the simulated worlds. It is a proper score: an ensemble only improves by being centred on
+reality without being too narrow or too wide. Aggregate CRPS values are scaled by the reference model's run-to-run
+spread, and the window score is 0.5 × aggregate + 0.5 × club-level, both relative to the reference (fixed curve), so
+the reference scores 1.
+
+**Mechanism** (`levelCurveAt` in `src/engine/evolution.ts`). The economic level of each pyramid rank, which drives
+clubs' structural targets, can move from the start's fitted curve toward the fitted 2025/26 curve (mapped by quantile
+onto the 114 ranks): weight = `levelPathAmount` × t^`levelPathShape`, t = (season − 1992) / 33. The 2026/27 start has
+no path; the engine parameters are the 2026 calibration.
+
+**Search** (window A only, screening seeds `screen92-`, 33 seasons per run):
+
+| Round | Configurations | Runs | Best (amount, shape) | Score A |
+|---|---|---|---|---|
+| 1 | 25 | 24 | 1.25, 0.35 | 0.854 |
+| 2 | 12 | 40 | 1, 0.15 | 0.836 |
+| 3 | 8 | 40 | 1, 0 | 0.809 |
+
+Round 1 found its best points on the edge of the grid (amount 1.25, the earliest timing). Before refining, the amount was
+restricted to at most 1. Beyond 1, a 1992 world would be more stratified after 2025 than the 2026 model that the
+long-term calibration validated.
+
+**Validation** on holdout seeds (`holdout92-`, 60 worlds per model). Rule, fixed before validation: *adopt only if, on holdout seeds, the score improves over the fixed-curve reference for the full period 1992-2024 and for the unseen window 2009-2024, and club-level skill over the full period is not worse*.
+
+| Model | Full 1992–2024 | Window B (unseen) | Window A | Club coverage (80% range) | Adoptable |
+|---|---|---|---|---|---|
+| Reference: fixed 1992 curve | 1.000 | 1.000 | 1.000 | 81% | reference |
+| amount 1, shape 0 (**adopted**) | 0.783 | 0.767 | 0.845 | 86% | yes |
+| amount 0.9, shape 0 | 0.812 | 0.797 | 0.834 | 84% | yes |
+| amount 1, shape 0.1 | 0.835 | 0.803 | 0.857 | 82% | yes |
+
+**Decision: adopted** (amount 1, shape 0): a 1992/93 world uses the fitted 2025/26 economic structure from its
+first season. The timing could not be identified (the earliest timing was always best): the data prefer the modern
+spread of money by pyramid rank throughout, which also offsets the compressed 1992 ratings.
+
+Full period 1992/93–2024/25 on the holdout seeds (mean of the simulated worlds, 10th–90th percentile in brackets):
+
+| Outcome | Real | Fixed curve | Adopted |
+|---|---|---|---|
+| Different champions | 7.0 | 13.3 (10–16) | 10.7 (8–13) |
+| Most titles by one club | 13.0 | 7.8 (5–11) | 9.2 (6–13) |
+| Title retention % | 34.4 | 21.7 (13–28) | 22.8 (16–31) |
+| Different top-flight clubs | 51.0 | 62.6 (59–66) | 55.5 (52–59) |
+| Ever-present top-flight clubs | 6.0 | 1.5 (1–3) | 3.3 (2–5) |
+| Champion points (per 38 games) | 86.9 | 79.9 (78–82) | 82.4 (80–85) |
+| SD of top-flight points (per 38) | 16.1 | 13.9 (13–15) | 15.2 (14–16) |
+| Top-4 places held by the 4 most frequent clubs % | 68.9 | 42.0 (34–48) | 51.3 (43–58) |
+| 1992 Premier League clubs relegated at least once | 16.0 | 20.5 (19–21) | 18.7 (17–20) |
+| 1992 tier-3/4 clubs reaching the top flight | 15.0 | 21.6 (18–25) | 16.5 (13–20) |
+| 1992 Conference clubs reaching the Football League | 6.0 | 18.9 (17–20) | 17.8 (16–20) |
+
+Later window 2009/10–2024/25 (not used by the search):
+
+| Outcome | Real | Fixed curve | Adopted |
+|---|---|---|---|
+| Different champions | 5.0 | 8.1 (6–10) | 6.6 (5–8) |
+| Most titles by one club | 8.0 | 4.8 (3–6) | 5.4 (4–7) |
+| Title retention % | 26.7 | 20.1 (7–33) | 24.3 (13–40) |
+| Different top-flight clubs | 42.0 | 46.9 (44–50) | 41.4 (39–44) |
+| Ever-present top-flight clubs | 7.0 | 3.9 (2–6) | 6.8 (5–9) |
+| Champion points (per 38 games) | 89.4 | 80.4 (78–84) | 83.5 (81–87) |
+| SD of top-flight points (per 38) | 17.6 | 14.2 (13–15) | 15.9 (15–17) |
+| Top-4 places held by the 4 most frequent clubs % | 70.3 | 50.8 (42–59) | 59.8 (52–69) |
+| 1992 Premier League clubs relegated at least once | 15.0 | 19.3 (17–21) | 16.9 (15–19) |
+| 1992 tier-3/4 clubs reaching the top flight | 14.0 | 17.0 (13–20) | 12.5 (9–16) |
+| 1992 Conference clubs reaching the Football League | 4.0 | 17.4 (16–19) | 16.3 (15–18) |
+
+**Remaining gaps (reported transparently).**
+* The 1992 world is still more open than the Premier League era: more champions, a weaker dominant club, lower champion points
+  and a smaller top-four elite. The 2026 calibration targets blend the Premier League era with post-war history, so part of
+  this is by design; the rest is the known champion-points weakness.
+* Almost every 1992 Conference club reaches the Football League in the simulation (about 18 of 22) against 6 in reality,
+  with or without the path. The Conference is the bottom of the playable pyramid: its clubs never drop out, and new clubs
+  never come up from below. This metric cannot improve without a playable sixth tier.
+* Wimbledon FC (dissolved in 2004) counts as relegated in real history; simulated clubs never dissolve.
+* One real history is a small sample: the club-level coverage (about 86% inside the 80% range) suggests the ensembles are,
+  if anything, slightly wide.
 
 ## Why this model was chosen
 
@@ -512,5 +602,11 @@ node tools/calibrate/run.mjs own-refine --from-default --configs 120 --runs 12 -
 node tools/calibrate/run.mjs own-refine --top 5 --per 10 --runs 12 --seasons 80 --step 0.1     # then 0.06, 0.035 with --runs 16
 node tools/calibrate/run.mjs own-validate --finalists 4 --firsts 500 --r50 12 --r100 10 --holdout holdout4-
 node tools/calibrate/run.mjs sensitivity --source own
+# 0.7 the 1992/93 start against real 1992-2024 outcomes
+node tools/history/real1992.mjs
+node tools/calibrate/run.mjs start92-grid --runs 24
+node tools/calibrate/run.mjs start92-grid --runs 40 --amounts 0.75,0.9,1 --shapes 0.15,0.25,0.35,0.5
+node tools/calibrate/run.mjs start92-grid --runs 40 --amounts 0.9,1 --shapes 0,0.05,0.1,0.15
+node tools/calibrate/run.mjs start92-validate --finalists 3 --runs 60 --holdout holdout92-
 node tools/calibrate/report.mjs
 ```

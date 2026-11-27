@@ -45,6 +45,19 @@
 * Save schema 6: 1992 worlds saved earlier keep the frozen 1992/93 rules (`ENG1992-0.6`).
 * `npm run history:fetch` also downloads the Wikipedia season pages; `tools/history/wikitable.mjs` parses them.
 
+### Goal 4: the 1992/93 start against real history
+* **Out-of-sample test:** real 1992/93–2024/25 outcomes (11 aggregates plus every 1992 club's top-flight seasons and
+  mean tier) measured by the same code as simulated 1992 worlds and scored with CRPS (a proper score for one real
+  history against an ensemble). With the 2026 parameters the 1992 world was far too open (about 13 champions in 33
+  seasons vs 7, 63 top-flight clubs vs 51).
+* **Start-specific calibration:** an economic path for historical starts (`levelPath`): the curve of money by pyramid
+  rank moves toward the fitted 2025/26 curve. Searched on 1992–2008 only, validated on holdout seeds under a
+  pre-registered rule, including the unseen window 2009–2024. **Adopted** (2025/26 structure from the first season):
+  full-period score 0.783 and later window 0.767 relative to the fixed curve, with club-level coverage up from 81% to 86%.
+  The world is still more open than the Premier League era (reported in CALIBRATION.md and KNOWN-ISSUES.md).
+* The 2026/27 start is unchanged (no path). Save schema 7 (earlier saves keep a fixed curve).
+* Calibration phases `start92-grid`, `start92-validate`; `tools/history/real1992.mjs`.
+
 ## 0.6.0 (2026-11-27)
 
 ### Goal 1: ownership ambition (realism experiment, not adopted)

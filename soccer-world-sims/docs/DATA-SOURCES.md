@@ -91,6 +91,15 @@ node tools/ratings/fit.mjs --start 1992 && node tools/ratings/build-db.mjs --sta
   else is neutral.
 * The bundle strips `provenance` (the UI does not show it); the JSON file keeps it for every club.
 
+### Real outcomes 1992/93–2024/25 (0.7)
+
+`tools/history/real1992.mjs` measures what actually happened to the 114 clubs of 1992/93 from the derived season
+tables (tiers 1–4; any other season counts as tier 5 or below) and writes `data/history/derived/real-1992.json`: 11
+aggregate outcomes (different champions, most titles, retention, different and ever-present top-flight clubs,
+champion points and points spread per 38 games, top-four concentration, founders relegated, lower-league risers,
+Conference clubs reaching the League) and per-club top-flight seasons and mean tier, for 1992–2008, 2009–2024 and the
+whole period. The same code (`tools/calibrate/real92.mjs`) measures simulated worlds.
+
 ### Source: English Wikipedia (1992/93 fifth tier)
 
 `npm run history:fetch` also downloads the 1988/89–1992/93 Football Conference pages and the 1988/89–1991/92

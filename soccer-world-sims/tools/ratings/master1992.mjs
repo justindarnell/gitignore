@@ -35,7 +35,7 @@ const NAMES = {
 };
 // Dagenham & Redbridge took Redbridge Forest's Conference place in 1992 (merger with Dagenham FC):
 // its pre-1992 record is Redbridge Forest's.
-const EXTRA_KEYS = { 'dagenham-and-redbridge': ['redbridge-forest'] };
+const EXTRA_KEYS = { 'dagenham-and-redbridge': ['redbridge-forest'], 'macclesfield-town': ['macclesfield'] };
 
 export function members(season = 1992) {
   const rows = parseCsv(readFileSync(join(root, 'data/history/raw/engsoccerdata/england.csv'), 'utf8')).filter(r => +r.Season === season);

@@ -35,8 +35,21 @@ const SELLOFF_TEXT = 'Sold to new owners who strip assets and cut spending';
  * institutional pull. Success therefore helps (reputation, revenue) but every channel is
  * bounded and mean-reverting: there is no permanent winner-stays-winner feedback loop.
  */
+/**
+ * The economic level curve in force in season `year`: the start's curve, moved toward the path's target for
+ * historical starts (0.7, e.g. the Premier League era's growing gaps for a 1992/93 start).
+ */
+export function levelCurveAt(world: World, p: { levelPathAmount: number; levelPathShape: number }, year: number): number[] {
+  const path = world.levelPath;
+  if (!path || !(p.levelPathAmount > 0)) return world.levelCurve;
+  const t = Math.max(0, Math.min(1, (year - path.from) / Math.max(1, path.to - path.from)));
+  const w = p.levelPathAmount * Math.pow(t, p.levelPathShape);
+  return world.levelCurve.map((x, r) => (1 - w) * x + w * path.target[r]);
+}
+
 export function evolveClubs(world: World, rt: Runtime): void {
   const p = rt.params, rng = rt.rng, s = world.season;
+  const curve = levelCurveAt(world, p, s.year);
   const leagues = rt.country.leagues;
   const rec = world.history.leagues[world.history.leagues.length - 1];
   const cups = world.history.cups[world.history.cups.length - 1] ?? [];
@@ -45,7 +58,7 @@ export function evolveClubs(world: World, rt: Runtime): void {
   for (const l of leagues) {
     offset[l.id] = off; tierOf[l.id] = l.tier; size[l.id] = l.size;
     let sum = 0;
-    for (let r = off; r < off + l.size; r++) sum += world.levelCurve[Math.min(r, world.levelCurve.length - 1)];
+    for (let r = off; r < off + l.size; r++) sum += curve[Math.min(r, curve.length - 1)];
     divLevel[l.id] = sum / l.size;
     off += l.size;
   }
@@ -67,7 +80,7 @@ export function evolveClubs(world: World, rt: Runtime): void {
     let honours = 0;
     if (c.id === championOfTop) honours += p.repTitleBonus;
     for (const cr of cups) if (cr.winner === c.id) honours += 1.5 * (rt.country.cups.find(x => x.id === cr.cup)?.prestige ?? 1);
-    const achieved = world.levelCurve[Math.min(offset[oldL] + pos - 1, world.levelCurve.length - 1)] + honours;
+    const achieved = curve[Math.min(offset[oldL] + pos - 1, curve.length - 1)] + honours;
     const rate = p.repRate * (achieved >= c.reputation ? 1 : p.repDecayFactor);
     c.reputation = clamp(c.reputation + rate * (achieved - c.reputation), 1, 99);
 
@@ -76,7 +89,7 @@ export function evolveClubs(world: World, rt: Runtime): void {
     // (promoted clubs arrive at the bottom of the new division, relegated clubs at the top
     // of the lower one, i.e. with parachute money).
     const newRank = newL === oldL ? offset[oldL] + pos : promoted ? offset[newL] + size[newL] : offset[newL] + 1;
-    const rankLevel = world.levelCurve[Math.min(newRank - 1, world.levelCurve.length - 1)];
+    const rankLevel = curve[Math.min(newRank - 1, curve.length - 1)];
     const econ = (1 - p.rankEconomics) * divLevel[newL] + p.rankEconomics * rankLevel;
     // ---- Ownership ambition: slow drift plus occasional ownership changes. The draws are made
     // for every club every season, so the random stream does not depend on the parameters.

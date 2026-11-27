@@ -71,6 +71,8 @@ const MIGRATIONS: Record<number, (w: any) => any> = {
     if (w.country === 'ENG1992' && !w.clubs.some((c: { league: string }) => c.league === 'ENG5')) w.country = 'ENG1992-0.6';
     return w;
   },
+  // 6 -> 7 (0.7.0): optional economic path of historical starts. Earlier worlds keep a fixed curve.
+  6: w => { w.levelPath ??= null; return w; },
 };
 
 export class SaveError extends Error {}

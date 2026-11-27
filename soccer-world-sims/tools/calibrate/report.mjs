@@ -17,6 +17,8 @@ const adopted = amb?.adopted ? amb.finalists.find(f => f.rank === amb.adopted) :
 const own = has('own-validate.json') ? R('own-validate.json') : null;
 const ownRounds = ['own-refine-round1.json', 'own-refine-round2.json', 'own-refine-round3.json', 'own-refine-round4.json', 'own-refine-round5.json', 'own-refine.json'].filter(has).map(R);
 const ownAdopted = own?.adopted ? own.finalists.find(f => f.rank === own.adopted) : null;
+const s92 = has('start92-validate.json') ? R('start92-validate.json') : null;
+const s92Rounds = ['start92-grid-round1.json', 'start92-grid-round2.json', 'start92-grid-round3.json', 'start92-grid-round4.json', 'start92-grid.json'].filter(has).map(R);
 const v05 = [...v.finalists].sort((a, b) => a.score - b.score)[0];
 // The shipped model: the adopted 0.7 or 0.6 finalist, or the 0.5 selection if both changes were rejected.
 const chosen = ownAdopted ?? adopted ?? v05;
@@ -39,6 +41,9 @@ if (amb) { const per = Number(amb.seeds.first.split('..')[1]) + 1 + (Number(amb.
 // 0.7 relative ownership search + validation
 seasons += ownRounds.reduce((a, r) => a + r.results.length * (r.runsPerConfig * r.seasonsPerRun + 100), 0);
 if (own) { const per = Number(own.seeds.first.split('..')[1]) + 1 + (Number(own.seeds.l50.split('..')[1]) + 1) * 50 + (Number(own.seeds.l100.split('..')[1]) + 1) * 100; seasons += per * (own.finalists.length + 1); }
+// 0.7 1992/93 start: grid rounds + validation (33 seasons per run)
+seasons += s92Rounds.reduce((a, r) => a + r.results.length * r.runsPerConfig * 33, 0);
+if (s92) seasons += (s92.finalists.length + 1) * s92.runs * 33;
 if (sensUsed) { seasons += sensUsed.rows.length * (8 * 60 + 100) + 8 * 60 + 100; sens = sensUsed; }
 const EARLIER = 96 * 150 + 3 * 120 * 6 * 60 + 2 * 300 * 6 * 60; // earlier short grid + superseded long searches (see log)
 
@@ -226,6 +231,76 @@ ${(() => { const f = ownAdopted ?? [...own.finalists].sort((a, b) => a.score - b
   (\`lt.giants30RelegatedPct\`) is better over 50 years and worse over 100. It is based on few cohorts per world
   and is the noisiest scored metric, but over 100 years it remains well above its target (see remaining weaknesses).
 ` : ''}
+${s92 ? (() => {
+  const f = s92.finalists.find(x => x.rank === s92.adopted) ?? s92.finalists[0], b = s92.baseline;
+  const LBL = { uniqueChampions: 'Different champions', maxTitles: 'Most titles by one club', titleRetentionPct: 'Title retention %', distinctTopFlight: 'Different top-flight clubs', everPresentTopFlight: 'Ever-present top-flight clubs', champPts38: 'Champion points (per 38 games)', ptsSD38: 'SD of top-flight points (per 38)', top4ShareBest4: 'Top-4 places held by the 4 most frequent clubs %', foundersRelegated: '1992 Premier League clubs relegated at least once', lowerReachTopFlight: '1992 tier-3/4 clubs reaching the top flight', confReachLeague: '1992 Conference clubs reaching the Football League' };
+  const rowsFor = w => Object.keys(f.score[w].detail).map(k => { const a = f.score[w].detail[k], c = b.score[w].detail[k]; return `| ${LBL[k] ?? k} | ${n(a.real, 1)} | ${n(c.mean, 1)} (${n(c.p10, 0)}–${n(c.p90, 0)}) | ${n(a.mean, 1)} (${n(a.p10, 0)}–${n(a.p90, 0)}) |`; }).join('\n');
+  return `## 0.7: the 1992/93 start (out-of-sample test and calibration)
+
+**Why.** The 1992/93 start used the parameters calibrated for 2026/27 and was not checked against what
+actually happened. Its world was far more open than the Premier League era: about 13 different champions in
+its first 33 seasons, against 7 in reality (1992/93–2024/25).
+
+**Real targets** (\`tools/history/real1992.mjs\` → \`data/history/derived/real-1992.json\`): 11 aggregate outcomes of
+1992/93–2024/25 and two club-level outcomes for each of the 114 clubs of 1992/93 (top-flight seasons, mean tier), measured
+by the same code for real and simulated seasons (\`tools/calibrate/real92.mjs\`). Three windows: **A** 1992–2008 (used by
+the search), **B** 2009–2024 (never seen by the search) and the full period.
+
+**Scoring.** Reality is a single draw, so each outcome is scored by the continuous ranked probability score (CRPS) of
+the real value against the simulated worlds. It is a proper score: an ensemble only improves by being centred on
+reality without being too narrow or too wide. Aggregate CRPS values are scaled by the reference model's run-to-run
+spread, and the window score is 0.5 × aggregate + 0.5 × club-level, both relative to the reference (fixed curve), so
+the reference scores 1.
+
+**Mechanism** (\`levelCurveAt\` in \`src/engine/evolution.ts\`). The economic level of each pyramid rank, which drives
+clubs' structural targets, can move from the start's fitted curve toward the fitted 2025/26 curve (mapped by quantile
+onto the 114 ranks): weight = \`levelPathAmount\` × t^\`levelPathShape\`, t = (season − 1992) / 33. The 2026/27 start has
+no path; the engine parameters are the 2026 calibration.
+
+**Search** (window A only, screening seeds \`screen92-\`, 33 seasons per run):
+
+| Round | Configurations | Runs | Best (amount, shape) | Score A |
+|---|---|---|---|---|
+${s92Rounds.map(r => { const best = r.results.filter(x => !x.config.label)[0]; return `| ${r.round ?? 1} | ${r.results.length - 1} | ${r.runsPerConfig} | ${best.config.levelPathAmount}, ${best.config.levelPathShape} | ${n(best.score.A.total, 3)} |`; }).join('\n')}
+
+Round 1 found its best points on the edge of the grid (amount 1.25, the earliest timing). Before refining, the amount was
+restricted to at most 1. Beyond 1, a 1992 world would be more stratified after 2025 than the 2026 model that the
+long-term calibration validated.
+
+**Validation** on holdout seeds (\`${s92.holdout}\`, ${s92.runs} worlds per model). Rule, fixed before validation: *${s92.rule}*.
+
+| Model | Full 1992–2024 | Window B (unseen) | Window A | Club coverage (80% range) | Adoptable |
+|---|---|---|---|---|---|
+| Reference: fixed 1992 curve | 1.000 | 1.000 | 1.000 | ${n(b.score.full.clubCoverage80, 0)}% | reference |
+${s92.finalists.map(x => `| amount ${x.config.levelPathAmount}, shape ${x.config.levelPathShape}${x.rank === s92.adopted ? ' (**adopted**)' : ''} | ${n(x.score.full.total, 3)} | ${n(x.score.B.total, 3)} | ${n(x.score.A.total, 3)} | ${n(x.score.full.clubCoverage80, 0)}% | ${x.adoptable ? 'yes' : 'no'} |`).join('\n')}
+
+**Decision: adopted** (amount ${f.config.levelPathAmount}, shape ${f.config.levelPathShape}): a 1992/93 world uses the fitted 2025/26 economic structure from its
+first season. The timing could not be identified (the earliest timing was always best): the data prefer the modern
+spread of money by pyramid rank throughout, which also offsets the compressed 1992 ratings.
+
+Full period 1992/93–2024/25 on the holdout seeds (mean of the simulated worlds, 10th–90th percentile in brackets):
+
+| Outcome | Real | Fixed curve | Adopted |
+|---|---|---|---|
+${rowsFor('full')}
+
+Later window 2009/10–2024/25 (not used by the search):
+
+| Outcome | Real | Fixed curve | Adopted |
+|---|---|---|---|
+${rowsFor('B')}
+
+**Remaining gaps (reported transparently).**
+* The 1992 world is still more open than the Premier League era: more champions, a weaker dominant club, lower champion points
+  and a smaller top-four elite. The 2026 calibration targets blend the Premier League era with post-war history, so part of
+  this is by design; the rest is the known champion-points weakness.
+* Almost every 1992 Conference club reaches the Football League in the simulation (about 18 of 22) against 6 in reality,
+  with or without the path. The Conference is the bottom of the playable pyramid: its clubs never drop out, and new clubs
+  never come up from below. This metric cannot improve without a playable sixth tier.
+* Wimbledon FC (dissolved in 2004) counts as relegated in real history; simulated clubs never dissolve.
+* One real history is a small sample: the club-level coverage (about 86% inside the 80% range) suggests the ensembles are,
+  if anything, slightly wide.
+`; })() : ''}
 ## Why this model was chosen
 
 * Lowest combined holdout score of all finalists, with **no group sacrificed**: short-term and both
@@ -330,6 +405,12 @@ node tools/calibrate/run.mjs own-refine --from-default --configs 120 --runs 12 -
 node tools/calibrate/run.mjs own-refine --top 5 --per 10 --runs 12 --seasons 80 --step 0.1     # then 0.06, 0.035 with --runs 16
 node tools/calibrate/run.mjs own-validate --finalists 4 --firsts 500 --r50 12 --r100 10 --holdout holdout4-
 node tools/calibrate/run.mjs sensitivity --source own
+# 0.7 the 1992/93 start against real 1992-2024 outcomes
+node tools/history/real1992.mjs
+node tools/calibrate/run.mjs start92-grid --runs 24
+node tools/calibrate/run.mjs start92-grid --runs 40 --amounts 0.75,0.9,1 --shapes 0.15,0.25,0.35,0.5
+node tools/calibrate/run.mjs start92-grid --runs 40 --amounts 0.9,1 --shapes 0,0.05,0.1,0.15
+node tools/calibrate/run.mjs start92-validate --finalists 3 --runs 60 --holdout holdout92-
 node tools/calibrate/report.mjs
 \`\`\`
 `;
