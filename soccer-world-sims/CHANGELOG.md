@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.7.0 (2026-11-27)
+
+### Goal 1: relative ownership (adopted)
+* Redesigned ownership: owners now shift a club's structural target **relative to its standing**. The shift
+  scales with headroom below the elite (`ambRepRef`), so established giants are shielded from asset-strippers,
+  while funded smaller clubs can rise well above what their reputation supports (`ambLift`, `ambDrop`).
+  Promotion investment and development upside from 0.6 remain.
+* Calibration: 4 rounds (289 candidate evaluations) from the 0.6 model, then validation on new `holdout4-` seeds
+  under the same pre-registered rule. **Adopted:** combined holdout score 0.284 vs 0.325, with no group worse
+  (short 0.203 vs 0.211, 50-year 0.320 vs 0.438, 100-year 0.411 vs 0.441). Lower-league risers and champion
+  points moved toward history; promoted-club top-half finishes did not; era giants are relegated less over
+  50 years but more over 100. Report: docs/CALIBRATION.md, "0.7: relative ownership". Sensitivity re-run.
+* New defaults: ownership on, and re-tuned promoBoost, relegHit, revert, eraSD, promoEra, repWeight,
+  rankEconomics, ceiling and ceilingCost. The **Ownership dynamics** setting now scales every ownership
+  effect (100% = calibrated, 0% = off) instead of adding the 0.6 experimental finalist.
+* Save schema 5. The migration keeps old saves on their own model (new ownership parameters off, the old
+  experimental setting folded into the stored parameters).
+* Calibration phases `own-refine`, `own-validate`, `sensitivity --source own`. Search bases are explicit
+  (`MODEL_06`), so the 0.6 and 0.7 phases reproduce after adoption.
+
 ## 0.6.0 (2026-11-27)
 
 ### Goal 1: ownership ambition (realism experiment, not adopted)

@@ -109,7 +109,7 @@ era   = eraPersist·era + eraSD·damp(stability)·N + promotion momentum
   Negative effects are scaled by stability. Users can change event frequency or set it to 0.
 * Style deviations (attack vs defence) drift slowly and revert toward balance.
 
-### Ownership ambition (0.6, off by default)
+### Ownership ambition (0.6) and relative ownership (0.7, calibrated default)
 
 `ambition` is a slow latent club trait in [−1, 1] (−1 asset-stripping, 0 steady, +1 wealthy takeover),
 seeded from documented ownership situations (`OWNERSHIP` in `tools/ratings/build-db.mjs`, provenance in
@@ -120,10 +120,24 @@ and upkeep ceiling (`ambTarget`·A), scales promotion investment (`1 + ambPromo�
 toward the upside without changing their mean (`ambUpside`) and erodes stability when negative. Ownership
 changes are written to club timelines (kind `owner`) and the news.
 
-Calibration did **not** adopt the mechanism (CALIBRATION.md), so `DEFAULT_PARAMS` has `ambTarget`,
-`ambPromo`, `ambUpside` and `ownerEventRate` at 0. The draws still happen every season, so turning the
-mechanism on does not shift the rest of the random stream. The **Ownership dynamics** setting adds
-`k ×` the best finalist's values (`OWNERSHIP_EXPERIMENTAL`).
+Calibration did **not** adopt the 0.6 version. **0.7 relative ownership** replaces the structural shift
+(`ambTarget` = 0) with one that depends on the club's standing:
+
+```
+head = clamp((ambRepRef − reputation) / 35, 0, 1)        headroom below the elite
+T   += head · (ambLift · max(A, 0) + ambDrop · min(A, 0))  (the upkeep ceiling rises with a positive shift)
+```
+
+A club whose reputation is at or above `ambRepRef` (81.4) gets no target shift from its owners, so
+asset-strippers cannot sink an established giant and a takeover adds nothing structural there. A smaller
+club can be pushed far above what its standing supports (`ambLift` 1.8 points) or run far below it
+(`ambDrop` 7.5 points). As a funded club succeeds, its reputation rises and the push fades. Promotion
+investment (`ambPromo`) and development upside (`ambUpside`) remain. This was adopted on fresh `holdout4-`
+seeds under the pre-registered rule (CALIBRATION.md, "0.7: relative ownership"), so ownership changes
+(about 2.8% of clubs per season) are part of the default model. The **Ownership dynamics** setting
+multiplies every ownership effect (`ambTarget`, `ambLift`, `ambDrop`, `ambPromo`, `ambUpside`,
+`ownerEventRate`): 100% is the calibrated model and 0% means owners never matter. The draws happen every
+season either way, so the setting does not shift the rest of the random stream.
 
 Every channel is bounded and mean-reverting. Success raises reputation and revenue, but fatigue,
 ceiling upkeep and reversion stop "winning makes you win forever". Failure lowers them, but recovery
@@ -204,8 +218,10 @@ more goals conceded, then home defeats ahead of away defeats, then the earlier m
   store holds slot metadata (name, seed, season, date, size). Autosave writes after every simulation.
 * Export downloads `.sws.json.gz` (gzip via `CompressionStream`, or plain JSON when that is
   unavailable). Import accepts both.
-* Every save has `schema` (currently 4). Migration 3 → 4 (0.6) sets `start` '2026', no interventions and a
-  root lineage.
+* Every save has `schema` (currently 5). Migration 4 → 5 (0.7) keeps a save's model: it sets the new
+  relative-ownership parameters to 0 and writes the old experimental *Ownership dynamics* setting (k × the 0.6
+  finalist, added on top) into the stored parameters, then sets the setting to 100%. Migration 3 → 4 (0.6)
+  sets `start` '2026', no interventions and a root lineage.
 * Earlier migrations: Migration 1 → 2 (0.6) gives every club neutral ownership
   ambition (`ambition` 0, `ownerSince` null) and the new `ownership` setting at 0. Migration 2 → 3 (0.6)
   adds empty stories for past seasons (they cannot be re-detected), an empty head-to-head table counted
@@ -239,6 +255,10 @@ container. 0.5 and 0.6 were measured on the same machine so they are directly co
 | Standard | 1.99 s · 5.51 MB (0.94 MB gz) | 2.07 s · 5.53 MB (0.95 MB gz) | 2.27 s · 6.82 MB (1.17 MB gz) |
 | Full | 1.93 s · 15.25 MB (2.15 MB gz) | 1.80 s · 15.26 MB (2.15 MB gz) | 2.40 s · 16.56 MB (2.37 MB gz) |
 
+0.7 relative ownership (goal 1) measured 0.75 s · 3.64 MB (0.55 MB gz) at Essential, 1.83 s · 6.91 MB (1.18 MB gz) at
+Standard and 1.94 s · 16.66 MB (2.38 MB gz) at Full: no measurable cost; the saves are about 0.1 MB larger (more
+ownership news).
+
 Goal 3 adds no per-step cost; a 1992/93 world simulates 100 seasons in 2.3 s (Standard, 5.8 MB).
 `dist/app.js` is 305 KB (both club databases once, without the provenance strings). Before the build
 change, the 1992 database pushed it to 665 KB because a module-level property access kept a second
@@ -255,7 +275,7 @@ min/max decimation, so matchday-level histories (~4,600 points per century) rend
 
 ## Testing
 
-* `npm test`: 51 engine tests covering database integrity, fixture counts and uniqueness, home/away
+* `npm test`: 53 engine tests covering database integrity, fixture counts and uniqueness, home/away
   balance, clash-free calendar, scoring, tiebreakers, promotion/relegation counts, play-off brackets
   (including the six-team Championship format), FA Cup and EFL Cup structure, single winners,
   history consistency, graph data, best/worst ranking rules, attribute bounds, determinism,

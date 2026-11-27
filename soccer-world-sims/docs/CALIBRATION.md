@@ -9,14 +9,16 @@ engine headlessly in parallel worker threads and scores each candidate against h
 benchmarks computed from English league data (`data/history/derived/benchmarks.json`,
 produced by `tools/history/benchmarks.mjs`).
 
-* **Selected model:** finalist 1 of the second holdout validation.
-  Holdout score **0.296** (short-term 0.206, 50-year 0.371, 100-year 0.401).
-* The 0.6 ownership-ambition change was **not adopted**: no finalist met the adoption rule (see below).
+* **Selected model (0.7):** the 0.6 model plus *relative ownership* (finalist 1 of the
+  ownership validation on the fresh `holdout4-*` seeds). Holdout score **0.284**
+  (short-term 0.203, 50-year 0.320, 100-year 0.411), against
+  0.325 (0.211 / 0.438 / 0.441) for the 0.6 model on the same seeds.
+* The 0.6 ownership-ambition change was not adopted; 0.7 redesigned it (see "0.7: relative ownership").
 * **Uncalibrated starting model** (0.5 search) on the `holdout2-*` seeds: short-term 0.643, 100-year 2.132.
 * A score of 1.0 means a metric is on average one tolerance away from its historical target; scores are
   weighted means of squared z-values capped at 3σ (see `tools/calibrate/targets.mjs`).
-* About **1411k simulated seasons** in total across all phases
-  (1051k recorded in the result files plus ~360k from earlier screening runs that were superseded when the model structure changed).
+* About **1802k simulated seasons** in total across all phases
+  (1442k recorded in the result files plus ~360k from earlier screening runs that were superseded when the model structure changed).
 
 ## Method
 
@@ -56,7 +58,7 @@ were ~3× and FA Cup 9+ margins ~8× the 1995–2024 rate, because extreme misma
 non-league) hit the old hard cap of 7 expected goals. Real favourites ease off and underdogs defend
 deep, so expected goals above 2.5 now saturate smoothly toward 4.5 (`softCap` in `match.ts`).
 Typical matches are untouched. Re-checked on the same `holdout2` seeds (`check-holdout2.json`):
-short-term 0.188 (was 0.206), 100-year 0.379 (was 0.401); FA Cup 7+-goal margins now match history (≈59 vs 60 per 10,000 ties).
+short-term 0.188 (was 0.203), 100-year 0.379 (was 0.411); FA Cup 7+-goal margins now match history (≈59 vs 60 per 10,000 ties).
 The tables below show the validated model as selected; the shipped default additionally includes
 this saturation (`lambdaSoft` 2.5, `lambdaSpan` 2.0).
 
@@ -107,7 +109,7 @@ Rule, fixed before validation: *adopt only if combined holdout score improves an
 | finalist 3 | 0.293 | 0.180 | 0.504 | 0.309 | no |
 | finalist 4 | 0.302 | 0.198 | 0.440 | 0.372 | no |
 
-**Decision: not adopted.** No finalist improved the combined score without worsening a group. Every finalist raised lower-league mobility and title streaks toward history, but every one also relegated the era's giants far more often (see `lt.giants30RelegatedPct` below), and the best finalist (2) reduced first-season table spread because ambitious promoted clubs invest more. The shipped model keeps ambition switched off (`ambTarget`, `ambPromo`, `ambUpside` and `ownerEventRate` are 0; the ambition draws still happen, so the random stream differs from 0.5 but the model is statistically identical). Finalist 2 is offered as the opt-in, non-calibrated setting *Ownership dynamics (experimental)* (`OWNERSHIP_EXPERIMENTAL` in `params.ts`). It was not tuned further against these holdout seeds; a future structural change must be validated on a fresh seed prefix.
+**Decision: not adopted.** No finalist improved the combined score without worsening a group. Every finalist raised lower-league mobility and title streaks toward history, but every one also relegated the era's giants far more often (see `lt.giants30RelegatedPct` below), and the best finalist (2) reduced first-season table spread because ambitious promoted clubs invest more. The shipped model keeps ambition switched off (`ambTarget`, `ambPromo`, `ambUpside` and `ownerEventRate` are 0; the ambition draws still happen, so the random stream differs from 0.5 but the model is statistically identical). In 0.6, finalist 2 was offered as the opt-in setting *Ownership dynamics (experimental)*. It was not tuned further against these holdout seeds; 0.7 replaced it with relative ownership, validated on a fresh seed prefix.
 
 Targeted weaknesses on the `holdout3-` seeds (100-year worlds; 50-year in brackets):
 
@@ -123,6 +125,76 @@ Targeted weaknesses on the `holdout3-` seeds (100-year worlds; 50-year in bracke
 | lt.uniqueChampionsIn25 | 7.5 | 7.68 (7.33) | 7.99 (7.69) |
 | lt.plMeanRatingDrift | 0 | 1.56 (1.42) | 2.56 (2.49) |
 
+
+## 0.7: relative ownership
+
+**Why.** The 0.6 mechanism shifted every club's structural target by its ownership, so asset-stripped
+*giants* sank as easily as small clubs and the era's giants were relegated far too often. The 0.6 report
+suggested making ownership act on squad quality relative to the club's standing, so that established
+giants are protected while newly funded clubs can rise.
+
+**Mechanism** (`src/engine/evolution.ts`). The latent trait, its drift and the ownership events are
+unchanged. The structural target gains
+
+`own = head · (ambLift · max(A, 0) + ambDrop · min(A, 0))`, with `head = clamp((ambRepRef − reputation) / 35, 0, 1)`.
+
+*Headroom* is how far a club's reputation is below the elite (`ambRepRef`). A club at or above it gets no
+target shift from its owners in either direction, so it is shielded from asset-strippers and also
+gains nothing structural from a takeover. A smaller club can be pushed far above (or run far below) what
+its standing supports. As a funded club succeeds, its reputation rises and the extra push fades:
+by then the club's own standing carries it. The upkeep ceiling rises with a positive shift. The 0.6
+channels for promotion investment (`ambPromo`) and development upside (`ambUpside`) remain, and the old
+target shift (`ambTarget`) is fixed at 0.
+
+**Search.** 4 rounds on the screening seeds (common random numbers), starting from the 0.6
+shipped model (`MODEL_06` in `params.ts`, ownership off): round 1 a 120-point Latin hypercube over the seven
+ownership parameters (ambPersist, ambLift, ambDrop, ambRepRef, ambPromo, ambUpside, ownerEventRate), then joint local refinement with the
+interacting long-term parameters (promoBoost, relegHit, revert, eraSD, promoEra, repWeight, rankEconomics, ceiling, ceilingCost) with shrinking steps. The 0.6 model was carried through every round as a reference.
+
+| Round | Candidates | Runs × seasons | Best screening score | 0.6 model (reference) |
+|---|---|---|---|---|
+| 1 | 121 | 12 × 80 | 0.261 | 0.331 |
+| 2 | 56 | 12 × 80 | 0.261 | 0.331 |
+| 3 | 56 | 16 × 80 | 0.265 | 0.350 |
+| 4 | 56 | 16 × 80 | 0.241 | 0.350 |
+
+**Validation and adoption rule.** The top 4 candidates and the 0.6 model ran on a **new** holdout seed
+prefix (`holdout4-`: 500 first seasons, 12 × 50-season and 10 × 100-season worlds), with the same rule as 0.6, fixed before
+validation: *adopt only if combined holdout score improves and no group (short, 50-year, 100-year) is worse than the current model on the same seeds*.
+
+| Model | Combined | Short | 50-year | 100-year | Adoptable |
+|---|---|---|---|---|---|
+| 0.6 model (ownership off) | 0.325 | 0.211 | 0.438 | 0.441 | reference |
+| finalist 1 (**adopted**) | 0.284 | 0.203 | 0.320 | 0.411 | yes |
+| finalist 2 | 0.322 | 0.220 | 0.536 | 0.312 | no |
+| finalist 3 | 0.287 | 0.193 | 0.357 | 0.407 | yes |
+| finalist 4 | 0.286 | 0.182 | 0.447 | 0.331 | no |
+
+**Decision: adopted** (finalist 1, the adoptable finalist with the best combined score). It is the default model from 0.7.
+The *Ownership dynamics* setting now scales every ownership effect (100% = calibrated, 0% = owners never matter).
+
+Targeted weaknesses on the `holdout4-` seeds (100-year worlds; 50-year in brackets). The score gain is
+spread over many metrics; the weaknesses this change targeted moved only modestly.
+
+| Metric | Target | 0.6 model | Adopted model |
+|---|---|---|---|
+| lt.promotedTopHalfPct | 19 | 10.10 (12.09) | 9.83 (11.63) |
+| lt.lowerReachPL25Pct | 19.6 | 10.28 (11.57) | 12.08 (12.96) |
+| lt.lowerReachPL50Pct | 27.7 | 23.33 (23.15) | 23.06 (25.58) |
+| pl.pts1 | 87.5 | 84.18 (84.78) | 85.06 (85.74) |
+| lt.promotedSurvivalPct | 52 | 53.74 (56.25) | 54.15 (57.29) |
+| lt.giants30RelegatedPct | 35 | 44.46 (53.89) | 51.08 (45.56) |
+| lt.initialGiantsRelegatedBefore30Pct | 30 | 35.00 (29.17) | 35.00 (29.17) |
+| lt.initialGiantsTier3Before50Pct | 8 | 5.00 (4.17) | 5.00 (4.17) |
+| lt.titleRetentionPct | 27 | 23.13 (29.42) | 25.66 (25.85) |
+| lt.uniqueChampionsIn25 | 7.5 | 8.17 (7.51) | 8.50 (7.71) |
+| lt.plMeanRatingDrift | 0 | 1.35 (1.07) | 1.83 (1.19) |
+
+* Lower-league mobility and champion points move toward history; promoted clubs finishing in the top half do not.
+* The initial giants' outcomes are unchanged from the 0.6 model on the same seeds (their reputation is above
+  `ambRepRef`, so ownership never shifts their own target). The relegation rate of each era's top five
+  (`lt.giants30RelegatedPct`) is better over 50 years and worse over 100. It is based on few cohorts per world
+  and is the noisiest scored metric, but over 100 years it remains well above its target (see remaining weaknesses).
 
 ## Why this model was chosen
 
@@ -144,6 +216,8 @@ Targeted weaknesses on the `holdout3-` seeds (100-year worlds; 50-year in bracke
  "baseGoals": 0.14,
  "homeAdv": 0.22,
  "dcRho": -0.1,
+ "lambdaSoft": 2.5,
+ "lambdaSpan": 2,
  "matchNoise": 0.0373,
  "etGoalFactor": 0.3,
  "penaltyRate": 0.76,
@@ -153,185 +227,193 @@ Targeted weaknesses on the `holdout3-` seeds (100-year worlds; 50-year in bracke
  "formSD": 0.35,
  "formPersist": 0.9,
  "initialFormWeight": 1,
- "revert": 0.1356,
+ "revert": 0.1403,
  "recoverBoost": 1.0272,
  "stabilityDamping": 1.0083,
- "promoEra": 0.3686,
- "repWeight": 0.5822,
- "rankEconomics": 0.8695,
+ "promoEra": 0.4541,
+ "repWeight": 0.59,
+ "rankEconomics": 0.8724,
  "eraPersist": 0.7282,
- "eraSD": 0.8359,
+ "eraSD": 0.8346,
  "qualityNoise": 0.3804,
  "perfEffect": 0.0234,
- "promoBoost": 2.1842,
- "relegHit": 4.0939,
+ "promoBoost": 2.0071,
+ "relegHit": 4.0147,
  "fatigueTitle": 0.893,
  "fatigueDecay": 0.5,
  "fatigueStreak": 1.4665,
  "promoVar": 0,
  "fatigueQuality": 0.2999,
- "ceiling": 91.2541,
- "ceilingCost": 0.1973,
+ "ceiling": 91.4192,
+ "ceilingCost": 0.1829,
  "repRate": 0.0388,
  "repDecayFactor": 1,
  "repTitleBonus": 3,
  "stabRate": 0.08,
  "eventRate": 0.1589,
- "eventScale": 1
+ "eventScale": 1,
+ "ambPersist": 0.8309,
+ "ambTarget": 0,
+ "ambPromo": 1.1449,
+ "ambUpside": 1.3909,
+ "ownerEventRate": 0.0278,
+ "ambLift": 1.8291,
+ "ambDrop": 7.515,
+ "ambRepRef": 81.4162
 }
 ```
 
 These are `DEFAULT_PARAMS` in `src/engine/params.ts`. User settings multiply a subset of them
 (`effectiveParams`), so 100% on every slider reproduces exactly this model.
 
-## Holdout results — short term (500 first seasons, unseen seeds)
+## Holdout results — short term (500 first seasons, unseen seeds: `holdout4-`)
 
 | Metric | Target ± tolerance | Result (mean) | Run spread (p10–p90) | z | Historical source |
 |---|---|---|---|---|---|
-| pl.goalsPerMatch | 2.78 ± 0.08 | **2.85** | 2.7 – 3.0 | 0.88 | PL 2015-25: 2.82; 1995-25: 2.71 |
-| pl.drawPct | 24.50 ± 1.50 | **23.70** | 20.8 – 26.6 | -0.53 | PL 2015-25: 23.7%; 1995-25: 25.2% |
-| pl.homeWinPct | 45.00 ± 2.00 | **44.17** | 41.3 – 47.1 | -0.41 | PL 2015-25: 44.3%; 1995-25: 45.8% |
-| pl.margin5plusPct | 2.20 ± 0.60 | **2.53** | 1.6 – 3.7 | 0.55 | PL 1995-25: 2.1%; 2015-25: 2.3% |
-| pl.team6plusPct | 1.15 ± 0.45 | **1.49** | 0.8 – 2.4 | 0.75 | PL: 1.1-1.2% of matches have a side scoring 6+ |
-| pl.cleanSheetPct | 27.50 ± 2.00 | **26.95** | 25.0 – 28.8 | -0.27 | PL 1995-25: 28.3%; 2015-25: 26.8% |
-| pl.pts1 | 87.50 ± 3.00 | **86.51** | 80.0 – 94.0 | -0.33 | Champion: 1995-25 mean 87.5 (2015-25: 90.8; 2024/25-2025/26: 84-85) |
-| pl.pts2 | 80.50 ± 3.50 | **78.31** | 72.0 – 86.0 | -0.62 | Runner-up: 1995-25 80.5; 2015-25 82.5 |
-| pl.pts4 | 69.00 ± 2.50 | **67.22** | 63.0 – 72.0 | -0.71 | 4th: 2015-25 69.5; 1995-25 68.8 |
-| pl.pts6 | 62.00 ± 2.50 | **61.50** | 58.0 – 66.0 | -0.20 | 6th: 2015-25 62.8; 1995-25 61.4 |
-| pl.pts17 | 38.00 ± 2.00 | **37.40** | 33.0 – 41.0 | -0.30 | 17th (safety): 2015-25 37.6; 1995-25 38.1 |
-| pl.pts18 | 34.00 ± 2.50 | **33.71** | 29.0 – 38.0 | -0.12 | 18th: 2015-25 32.6; 1995-25 34.7 |
-| pl.pts20 | 23.00 ± 4.00 | **20.86** | 14.0 – 28.0 | -0.53 | 20th: 2015-25 20.6; 1995-25 24.9 |
-| pl.withinSeasonSD | 17.00 ± 1.20 | **16.38** | 14.4 – 18.4 | -0.51 | SD of PL points: 2015-25 17.9; 1995-25 16.5 |
-| pl.championPtsSD | 6.00 ± 2.00 | **5.76** | 0.0 – 0.0 | -0.12 | Champion points SD 6.0-6.1 |
-| first.promotedSurvived | 40.00 ± 15.00 | **32.60** | 0.0 – 66.7 | -0.49 | Promoted survival 2015-25: 46.7%; this trio includes a +7 GD play-off winner, so a wider band below average |
-| first.promotedTop4 | 0.00 ± 0.08 | **0.00** | 0.0 – 0.0 | 0.00 | 0 of 89 promoted clubs finished top 4 since 1995/96 |
-| first.weakTop4 | 0.30 ± 0.25 | **0.25** | 0.0 – 1.0 | -0.21 | Clubs outside the pre-season top 10 reaching the top 4: ~0.3/season (judgement from 2015-25 cases) |
-| first.strongBottom5 | 0.10 ± 0.15 | **0.13** | 0.0 – 1.0 | 0.20 | Pre-season top-6 clubs finishing 16th+: rare (~0.1/season) |
-| ch.pts1 | 94.60 ± 4.00 | **93.04** | 85.0 – 102.0 | -0.39 | Championship champion 1995-25: 94.6 |
-| ch.pts6 | 73.50 ± 3.00 | **73.18** | 70.0 – 77.0 | -0.11 | Championship 6th: 73.5 |
-| ch.withinSeasonSD | 14.50 ± 1.30 | **13.97** | 11.7 – 16.3 | -0.40 | Championship points SD 14.5 |
-| ch.drawPct | 27.50 ± 1.50 | **27.10** | 24.6 – 29.5 | -0.27 | Championship draws 27.5% |
-| ch.goalsPerMatch | 2.57 ± 0.10 | **2.54** | 2.5 – 2.6 | -0.28 | Championship 2.57 goals |
-| l1.pts1 | 94.40 ± 4.50 | **93.42** | 86.0 – 103.0 | -0.22 | League One champion 94.4 |
-| l1.withinSeasonSD | 15.00 ± 1.50 | **14.70** | 12.5 – 16.8 | -0.20 | League One points SD 15.0 |
-| l2.pts1 | 88.50 ± 5.00 | **90.51** | 83.0 – 99.0 | 0.40 | League Two champion 88.5 |
-| l2.withinSeasonSD | 13.30 ± 1.50 | **13.59** | 11.5 – 15.7 | 0.20 | League Two points SD 13.3 |
-| cup.FAC:1v2.higherPct | 79.30 ± 6.00 | **78.99** | 68.4 – 91.7 | -0.05 | FA Cup PL v Championship ties: 79.3% (n=400) |
-| cup.FAC:2v3.higherPct | 61.00 ± 7.00 | **64.91** | 33.3 – 100.0 | 0.56 | FA Cup Championship v League One: 61.0% (n=141) |
-| cup.FAC:3v4.higherPct | 63.90 ± 6.00 | **64.99** | 50.0 – 80.0 | 0.18 | FA Cup League One v League Two: 63.9% (n=335) |
-| cup.EFLC:1v2.higherPct | 70.60 ± 7.00 | **73.03** | 58.3 – 90.0 | 0.35 | League Cup PL v Championship: 70.6% (n=293) |
-| cup.EFLC:2v4.higherPct | 76.20 ± 6.00 | **75.01** | 60.0 – 90.9 | -0.20 | League Cup Championship v League Two: 76.2% (n=336) |
+| pl.goalsPerMatch | 2.78 ± 0.08 | **2.84** | 2.7 – 3.0 | 0.73 | PL 2015-25: 2.82; 1995-25: 2.71 |
+| pl.drawPct | 24.50 ± 1.50 | **23.83** | 21.1 – 26.8 | -0.44 | PL 2015-25: 23.7%; 1995-25: 25.2% |
+| pl.homeWinPct | 45.00 ± 2.00 | **44.27** | 41.1 – 47.1 | -0.36 | PL 2015-25: 44.3%; 1995-25: 45.8% |
+| pl.margin5plusPct | 2.20 ± 0.60 | **2.30** | 1.3 – 3.4 | 0.17 | PL 1995-25: 2.1%; 2015-25: 2.3% |
+| pl.team6plusPct | 1.15 ± 0.45 | **1.40** | 0.5 – 2.1 | 0.56 | PL: 1.1-1.2% of matches have a side scoring 6+ |
+| pl.cleanSheetPct | 27.50 ± 2.00 | **26.97** | 24.9 – 29.1 | -0.26 | PL 1995-25: 28.3%; 2015-25: 26.8% |
+| pl.pts1 | 87.50 ± 3.00 | **85.77** | 78.0 – 94.0 | -0.58 | Champion: 1995-25 mean 87.5 (2015-25: 90.8; 2024/25-2025/26: 84-85) |
+| pl.pts2 | 80.50 ± 3.50 | **78.10** | 71.0 – 85.0 | -0.69 | Runner-up: 1995-25 80.5; 2015-25 82.5 |
+| pl.pts4 | 69.00 ± 2.50 | **67.03** | 62.0 – 72.0 | -0.79 | 4th: 2015-25 69.5; 1995-25 68.8 |
+| pl.pts6 | 62.00 ± 2.50 | **60.96** | 57.0 – 65.0 | -0.42 | 6th: 2015-25 62.8; 1995-25 61.4 |
+| pl.pts17 | 38.00 ± 2.00 | **37.90** | 34.0 – 42.0 | -0.05 | 17th (safety): 2015-25 37.6; 1995-25 38.1 |
+| pl.pts18 | 34.00 ± 2.50 | **34.44** | 30.0 – 39.0 | 0.18 | 18th: 2015-25 32.6; 1995-25 34.7 |
+| pl.pts20 | 23.00 ± 4.00 | **21.48** | 14.0 – 29.0 | -0.38 | 20th: 2015-25 20.6; 1995-25 24.9 |
+| pl.withinSeasonSD | 17.00 ± 1.20 | **16.03** | 14.0 – 18.1 | -0.81 | SD of PL points: 2015-25 17.9; 1995-25 16.5 |
+| pl.championPtsSD | 6.00 ± 2.00 | **6.09** | 0.0 – 0.0 | 0.04 | Champion points SD 6.0-6.1 |
+| first.promotedSurvived | 40.00 ± 15.00 | **40.60** | 0.0 – 66.7 | 0.04 | Promoted survival 2015-25: 46.7%; this trio includes a +7 GD play-off winner, so a wider band below average |
+| first.promotedTop4 | 0.00 ± 0.08 | **0.01** | 0.0 – 0.0 | 0.10 | 0 of 89 promoted clubs finished top 4 since 1995/96 |
+| first.weakTop4 | 0.30 ± 0.25 | **0.26** | 0.0 – 1.0 | -0.14 | Clubs outside the pre-season top 10 reaching the top 4: ~0.3/season (judgement from 2015-25 cases) |
+| first.strongBottom5 | 0.10 ± 0.15 | **0.16** | 0.0 – 1.0 | 0.40 | Pre-season top-6 clubs finishing 16th+: rare (~0.1/season) |
+| ch.pts1 | 94.60 ± 4.00 | **93.97** | 85.0 – 103.0 | -0.16 | Championship champion 1995-25: 94.6 |
+| ch.pts6 | 73.50 ± 3.00 | **73.25** | 70.0 – 77.0 | -0.08 | Championship 6th: 73.5 |
+| ch.withinSeasonSD | 14.50 ± 1.30 | **14.04** | 11.7 – 16.4 | -0.35 | Championship points SD 14.5 |
+| ch.drawPct | 27.50 ± 1.50 | **27.01** | 24.6 – 29.2 | -0.33 | Championship draws 27.5% |
+| ch.goalsPerMatch | 2.57 ± 0.10 | **2.55** | 2.5 – 2.6 | -0.21 | Championship 2.57 goals |
+| l1.pts1 | 94.40 ± 4.50 | **93.51** | 86.0 – 102.0 | -0.20 | League One champion 94.4 |
+| l1.withinSeasonSD | 15.00 ± 1.50 | **14.69** | 12.4 – 16.7 | -0.21 | League One points SD 15.0 |
+| l2.pts1 | 88.50 ± 5.00 | **90.49** | 83.0 – 99.0 | 0.40 | League Two champion 88.5 |
+| l2.withinSeasonSD | 13.30 ± 1.50 | **13.65** | 11.6 – 15.7 | 0.23 | League Two points SD 13.3 |
+| cup.FAC:1v2.higherPct | 79.30 ± 6.00 | **78.56** | 65.2 – 92.3 | -0.12 | FA Cup PL v Championship ties: 79.3% (n=400) |
+| cup.FAC:2v3.higherPct | 61.00 ± 7.00 | **66.49** | 40.0 – 100.0 | 0.78 | FA Cup Championship v League One: 61.0% (n=141) |
+| cup.FAC:3v4.higherPct | 63.90 ± 6.00 | **65.53** | 50.0 – 83.3 | 0.27 | FA Cup League One v League Two: 63.9% (n=335) |
+| cup.EFLC:1v2.higherPct | 70.60 ± 7.00 | **72.83** | 57.1 – 90.0 | 0.32 | League Cup PL v Championship: 70.6% (n=293) |
+| cup.EFLC:2v4.higherPct | 76.20 ± 6.00 | **73.10** | 53.8 – 90.9 | -0.52 | League Cup Championship v League Two: 76.2% (n=336) |
 
 ## Holdout results — 100-year worlds (10 worlds, unseen seeds)
 
 | Metric | Target ± tolerance | Result (mean) | Run spread (p10–p90) | z | Historical source |
 |---|---|---|---|---|---|
-| lt.titleRetentionPct | 27.00 ± 7.00 | **23.84** | 20.2 – 27.3 | -0.45 | Title retention: PL era 33.3%, post-war 22.8% |
-| lt.streaks3plusPerCentury | 6.00 ± 3.50 | **4.50** | 2.0 – 7.0 | -0.43 | Runs of 3+ titles: post-war 4 in 80 seasons (5/century); PL era 3 in 34 |
-| lt.streaks5plusPerCentury | 0.00 ± 0.50 | **0.00** | 0.0 – 0.0 | 0.00 | No 5-title run in English top-flight history (record: 4) |
-| lt.uniqueChampionsIn10 | 4.30 ± 0.80 | **4.84** | 4.6 – 5.3 | 0.67 | Unique champions per 10 years: PL era 3.6, post-war 5.1 |
-| lt.uniqueChampionsIn25 | 7.50 ± 1.60 | **7.88** | 7.1 – 8.8 | 0.24 | Per 25 years: PL era 6.0, post-war 9.0 |
-| lt.top4NewEntrants | 1.40 ± 0.30 | **1.66** | 1.5 – 1.8 | 0.86 | New top-4 clubs per season: PL era 1.12, post-war 1.73 |
-| lt.top6NewEntrants | 1.85 ± 0.40 | **2.06** | 1.9 – 2.2 | 0.53 | New top-6 clubs per season: PL era 1.45, post-war 2.25 |
-| lt.top6ShareBest6_30y | 64.00 ± 8.00 | **65.39** | 60.0 – 70.0 | 0.17 | Share of top-6 places held by the 6 most frequent clubs: PL era 72.5%, post-war 55.2% |
-| pl.pts1 | 88.00 ± 3.00 | **84.90** | 84.1 – 85.7 | -1.03 | Champion: 1995-25 mean 87.5 (2015-25: 90.8; 2024/25-2025/26: 84-85) |
-| pl.withinSeasonSD | 16.80 ± 1.30 | **16.68** | 16.2 – 17.1 | -0.09 | SD of PL points: 2015-25 17.9; 1995-25 16.5 |
-| pl.pts18 | 34.50 ± 2.50 | **32.70** | 31.9 – 33.3 | -0.72 | 18th: 2015-25 32.6; 1995-25 34.7 |
-| lt.distinctPL10y | 35.00 ± 2.50 | **33.95** | 33.3 – 34.6 | -0.42 | Distinct top-flight clubs per 10 years: 35 (both eras) |
-| lt.distinctPL30y | 49.00 ± 4.00 | **47.61** | 46.4 – 48.7 | -0.35 | Per 30 years: 49 (PL era), 48 (post-war) |
-| lt.everPresentPL30y | 4.80 ± 1.80 | **5.04** | 4.3 – 5.7 | 0.13 | Ever-present clubs over 30 years: PL era 6, post-war 3.6 |
-| lt.promotedSurvivalPct | 52.00 ± 6.00 | **55.58** | 53.1 – 58.2 | 0.60 | Promoted-club PL survival 1995-25: 52.8%; 2001-24: 54.2% |
-| lt.promotedTop4Pct | 0.80 ± 1.00 | **0.78** | 0.3 – 1.4 | -0.02 | 0/89 since 1995; rare earlier (e.g. Forest 1977/78 champions) |
-| lt.promotedTopHalfPct | 19.00 ± 6.00 | **10.17** | 8.5 – 11.9 | -1.47 | Promoted clubs finishing top half: 19.1% |
-| lt.relegatedImmediateReturnPct | 29.70 ± 7.00 | **30.82** | 26.2 – 34.0 | 0.16 | Relegated PL clubs returning next season: 29.7% |
-| lt.relegatedReturnWithin3Pct | 45.00 ± 8.00 | **50.94** | 47.9 – 54.2 | 0.74 | Returning within 3 seasons: 45.1% |
-| lt.relegatedReturnWithin10Pct | 70.00 ± 10.00 | **69.81** | 67.0 – 71.2 | -0.02 | Returning within 10 seasons: 70.1% |
-| lt.chPromotedSurvivalPct | 82.00 ± 7.00 | **77.24** | 74.8 – 79.3 | -0.68 | Clubs promoted to the Championship surviving: 82.0% |
-| lt.l1PromotedSurvivalPct | 81.00 ± 7.00 | **75.46** | 73.5 – 76.5 | -0.79 | Clubs promoted to League One surviving: 81.1% |
-| lt.giants30RelegatedPct | 35.00 ± 12.00 | **48.77** | 40.0 – 60.0 | 1.15 | Top-5 clubs (trailing 10y) relegated within 30y: post-war 52%; modern giants sturdier (judgement) |
-| lt.giants30Tier3Pct | 12.00 ± 8.00 | **8.00** | 4.6 – 9.2 | -0.50 | Reaching tier 3 within 30y: post-war 26%; modern era lower (judgement) |
-| lt.initialGiantsTier3Before50Pct | 8.00 ± 7.00 | **7.50** | 0.0 – 25.0 | -0.07 | Brief: a Liverpool/Arsenal/Man Utd in League One within 40-50 seasons should be unusual, not impossible |
-| lt.initialGiantsRelegatedBefore30Pct | 30.00 ± 15.00 | **17.50** | 0.0 – 25.0 | -0.83 | Post-war: half of giants relegated within 30y; modern giants sturdier (judgement) |
-| lt.lowerReachPL25Pct | 19.60 ± 6.00 | **11.81** | 8.3 – 16.7 | -1.30 | Tier 3-4 clubs reaching the top flight within 25y: 19.6% (1960-95 cohorts) |
-| lt.lowerReachPL50Pct | 27.70 ± 7.00 | **21.81** | 19.4 – 25.0 | -0.84 | Within 50y: 27.7% (1960-75 cohorts) |
-| lt.lowerWinTitle50Pct | 0.80 ± 0.80 | **0.56** | 0.0 – 1.4 | -0.31 | Tier 3-4 clubs winning the title within 50y: 0.78% |
-| lt.plMeanRatingDrift | 0.00 ± 2.00 | **0.95** | -0.4 – 2.0 | 0.47 | Mean PL rating should not inflate/deflate over a century |
+| lt.titleRetentionPct | 27.00 ± 7.00 | **25.66** | 19.2 – 31.3 | -0.19 | Title retention: PL era 33.3%, post-war 22.8% |
+| lt.streaks3plusPerCentury | 6.00 ± 3.50 | **4.90** | 3.0 – 6.0 | -0.31 | Runs of 3+ titles: post-war 4 in 80 seasons (5/century); PL era 3 in 34 |
+| lt.streaks5plusPerCentury | 0.00 ± 0.50 | **0.20** | 0.0 – 1.0 | 0.40 | No 5-title run in English top-flight history (record: 4) |
+| lt.uniqueChampionsIn10 | 4.30 ± 0.80 | **4.85** | 4.6 – 5.4 | 0.69 | Unique champions per 10 years: PL era 3.6, post-war 5.1 |
+| lt.uniqueChampionsIn25 | 7.50 ± 1.60 | **8.50** | 7.5 – 9.2 | 0.62 | Per 25 years: PL era 6.0, post-war 9.0 |
+| lt.top4NewEntrants | 1.40 ± 0.30 | **1.63** | 1.5 – 1.7 | 0.76 | New top-4 clubs per season: PL era 1.12, post-war 1.73 |
+| lt.top6NewEntrants | 1.85 ± 0.40 | **1.99** | 1.8 – 2.2 | 0.36 | New top-6 clubs per season: PL era 1.45, post-war 2.25 |
+| lt.top6ShareBest6_30y | 64.00 ± 8.00 | **61.61** | 53.3 – 69.4 | -0.30 | Share of top-6 places held by the 6 most frequent clubs: PL era 72.5%, post-war 55.2% |
+| pl.pts1 | 88.00 ± 3.00 | **85.06** | 83.3 – 85.8 | -0.98 | Champion: 1995-25 mean 87.5 (2015-25: 90.8; 2024/25-2025/26: 84-85) |
+| pl.withinSeasonSD | 16.80 ± 1.30 | **16.93** | 16.3 – 17.5 | 0.10 | SD of PL points: 2015-25 17.9; 1995-25 16.5 |
+| pl.pts18 | 34.50 ± 2.50 | **32.33** | 31.6 – 33.2 | -0.87 | 18th: 2015-25 32.6; 1995-25 34.7 |
+| lt.distinctPL10y | 35.00 ± 2.50 | **34.29** | 33.5 – 34.7 | -0.28 | Distinct top-flight clubs per 10 years: 35 (both eras) |
+| lt.distinctPL30y | 49.00 ± 4.00 | **48.78** | 48.0 – 49.9 | -0.05 | Per 30 years: 49 (PL era), 48 (post-war) |
+| lt.everPresentPL30y | 4.80 ± 1.80 | **4.77** | 3.7 – 6.1 | -0.01 | Ever-present clubs over 30 years: PL era 6, post-war 3.6 |
+| lt.promotedSurvivalPct | 52.00 ± 6.00 | **54.15** | 51.4 – 56.8 | 0.36 | Promoted-club PL survival 1995-25: 52.8%; 2001-24: 54.2% |
+| lt.promotedTop4Pct | 0.80 ± 1.00 | **0.78** | 0.0 – 1.4 | -0.02 | 0/89 since 1995; rare earlier (e.g. Forest 1977/78 champions) |
+| lt.promotedTopHalfPct | 19.00 ± 6.00 | **9.83** | 7.1 – 12.2 | -1.53 | Promoted clubs finishing top half: 19.1% |
+| lt.relegatedImmediateReturnPct | 29.70 ± 7.00 | **28.03** | 24.8 – 33.0 | -0.24 | Relegated PL clubs returning next season: 29.7% |
+| lt.relegatedReturnWithin3Pct | 45.00 ± 8.00 | **50.17** | 46.5 – 54.5 | 0.65 | Returning within 3 seasons: 45.1% |
+| lt.relegatedReturnWithin10Pct | 70.00 ± 10.00 | **68.76** | 67.0 – 71.2 | -0.12 | Returning within 10 seasons: 70.1% |
+| lt.chPromotedSurvivalPct | 82.00 ± 7.00 | **77.31** | 74.8 – 80.3 | -0.67 | Clubs promoted to the Championship surviving: 82.0% |
+| lt.l1PromotedSurvivalPct | 81.00 ± 7.00 | **74.16** | 72.7 – 75.8 | -0.98 | Clubs promoted to League One surviving: 81.1% |
+| lt.giants30RelegatedPct | 35.00 ± 12.00 | **51.08** | 33.8 – 64.6 | 1.34 | Top-5 clubs (trailing 10y) relegated within 30y: post-war 52%; modern giants sturdier (judgement) |
+| lt.giants30Tier3Pct | 12.00 ± 8.00 | **8.92** | 4.6 – 15.4 | -0.38 | Reaching tier 3 within 30y: post-war 26%; modern era lower (judgement) |
+| lt.initialGiantsTier3Before50Pct | 8.00 ± 7.00 | **5.00** | 0.0 – 25.0 | -0.43 | Brief: a Liverpool/Arsenal/Man Utd in League One within 40-50 seasons should be unusual, not impossible |
+| lt.initialGiantsRelegatedBefore30Pct | 30.00 ± 15.00 | **35.00** | 0.0 – 75.0 | 0.33 | Post-war: half of giants relegated within 30y; modern giants sturdier (judgement) |
+| lt.lowerReachPL25Pct | 19.60 ± 6.00 | **12.08** | 9.7 – 13.9 | -1.25 | Tier 3-4 clubs reaching the top flight within 25y: 19.6% (1960-95 cohorts) |
+| lt.lowerReachPL50Pct | 27.70 ± 7.00 | **23.06** | 19.4 – 26.4 | -0.66 | Within 50y: 27.7% (1960-75 cohorts) |
+| lt.lowerWinTitle50Pct | 0.80 ± 0.80 | **0.42** | 0.0 – 1.4 | -0.48 | Tier 3-4 clubs winning the title within 50y: 0.78% |
+| lt.plMeanRatingDrift | 0.00 ± 2.00 | **1.83** | 0.4 – 3.5 | 0.92 | Mean PL rating should not inflate/deflate over a century |
 
 ### Additional long-term measures (not scored)
 
 | Measure | Mean | p10 – p90 |
 |---|---|---|
-| lt.longestStreak | 3.60 | 3.0 – 4.0 |
-| lt.streaks4plusPerCentury | 0.90 | 0.0 – 2.0 |
-| lt.uniqueChampionsFirst10 | 4.30 | 4.0 – 5.0 |
-| lt.uniqueChampionsFirst25 | 7.20 | 6.0 – 8.0 |
-| lt.uniqueChampionsFirst50 | 11.60 | 10.0 – 14.0 |
-| lt.uniqueChampionsFirst100 | 15.90 | 14.0 – 18.0 |
-| lt.uniquePLClubsTotal | 70.20 | 67.0 – 72.0 |
-| lt.yoyoClubs | 31.10 | 27.0 – 34.0 |
-| lt.lowerWinMajor50Pct | 3.33 | 1.4 – 5.6 |
-| lt.initialGiantsTitlesShare | 42.30 | 32.0 – 53.0 |
-| lt.initialGiantsTitlesShareLast25 | 31.20 | 24.0 – 44.0 |
-| lt.initialGiantsSeasonsOutsidePL50 | 3.85 | 0.8 – 6.5 |
-| lt.initialGiantsTier3Seasons50 | 3.60 | 0.0 – 1.0 |
-| lt.relegatedReturnWithin10Pct | 69.81 | 67.0 – 71.2 |
-| lt.reputation85Count | 0.80 | 0.0 – 1.0 |
-| lt.stabilityMean | 46.86 | 46.4 – 47.3 |
-| pl.margin5plusPct | 2.46 | 2.3 – 2.6 |
-| pl.team6plusPct | 1.43 | 1.3 – 1.6 |
-| pl.goalsPerMatch | 2.82 | 2.8 – 2.8 |
-| ratings.y0.ENG1.mean | 77.66 | 77.7 – 77.7 |
-| ratings.y100.ENG1.mean | 78.60 | 77.3 – 79.7 |
-| ratings.y100.ENG1.sd | 5.34 | 4.5 – 6.0 |
-| ratings.y0.ENG5.mean | 41.67 | 41.7 – 41.7 |
-| ratings.y100.ENG5.mean | 38.35 | 37.4 – 39.2 |
+| lt.longestStreak | 3.70 | 3.0 – 5.0 |
+| lt.streaks4plusPerCentury | 1.20 | 0.0 – 2.0 |
+| lt.uniqueChampionsFirst10 | 4.80 | 3.0 – 6.0 |
+| lt.uniqueChampionsFirst25 | 8.60 | 6.0 – 11.0 |
+| lt.uniqueChampionsFirst50 | 12.00 | 11.0 – 15.0 |
+| lt.uniqueChampionsFirst100 | 18.30 | 16.0 – 20.0 |
+| lt.uniquePLClubsTotal | 72.90 | 69.0 – 75.0 |
+| lt.yoyoClubs | 28.90 | 23.0 – 34.0 |
+| lt.lowerWinMajor50Pct | 3.19 | 1.4 – 5.6 |
+| lt.initialGiantsTitlesShare | 36.20 | 25.0 – 48.0 |
+| lt.initialGiantsTitlesShareLast25 | 20.80 | 4.0 – 32.0 |
+| lt.initialGiantsSeasonsOutsidePL50 | 3.05 | 0.8 – 5.5 |
+| lt.initialGiantsTier3Seasons50 | 0.20 | 0.0 – 1.0 |
+| lt.relegatedReturnWithin10Pct | 68.76 | 67.0 – 71.2 |
+| lt.reputation85Count | 0.40 | 0.0 – 1.0 |
+| lt.stabilityMean | 36.07 | 35.3 – 37.2 |
+| pl.margin5plusPct | 2.51 | 2.4 – 2.7 |
+| pl.team6plusPct | 1.46 | 1.4 – 1.6 |
+| pl.goalsPerMatch | 2.81 | 2.8 – 2.8 |
+| ratings.y0.ENG1.mean | 77.79 | 77.8 – 77.8 |
+| ratings.y100.ENG1.mean | 79.62 | 78.2 – 81.3 |
+| ratings.y100.ENG1.sd | 6.69 | 5.6 – 7.5 |
+| ratings.y0.ENG5.mean | 41.65 | 41.7 – 41.7 |
+| ratings.y100.ENG5.mean | 38.05 | 37.2 – 38.9 |
 
 ## 50-year worlds (12 worlds)
 
 | Metric | Target ± tolerance | Result (mean) | Run spread (p10–p90) | z | Historical source |
 |---|---|---|---|---|---|
-| lt.titleRetentionPct | 27.00 ± 7.00 | **24.49** | 20.4 – 32.7 | -0.36 | Title retention: PL era 33.3%, post-war 22.8% |
-| lt.streaks3plusPerCentury | 6.00 ± 3.50 | **5.00** | 2.0 – 8.0 | -0.29 | Runs of 3+ titles: post-war 4 in 80 seasons (5/century); PL era 3 in 34 |
-| lt.streaks5plusPerCentury | 0.00 ± 0.50 | **0.00** | 0.0 – 0.0 | 0.00 | No 5-title run in English top-flight history (record: 4) |
-| lt.uniqueChampionsIn10 | 4.30 ± 0.80 | **4.51** | 4.2 – 4.9 | 0.27 | Unique champions per 10 years: PL era 3.6, post-war 5.1 |
-| lt.uniqueChampionsIn25 | 7.50 ± 1.60 | **7.12** | 6.1 – 7.9 | -0.24 | Per 25 years: PL era 6.0, post-war 9.0 |
-| lt.top4NewEntrants | 1.40 ± 0.30 | **1.54** | 1.3 – 1.8 | 0.45 | New top-4 clubs per season: PL era 1.12, post-war 1.73 |
-| lt.top6NewEntrants | 1.85 ± 0.40 | **1.89** | 1.6 – 2.2 | 0.11 | New top-6 clubs per season: PL era 1.45, post-war 2.25 |
-| lt.top6ShareBest6_30y | 64.00 ± 8.00 | **66.71** | 63.9 – 70.6 | 0.34 | Share of top-6 places held by the 6 most frequent clubs: PL era 72.5%, post-war 55.2% |
-| pl.pts1 | 88.00 ± 3.00 | **85.67** | 83.2 – 87.8 | -0.78 | Champion: 1995-25 mean 87.5 (2015-25: 90.8; 2024/25-2025/26: 84-85) |
-| pl.withinSeasonSD | 16.80 ± 1.30 | **16.91** | 16.1 – 18.0 | 0.08 | SD of PL points: 2015-25 17.9; 1995-25 16.5 |
-| pl.pts18 | 34.50 ± 2.50 | **32.38** | 30.8 – 33.6 | -0.85 | 18th: 2015-25 32.6; 1995-25 34.7 |
-| lt.distinctPL10y | 35.00 ± 2.50 | **33.86** | 33.0 – 35.2 | -0.46 | Distinct top-flight clubs per 10 years: 35 (both eras) |
-| lt.distinctPL30y | 49.00 ± 4.00 | **46.28** | 42.6 – 49.4 | -0.68 | Per 30 years: 49 (PL era), 48 (post-war) |
-| lt.everPresentPL30y | 4.80 ± 1.80 | **5.12** | 4.0 – 6.2 | 0.18 | Ever-present clubs over 30 years: PL era 6, post-war 3.6 |
-| lt.promotedSurvivalPct | 52.00 ± 6.00 | **55.44** | 50.0 – 59.0 | 0.57 | Promoted-club PL survival 1995-25: 52.8%; 2001-24: 54.2% |
-| lt.promotedTop4Pct | 0.80 ± 1.00 | **0.93** | 0.0 – 2.1 | 0.13 | 0/89 since 1995; rare earlier (e.g. Forest 1977/78 champions) |
-| lt.promotedTopHalfPct | 19.00 ± 6.00 | **11.34** | 6.9 – 14.6 | -1.28 | Promoted clubs finishing top half: 19.1% |
-| lt.relegatedImmediateReturnPct | 29.70 ± 7.00 | **30.38** | 26.4 – 34.7 | 0.10 | Relegated PL clubs returning next season: 29.7% |
-| lt.relegatedReturnWithin3Pct | 45.00 ± 8.00 | **50.48** | 44.9 – 58.7 | 0.69 | Returning within 3 seasons: 45.1% |
-| lt.relegatedReturnWithin10Pct | 70.00 ± 10.00 | **71.58** | 65.8 – 76.9 | 0.16 | Returning within 10 seasons: 70.1% |
-| lt.chPromotedSurvivalPct | 82.00 ± 7.00 | **77.37** | 73.6 – 81.3 | -0.66 | Clubs promoted to the Championship surviving: 82.0% |
-| lt.l1PromotedSurvivalPct | 81.00 ± 7.00 | **75.56** | 71.4 – 79.2 | -0.78 | Clubs promoted to League One surviving: 81.1% |
-| lt.giants30RelegatedPct | 35.00 ± 12.00 | **40.00** | 20.0 – 66.7 | 0.42 | Top-5 clubs (trailing 10y) relegated within 30y: post-war 52%; modern giants sturdier (judgement) |
+| lt.titleRetentionPct | 27.00 ± 7.00 | **25.85** | 18.4 – 32.7 | -0.16 | Title retention: PL era 33.3%, post-war 22.8% |
+| lt.streaks3plusPerCentury | 6.00 ± 3.50 | **4.33** | 2.0 – 8.0 | -0.48 | Runs of 3+ titles: post-war 4 in 80 seasons (5/century); PL era 3 in 34 |
+| lt.streaks5plusPerCentury | 0.00 ± 0.50 | **0.17** | 0.0 – 0.0 | 0.33 | No 5-title run in English top-flight history (record: 4) |
+| lt.uniqueChampionsIn10 | 4.30 ± 0.80 | **4.57** | 4.2 – 5.2 | 0.33 | Unique champions per 10 years: PL era 3.6, post-war 5.1 |
+| lt.uniqueChampionsIn25 | 7.50 ± 1.60 | **7.71** | 6.7 – 9.0 | 0.13 | Per 25 years: PL era 6.0, post-war 9.0 |
+| lt.top4NewEntrants | 1.40 ± 0.30 | **1.50** | 1.3 – 1.6 | 0.34 | New top-4 clubs per season: PL era 1.12, post-war 1.73 |
+| lt.top6NewEntrants | 1.85 ± 0.40 | **1.95** | 1.8 – 2.1 | 0.24 | New top-6 clubs per season: PL era 1.45, post-war 2.25 |
+| lt.top6ShareBest6_30y | 64.00 ± 8.00 | **65.74** | 62.8 – 68.3 | 0.22 | Share of top-6 places held by the 6 most frequent clubs: PL era 72.5%, post-war 55.2% |
+| pl.pts1 | 88.00 ± 3.00 | **85.74** | 84.1 – 87.1 | -0.75 | Champion: 1995-25 mean 87.5 (2015-25: 90.8; 2024/25-2025/26: 84-85) |
+| pl.withinSeasonSD | 16.80 ± 1.30 | **17.04** | 16.5 – 17.8 | 0.19 | SD of PL points: 2015-25 17.9; 1995-25 16.5 |
+| pl.pts18 | 34.50 ± 2.50 | **32.50** | 31.5 – 33.0 | -0.80 | 18th: 2015-25 32.6; 1995-25 34.7 |
+| lt.distinctPL10y | 35.00 ± 2.50 | **33.77** | 32.5 – 34.7 | -0.49 | Distinct top-flight clubs per 10 years: 35 (both eras) |
+| lt.distinctPL30y | 49.00 ± 4.00 | **47.93** | 44.8 – 51.8 | -0.27 | Per 30 years: 49 (PL era), 48 (post-war) |
+| lt.everPresentPL30y | 4.80 ± 1.80 | **5.00** | 3.4 – 6.8 | 0.11 | Ever-present clubs over 30 years: PL era 6, post-war 3.6 |
+| lt.promotedSurvivalPct | 52.00 ± 6.00 | **57.29** | 53.5 – 60.4 | 0.88 | Promoted-club PL survival 1995-25: 52.8%; 2001-24: 54.2% |
+| lt.promotedTop4Pct | 0.80 ± 1.00 | **0.69** | 0.0 – 1.4 | -0.11 | 0/89 since 1995; rare earlier (e.g. Forest 1977/78 champions) |
+| lt.promotedTopHalfPct | 19.00 ± 6.00 | **11.63** | 7.6 – 16.7 | -1.23 | Promoted clubs finishing top half: 19.1% |
+| lt.relegatedImmediateReturnPct | 29.70 ± 7.00 | **31.83** | 28.5 – 36.8 | 0.30 | Relegated PL clubs returning next season: 29.7% |
+| lt.relegatedReturnWithin3Pct | 45.00 ± 8.00 | **52.29** | 49.3 – 57.2 | 0.91 | Returning within 3 seasons: 45.1% |
+| lt.relegatedReturnWithin10Pct | 70.00 ± 10.00 | **69.80** | 64.1 – 75.2 | -0.02 | Returning within 10 seasons: 70.1% |
+| lt.chPromotedSurvivalPct | 82.00 ± 7.00 | **77.72** | 75.0 – 80.6 | -0.61 | Clubs promoted to the Championship surviving: 82.0% |
+| lt.l1PromotedSurvivalPct | 81.00 ± 7.00 | **74.31** | 70.3 – 79.2 | -0.96 | Clubs promoted to League One surviving: 81.1% |
+| lt.giants30RelegatedPct | 35.00 ± 12.00 | **45.56** | 20.0 – 66.7 | 0.88 | Top-5 clubs (trailing 10y) relegated within 30y: post-war 52%; modern giants sturdier (judgement) |
 | lt.giants30Tier3Pct | 12.00 ± 8.00 | **4.44** | 0.0 – 13.3 | -0.94 | Reaching tier 3 within 30y: post-war 26%; modern era lower (judgement) |
-| lt.initialGiantsTier3Before50Pct | 8.00 ± 7.00 | **2.08** | 0.0 – 0.0 | -0.85 | Brief: a Liverpool/Arsenal/Man Utd in League One within 40-50 seasons should be unusual, not impossible |
-| lt.initialGiantsRelegatedBefore30Pct | 30.00 ± 15.00 | **25.00** | 0.0 – 50.0 | -0.33 | Post-war: half of giants relegated within 30y; modern giants sturdier (judgement) |
-| lt.lowerReachPL25Pct | 19.60 ± 6.00 | **10.42** | 8.3 – 12.5 | -1.53 | Tier 3-4 clubs reaching the top flight within 25y: 19.6% (1960-95 cohorts) |
-| lt.lowerReachPL50Pct | 27.70 ± 7.00 | **20.60** | 15.3 – 23.6 | -1.01 | Within 50y: 27.7% (1960-75 cohorts) |
-| lt.lowerWinTitle50Pct | 0.80 ± 0.80 | **0.35** | 0.0 – 1.4 | -0.57 | Tier 3-4 clubs winning the title within 50y: 0.78% |
-| lt.plMeanRatingDrift | 0.00 ± 2.00 | **1.80** | 1.1 – 3.4 | 0.90 | Mean PL rating should not inflate/deflate over a century |
+| lt.initialGiantsTier3Before50Pct | 8.00 ± 7.00 | **4.17** | 0.0 – 25.0 | -0.55 | Brief: a Liverpool/Arsenal/Man Utd in League One within 40-50 seasons should be unusual, not impossible |
+| lt.initialGiantsRelegatedBefore30Pct | 30.00 ± 15.00 | **29.17** | 0.0 – 50.0 | -0.06 | Post-war: half of giants relegated within 30y; modern giants sturdier (judgement) |
+| lt.lowerReachPL25Pct | 19.60 ± 6.00 | **12.96** | 9.7 – 16.7 | -1.11 | Tier 3-4 clubs reaching the top flight within 25y: 19.6% (1960-95 cohorts) |
+| lt.lowerReachPL50Pct | 27.70 ± 7.00 | **25.58** | 18.1 – 33.3 | -0.30 | Within 50y: 27.7% (1960-75 cohorts) |
+| lt.lowerWinTitle50Pct | 0.80 ± 0.80 | **0.81** | 0.0 – 2.8 | 0.01 | Tier 3-4 clubs winning the title within 50y: 0.78% |
+| lt.plMeanRatingDrift | 0.00 ± 2.00 | **1.19** | -0.2 – 2.5 | 0.59 | Mean PL rating should not inflate/deflate over a century |
 
 ## Finalists compared (0.5 search, second holdout)
 
 | Finalist | Combined | Short | 50-year | 100-year |
 |---|---|---|---|---|
-| 1 (selected) | 0.296 | 0.206 | 0.371 | 0.401 |
+| 1 | 0.296 | 0.206 | 0.371 | 0.401 |
 | 2 | 0.306 | 0.236 | 0.421 | 0.331 |
 | 3 | 0.307 | 0.199 | 0.439 | 0.390 |
 | 4 | 0.353 | 0.224 | 0.506 | 0.460 |
 | Uncalibrated start | — | 0.643 | — | 2.132 |
 
-
+These are the 0.5 finalists on `holdout2-*`. The 0.7 model was compared with the 0.6 model on the new `holdout4-*` seeds above.
 
 The first holdout round (before consecutive-title fatigue was added) selected a model with combined score 0.395; it still produced 5+-title streaks in some worlds, which motivated the extra mechanism.
 
@@ -339,65 +421,74 @@ The first holdout round (before consecutive-title fatigue was added) selected a 
 
 | Metric | 0.4.3 (reported) | This model (holdout) | History |
 |---|---|---|---|
-| First-season champion points | 91.8 | 86.5 | 87.5 (1995–2025), 84–85 (last two seasons) |
-| First-season promoted survival | 30.7% | 32.6% | 46.7–52.8% |
-| Long-term champion points | 87.6 | 84.9 | 87.5 |
-| Long-term promoted survival | 65.5% | 55.6% | 52.8% |
+| First-season champion points | 91.8 | 85.8 | 87.5 (1995–2025), 84–85 (last two seasons) |
+| First-season promoted survival | 30.7% | 40.6% | 46.7–52.8% |
+| Long-term champion points | 87.6 | 85.1 | 87.5 |
+| Long-term promoted survival | 65.5% | 54.1% | 52.8% |
 | Long-term promoted top-four | 2.8% | 0.8% | 0% since 1995 |
-| Title retention | 18.4% | 23.8% | 33.3% PL era, 22.8% post-war |
-| New top-six clubs per season | 2.37 | 2.06 | 1.45 PL era, 2.25 post-war |
-| Longest title streak | 5 | 3.6 (max 4) | 4 |
+| Title retention | 18.4% | 25.7% | 33.3% PL era, 22.8% post-war |
+| New top-six clubs per season | 2.37 | 1.99 | 1.45 PL era, 2.25 post-war |
+| Longest title streak | 5 | 3.7 (max 5) | 4 |
 
 The 0.4.3 values could not be reproduced exactly: that engine used unseeded `Math.random`, so its
 runs are not repeatable. They are quoted from the brief for context only.
 
 ## Sensitivity (±25% on one parameter at a time; 8 × 60-season worlds + 100 first seasons)
 
-Reference scores: long 0.421, short 0.242. Larger "worst Δ" = more sensitive.
+Reference scores: long 0.343, short 0.178. Larger "worst Δ" = more sensitive.
 
 | Parameter | Worst Δ score | ×0.75: retention / unique champions (25y) / promoted survival / champion pts | ×1.25: same |
 |---|---|---|---|
-| ceiling | 4.641 | -13.8 / 5.8 / 19.2 / -9.7 | 6.6 / -1.1 / -0.1 / 1.3 |
-| strength | 2.135 | -6.1 / 0.9 / -0.9 / -5.7 | -0.4 / 0.4 / -2.8 / 3.7 |
-| eraPersist | 2.002 | -2.8 / 0.1 / -3.2 / -0.9 | -6.8 / 2.5 / -4.1 / -0.2 |
-| relegHit | 0.331 | -1.5 / 0.7 / 1.7 / -1.3 | -1.9 / 1.0 / -0.6 / -0.5 |
-| eraSD | 0.302 | -0.2 / 0.5 / -2.4 / -1.3 | 4.4 / 0.6 / 3.7 / 0.5 |
-| promoBoost | 0.267 | -1.3 / 0.5 / -4.2 / 0.0 | 0.0 / 1.0 / 3.7 / -1.6 |
-| repDecayFactor | 0.163 | -4.4 / 1.4 / -0.3 / -1.2 | 0.0 / 0.0 / 0.0 / 0.0 |
-| matchNoise | 0.157 | -1.3 / 0.8 / 0.6 / -1.8 | 2.3 / -0.2 / -0.8 / -0.2 |
-| seasonSD | 0.150 | -0.6 / 0.7 / -1.9 / -1.5 | -2.3 / 1.3 / 2.7 / 0.3 |
-| repWeight | 0.116 | 1.1 / 0.2 / -0.1 / 0.5 | -3.2 / 0.3 / -1.7 / 0.3 |
-| fatigueTitle | 0.115 | -2.1 / 0.7 / -2.9 / -0.4 | -6.8 / 1.5 / -2.6 / -1.1 |
-| stabilityDamping | 0.096 | 1.5 / 0.4 / 1.1 / -0.9 | -4.0 / 0.9 / -1.3 / -0.9 |
-| seasonPersist | 0.090 | -4.0 / 0.5 / -1.9 / -0.2 | 1.7 / -0.4 / -1.6 / -1.0 |
-| revert | 0.058 | -2.1 / 0.7 / -3.4 / 0.1 | -1.7 / 0.3 / -1.8 / -0.8 |
-| fatigueStreak | 0.049 | -1.1 / -0.2 / -1.1 / 0.4 | 0.2 / 0.3 / -0.6 / -0.9 |
-| recoverBoost | 0.045 | 1.5 / -0.4 / 0.9 / 0.3 | -2.3 / 0.2 / 1.8 / -0.2 |
-| eventRate | 0.014 | 0.6 / -0.1 / -4.0 / -0.4 | 0.4 / 0.5 / 1.0 / -1.3 |
-| promoEra | 0.010 | -4.7 / 1.2 / -1.9 / -0.4 | -2.8 / 1.0 / -0.1 / -0.4 |
+| ceiling | 4.115 | -14.0 / 4.9 / 19.0 / -8.1 | -0.8 / 0.4 / 3.3 / 0.8 |
+| strength | 2.359 | -5.7 / 0.7 / 7.5 / -5.1 | 2.1 / -0.7 / -3.1 / 5.4 |
+| eraPersist | 2.090 | -4.7 / -0.2 / -3.9 / -1.6 | -7.6 / 2.7 / 0.1 / -0.9 |
+| ambPersist | 0.800 | -3.4 / -0.3 / -0.1 / -0.0 | -4.2 / 1.7 / 5.7 / 1.1 |
+| eraSD | 0.349 | -4.0 / 0.1 / -1.9 / -1.2 | -1.9 / 0.9 / 2.4 / 0.3 |
+| ambPromo | 0.278 | -7.2 / 0.6 / 2.0 / -1.1 | -2.1 / -0.3 / -0.5 / 0.2 |
+| promoBoost | 0.240 | -2.3 / 0.0 / -5.2 / 1.1 | -3.4 / 0.6 / 6.0 / -0.3 |
+| seasonSD | 0.226 | -2.5 / -0.0 / 1.6 / -0.5 | -5.5 / 0.5 / 2.3 / 0.5 |
+| rankEconomics | 0.223 | -4.7 / 0.4 / 0.3 / -0.6 | -7.2 / 0.8 / -0.5 / -0.2 |
+| repWeight | 0.168 | -2.8 / -0.2 / 0.7 / -0.4 | -5.1 / -0.1 / 0.3 / 0.6 |
+| revert | 0.168 | 2.1 / 0.3 / 1.0 / -0.1 | -2.1 / -0.4 / 3.3 / -0.7 |
+| relegHit | 0.167 | -2.8 / 0.4 / 3.3 / -0.1 | -2.1 / 0.7 / -4.5 / 0.2 |
+| ambUpside | 0.143 | -4.2 / -0.2 / 0.4 / -0.2 | -0.4 / 0.9 / 0.6 / -0.3 |
+| matchNoise | 0.136 | -3.2 / 0.1 / 1.2 / -0.2 | -0.8 / 0.1 / 2.1 / 0.6 |
+| recoverBoost | 0.125 | -9.3 / 0.4 / -1.3 / 0.5 | -2.8 / -0.3 / 0.9 / 1.0 |
+| fatigueQuality | 0.116 | -4.2 / 0.1 / 1.9 / -0.1 | -5.5 / 0.4 / 0.4 / -0.8 |
+| fatigueStreak | 0.101 | -2.8 / 0.6 / 0.0 / -1.0 | -4.9 / 0.2 / 2.3 / -0.3 |
+| promoEra | 0.096 | -1.1 / -0.4 / 0.7 / 0.2 | -6.4 / 0.1 / -2.9 / 0.1 |
+| eventRate | 0.089 | -6.1 / 0.5 / 0.1 / -0.2 | -6.8 / 0.8 / 0.8 / -0.3 |
+| repRate | 0.085 | -5.1 / 0.6 / 1.8 / -0.2 | -6.4 / 0.7 / 1.0 / -0.4 |
+| qualityNoise | 0.084 | 0.8 / -0.2 / 0.7 / -0.8 | -1.9 / 0.2 / 2.2 / 0.4 |
+| seasonPersist | 0.073 | -2.8 / 0.2 / 3.2 / -0.0 | -3.2 / 0.5 / -1.1 / -0.3 |
+| stabilityDamping | 0.066 | 2.1 / -0.2 / 0.6 / 0.1 | -2.1 / -0.7 / 1.7 / 0.0 |
+| ownerEventRate | 0.063 | -0.8 / 0.0 / 2.1 / 0.4 | -2.5 / -0.2 / 2.6 / 0.9 |
+| ceilingCost | 0.056 | -1.7 / -0.6 / 4.0 / 0.7 | -4.4 / 0.5 / 0.9 / -0.2 |
+| repDecayFactor | 0.050 | -5.5 / 0.2 / -0.4 / -0.0 | 0.0 / 0.0 / 0.0 / 0.0 |
+| fatigueTitle | 0.047 | -1.7 / -0.2 / 2.6 / -0.4 | -4.4 / 0.1 / -0.6 / -0.1 |
+| ambDrop | 0.020 | -3.6 / 0.6 / 2.9 / 0.2 | 1.1 / -0.1 / 1.2 / 0.6 |
+| perfEffect | 0.006 | -4.2 / -0.2 / 1.4 / 0.9 | -2.3 / 0.0 / 1.4 / 0.1 |
 | promoVar | 0.000 | 0.0 / 0.0 / 0.0 / 0.0 | 0.0 / 0.0 / 0.0 / 0.0 |
-| ceilingCost | -0.007 | -0.8 / -0.2 / 0.9 / 0.4 | -2.1 / 0.3 / -1.9 / 0.2 |
-| perfEffect | -0.020 | 3.4 / 0.1 / -1.4 / 0.2 | -2.3 / 0.9 / -1.9 / -0.3 |
-| fatigueQuality | -0.023 | 1.1 / -0.2 / 0.9 / 0.4 | -1.1 / 0.9 / -2.5 / -0.6 |
-| qualityNoise | -0.029 | 1.9 / 0.0 / 0.9 / 0.1 | 0.0 / 0.8 / -0.2 / -0.9 |
-| rankEconomics | -0.032 | -0.4 / 0.2 / 0.1 / -0.3 | 0.6 / 0.2 / 1.4 / 0.6 |
-| repRate | -0.051 | 2.3 / 0.1 / -2.2 / -0.3 | 0.4 / 0.4 / -2.7 / -0.6 |
+| ambTarget | 0.000 | 0.0 / 0.0 / 0.0 / 0.0 | 0.0 / 0.0 / 0.0 / 0.0 |
+| ambRepRef | -0.005 | -3.8 / -0.4 / 1.1 / 0.3 | -0.4 / 0.1 / -0.9 / -0.4 |
+| ambLift | -0.075 | -1.3 / -0.4 / -0.1 / 0.2 | -1.3 / -0.5 / 1.8 / 0.3 |
 
 Most parameters can move ±25% with little effect: the model is not balanced on a knife-edge.
 The sensitive ones are the rating **ceiling** (a −25% ceiling is far below elite squad levels),
-**development persistence** (×1.25 approaches a random walk) and **match strength** (short-term realism).
+**development persistence** (×1.25 approaches a random walk) and **match strength** (short-term realism). In the 0.7
+model **ownership persistence** follows (`ambPersist` ×1.25 is above 1, so owners' ambition would never fade).
 
 ## Remaining weaknesses (reported transparently)
 
-* **lt.promotedTopHalfPct**: 10.17 vs target 19 (z -1.47). Promoted clubs finishing top half: 19.1%
-* **lt.lowerReachPL25Pct**: 11.81 vs target 19.6 (z -1.30). Tier 3-4 clubs reaching the top flight within 25y: 19.6% (1960-95 cohorts)
-* **lt.giants30RelegatedPct**: 48.77 vs target 35 (z 1.15). Top-5 clubs (trailing 10y) relegated within 30y: post-war 52%; modern giants sturdier (judgement)
-* **pl.pts1**: 84.90 vs target 88 (z -1.03). Champion: 1995-25 mean 87.5 (2015-25: 90.8; 2024/25-2025/26: 84-85)
-* **pl.goalsPerMatch**: 2.85 vs target 2.78 (z 0.88). PL 2015-25: 2.82; 1995-25: 2.71
-* **lt.top4NewEntrants**: 1.66 vs target 1.4 (z 0.86). New top-4 clubs per season: PL era 1.12, post-war 1.73
-* **lt.lowerReachPL50Pct**: 21.81 vs target 27.7 (z -0.84). Within 50y: 27.7% (1960-75 cohorts)
-* **lt.initialGiantsRelegatedBefore30Pct**: 17.50 vs target 30 (z -0.83). Post-war: half of giants relegated within 30y; modern giants sturdier (judgement)
-* Extreme scorelines are slightly more frequent than history (5+-goal margins 2.46% vs 2.1–2.3%), within tolerance.
+* **lt.promotedTopHalfPct**: 9.83 vs target 19 (z -1.53). Promoted clubs finishing top half: 19.1%
+* **lt.giants30RelegatedPct**: 51.08 vs target 35 (z 1.34). Top-5 clubs (trailing 10y) relegated within 30y: post-war 52%; modern giants sturdier (judgement)
+* **lt.lowerReachPL25Pct**: 12.08 vs target 19.6 (z -1.25). Tier 3-4 clubs reaching the top flight within 25y: 19.6% (1960-95 cohorts)
+* **pl.pts1**: 85.06 vs target 88 (z -0.98). Champion: 1995-25 mean 87.5 (2015-25: 90.8; 2024/25-2025/26: 84-85)
+* **lt.l1PromotedSurvivalPct**: 74.16 vs target 81 (z -0.98). Clubs promoted to League One surviving: 81.1%
+* **lt.plMeanRatingDrift**: 1.83 vs target 0 (z 0.92). Mean PL rating should not inflate/deflate over a century
+* **pl.pts18**: 32.33 vs target 34.5 (z -0.87). 18th: 2015-25 32.6; 1995-25 34.7
+* **pl.withinSeasonSD**: 16.03 vs target 17 (z -0.81). SD of PL points: 2015-25 17.9; 1995-25 16.5
+* Extreme scorelines are slightly more frequent than history (5+-goal margins 2.51% vs 2.1–2.3%), within tolerance.
 * Several targets for the modern era are judgements (documented in `targets.mjs`): e.g. how much sturdier today's giants are than post-war giants.
 * Initial ratings come from results only (no transfer or wage data), and goal data cannot separate midfield from attack/defence.
 
@@ -416,5 +507,10 @@ node tools/calibrate/run.mjs amb-refine --from-default --configs 60 --runs 12 --
 node tools/calibrate/run.mjs amb-refine --top 5 --per 10 --runs 12 --seasons 80 --step 0.1     # then 0.06, 0.035 with --runs 16
 node tools/calibrate/run.mjs amb-validate --finalists 4 --firsts 500 --r50 12 --r100 10 --holdout holdout3-
 node tools/calibrate/run.mjs sensitivity --source amb
+# 0.7 relative ownership (searched from MODEL_06, validated on fresh seeds)
+node tools/calibrate/run.mjs own-refine --from-default --configs 120 --runs 12 --seasons 80
+node tools/calibrate/run.mjs own-refine --top 5 --per 10 --runs 12 --seasons 80 --step 0.1     # then 0.06, 0.035 with --runs 16
+node tools/calibrate/run.mjs own-validate --finalists 4 --firsts 500 --r50 12 --r100 10 --holdout holdout4-
+node tools/calibrate/run.mjs sensitivity --source own
 node tools/calibrate/report.mjs
 ```

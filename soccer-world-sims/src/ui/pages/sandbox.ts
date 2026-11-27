@@ -20,7 +20,7 @@ export function whatIfCard(world: World, id: string, busy: boolean): string {
     </div>
     <div class="toolbar"><button class="btn primary" data-action="whatif-edit" data-club="${esc(id)}"${busy ? ' disabled' : ''}>Apply edits</button>
       ${Object.entries(EVENT_EFFECTS).map(([k, e]) => `<button class="btn" data-action="whatif-event" data-kind="${k}" data-club="${esc(id)}"${busy ? ' disabled' : ''} title="${esc(effectText(e))}">${esc(e.label)}</button>`).join('')}</div>
-    <p class="muted small">Changes take effect from the next match. Ownership ambition only shapes development when <a href="#/settings">ownership dynamics</a> are switched on; the immediate effects of events always apply.</p>
+    <p class="muted small">Changes take effect from the next match. Ownership shapes development from the next season (scaled by the <a href="#/settings">ownership dynamics</a> setting; clubs whose reputation is already elite are barely affected). The immediate effects of events always apply.</p>
     ${mine.length ? `<h3>Interventions at this club</h3><ul class="timeline">${mine.slice().reverse().map(i => `<li class="intervention"><span class="muted">${esc(seasonLabel(i.season))} · ${esc(i.date)}</span> ${esc(i.text)}</li>`).join('')}</ul>` : ''}
   </details></section>`;
 }

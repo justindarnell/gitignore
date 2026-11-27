@@ -82,7 +82,7 @@ The same seed and settings always produce the same history, however you split th
 
 ## Settings
 
-All sliders default to **100%** (ownership dynamics: **0%**), the calibrated, historically realistic model. Presets:
+All sliders default to **100%**, the calibrated, historically realistic model. Presets:
 
 * **Dynamic**: more upsets, bigger swings and more events.
 * **Chaotic**: anything can happen; not realistic.
@@ -90,9 +90,10 @@ All sliders default to **100%** (ownership dynamics: **0%**), the calibrated, hi
 
 Changes apply from the next match onward and are logged. Recorded history is never changed.
 **Random event frequency** at 0% disables events.
-**Ownership dynamics (experimental)** switches on takeovers and sell-offs that change how much clubs
-invest. It is off by default because calibration did not adopt it: it produces more lower-league risers,
-but historic giants are relegated too often (see CALIBRATION.md, "0.6: ownership ambition").
+**Ownership dynamics** scales takeovers, sell-offs and how far owners can push a club above (or run it
+below) what its standing supports. Clubs whose reputation is already elite are shielded. 100% is the
+calibrated model (adopted in 0.7, see CALIBRATION.md, "0.7: relative ownership"); 0% means owners never
+matter. Saves from earlier versions keep the model they were created with.
 
 **Historical storage** controls how much detail is kept: Essential, Standard (default) or Full.
 See TECHNICAL.md for sizes.

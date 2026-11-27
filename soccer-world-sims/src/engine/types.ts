@@ -217,7 +217,7 @@ export interface Settings {
   relegationImpact: number;   // 0..2
   reputationProtection: number; // 0..2
   championshipFatigue: number;  // 0..2
-  /** 0..2 experimental ownership dynamics (0 = calibrated default: ownership ambition off). */
+  /** 0..2 multiplier on every ownership effect (1 = calibrated, 0 = owners never matter). */
   ownership: number;
   storage: 'essential' | 'standard' | 'full';
 }

@@ -5,7 +5,7 @@ A long-term football world simulation sandbox. Start from the real 2026/27 Engli
 without managing a team. Clubs rise, dynasties form and fade, giants stumble and underdogs win
 trophies, all driven by a statistically calibrated engine rather than scripted outcomes.
 
-Version **0.6.0**. 0.5 was a clean rebuild of the 0.1–0.4.3 prototypes.
+Version **0.7.0**. 0.5 was a clean rebuild of the 0.1–0.4.3 prototypes.
 
 ## Play
 
@@ -35,12 +35,12 @@ See [docs/USER-GUIDE.md](docs/USER-GUIDE.md) for the full guide.
 | Sandbox | What-if editing and injected events (recorded as interventions), fork a world, compare two timelines side by side |
 | Match engine | Poisson goals from attack/midfield/defence powers, home advantage, Dixon–Coles low-score correction, per-match upset noise, seasonal form, cup squad rotation, extra time, penalties |
 | Competitions | Double round-robin leagues with full tiebreakers; the new six-team Championship play-off; League One/Two/National League play-offs; FA Cup (incl. 4th qualifying round with non-playable qualifiers) and EFL Cup (regional rounds, two-legged semis) |
-| Club evolution | Reputation, stability, development cycles, rank-based economics, promotion/relegation effects, title fatigue, ten kinds of random events |
+| Club evolution | Reputation, stability, development cycles, rank-based economics, promotion/relegation effects, title fatigue, ten kinds of random events, ownership (takeovers and sell-offs that shift smaller clubs; established giants shielded) |
 | History | Rolls of honour, trophy totals, historical tables, movements, records, most improved/declined, best/worst matches, timelines, news |
 | Stories | Story of the season (final-day races, collapses, great escapes, runs, records, giant-killings), eras and dynasties, golden ages, decades bump chart, title-race charts, derbies and head-to-head records |
 | Saves | IndexedDB slots, autosave, export/import (gzip), schema versioning, three storage levels |
 | Calibration | ~1.1M simulated seasons across grid, Latin-hypercube and local searches, holdout validation and sensitivity analysis — [report](docs/CALIBRATION.md) |
-| Tests | 51 engine tests (`npm test`) + 56 end-to-end browser checks from `file://` |
+| Tests | 53 engine tests (`npm test`) + 56 end-to-end browser checks from `file://` |
 
 ## Develop
 

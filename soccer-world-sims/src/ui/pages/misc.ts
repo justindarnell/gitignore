@@ -37,7 +37,7 @@ const SETTINGS: { key: keyof Settings; label: string; help: string; max?: number
   { key: 'relegationImpact', label: 'Relegation impact', help: 'Squad loss on relegation (softened by stability).' },
   { key: 'reputationProtection', label: 'Reputation protection', help: 'How strongly institutional standing pulls clubs back to their level.' },
   { key: 'championshipFatigue', label: 'Championship fatigue', help: 'Difficulty of sustaining title-winning performance.' },
-  { key: 'ownership', label: 'Ownership dynamics (experimental)', help: 'Takeovers and sell-offs that change club investment. 0% = calibrated default. Not adopted by calibration: more lower-league risers, but historic giants are relegated too often.' },
+  { key: 'ownership', label: 'Ownership dynamics', help: 'Takeovers, sell-offs and how far owners push a club above or below its standing. Established giants are shielded. 0% = owners never matter; 100% = calibrated.' },
 ];
 
 export const settingsPage: Page = ({ world }) => {

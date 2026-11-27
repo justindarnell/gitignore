@@ -1,6 +1,6 @@
 {
   "name": "soccer-world-sims",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "private": true,
   "description": "Long-term football world simulation sandbox (offline, browser-based).",
   "type": "module",

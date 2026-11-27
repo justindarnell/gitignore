@@ -12,8 +12,8 @@ import type {
 } from './types.ts';
 import { STARTS } from '../data/england/starts.ts';
 
-export const ENGINE_VERSION = '0.6.0';
-export const SAVE_SCHEMA = 4;
+export const ENGINE_VERSION = '0.7.0';
+export const SAVE_SCHEMA = 5;
 
 export interface CreateOptions {
   seed?: string;

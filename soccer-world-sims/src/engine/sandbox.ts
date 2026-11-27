@@ -27,8 +27,8 @@ const BOUNDS: Record<EditableAttr, [number, number]> = { attack: [5, 99], midfie
 
 /**
  * Apply a user intervention to a club now (between steps). Returns the recorded intervention.
- * Note: ownership ambition only affects development when ownership dynamics are switched on in the
- * settings; the immediate effects of injected events apply regardless.
+ * Note: ownership ambition shapes development at the next season end, scaled by the ownership dynamics
+ * setting; the immediate effects of injected events apply regardless.
  */
 export function applyIntervention(world: World, clubId: string, spec: InterventionSpec): Intervention {
   const rt = runtime(world);

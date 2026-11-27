@@ -3,8 +3,8 @@
 ## Near term (0.5.x)
 
 * Address the reported calibration weaknesses (promoted-club variety, lower-league mobility, champion
-  points). The 0.6 ownership-ambition attempt was not adopted (CALIBRATION.md); next idea: ownership acting
-  on squad quality relative to reputation so giants are not over-relegated.
+  points, era giants over 100 years). 0.7 adopted relative ownership (CALIBRATION.md), which helped mobility and
+  champion points but not promoted-club variety.
 * A data-table view for every graph, plus CSV export of history tables.
 * More historical start seasons (any year with complete data in tiers 1–4), and era rule changes over
   time (e.g. the 1995 cut to a 20-club Premier League) as dated config.

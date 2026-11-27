@@ -1,6 +1,6 @@
 import type { World } from '../engine/types.ts';
 import { SAVE_SCHEMA, ENGINE_VERSION } from '../engine/world.ts';
-import { DEFAULT_PARAMS, DEFAULT_SETTINGS } from '../engine/params.ts';
+import { DEFAULT_PARAMS, DEFAULT_SETTINGS, OWNERSHIP_EXPERIMENTAL_06 } from '../engine/params.ts';
 
 /** Metadata shown in save slot lists without loading the full world. */
 export interface SaveMeta {
@@ -49,6 +49,20 @@ const MIGRATIONS: Record<number, (w: any) => any> = {
     w.start ??= '2026';
     w.interventions ??= [];
     w.lineage ??= { id: `root:2026:${w.seed}` };
+    return w;
+  },
+  // 4 -> 5 (0.7.0): relative ownership was adopted, and the `ownership` setting became a multiplier on the
+  // world's own ownership parameters (1 = as stored). Earlier saves keep their model: the new parameters
+  // are switched off, and the old experimental setting (k x the 0.6 finalist, added on top) is written
+  // into the stored parameters so the world simulates exactly as before.
+  4: w => {
+    const p = w.params, k = w.settings?.ownership ?? 0, E = OWNERSHIP_EXPERIMENTAL_06;
+    p.ambLift ??= 0; p.ambDrop ??= 0; p.ambRepRef ??= 90;
+    if (k > 0) {
+      if (!(p.ownerEventRate > 0)) p.ambPersist = E.ambPersist;
+      p.ambTarget += k * E.ambTarget; p.ambPromo += k * E.ambPromo; p.ambUpside += k * E.ambUpside; p.ownerEventRate += k * E.ownerEventRate;
+    }
+    w.settings = { ...w.settings, ownership: 1 };
     return w;
   },
 };

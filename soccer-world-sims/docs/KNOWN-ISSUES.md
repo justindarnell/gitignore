@@ -7,15 +7,20 @@
 * Lower-league clubs reach the top flight within 25 years less often than in 1960–95 history
   (≈11% vs 19.6%). That historical cohort was unusually mobile, so the modern-era target is uncertain.
 * Long-run champions average ≈85 points (1995–2025 average: 87.5; the last two real seasons: 84–85).
+* **Relative ownership (0.7, adopted)** improved the overall holdout score (0.284 vs 0.325) and moved
+  lower-league risers (25 years: 10.3% → 12.1%) and champion points (84.2 → 85.1) toward history, but promoted
+  clubs still finish in the top half about 10% of the time. Over 100 years, the top five of each era are
+  relegated within 30 years in about 51% of cases (target 35%), worse than 0.6 on the same seeds (44%); over
+  50 years it is better (46% vs 54%). The initial giants are unaffected (their reputation is above the
+  ownership threshold).
 * **Ownership ambition (0.6) did not fix these.** The new latent ownership trait was searched and
   validated on fresh `holdout3-` seeds. Every finalist improved lower-league mobility (25-year risers 10.6% →
   13.6%) and title streaks, but none moved promoted top-half finishes much (10.5% → 11.4%) or champion points
   (85.3 → 85.8). Every finalist also pushed the relegation of each era's giants well past the target (40% → 52%).
   The best one also lowered first-season table spread. Under the pre-registered adoption rule it was rejected and is
-  off by default; it is available as the experimental *Ownership dynamics* setting. The remaining gap
-  probably needs a mechanism that protects established giants while letting newly funded clubs rise.
-  For example, ownership could act on squad quality relative to reputation rather than on the structural target.
-* Top-5 clubs are relegated within 30 years in ≈49% of cases (target 35%, post-war history 52%).
+  was off by default in 0.6. 0.7 implemented the suggested redesign (above): ownership acting relative to
+  the club's standing, so established giants are shielded.
+* Top-5 clubs are relegated within 30 years in ≈51% of cases over a century (target 35%, post-war history 52%).
 * Five-goal margins are slightly more common than in history (≈2.35% vs 2.1–2.3%), and 9+-goal margins remain about twice as common as in 1995–2024 (still extremely rare: under 1 per 10,000 league games).
 * Ownership seeds are judgements from documented takeovers and crises (25 clubs). All other clubs start
   neutral, and saves from 0.5 start every club neutral.
@@ -41,8 +46,9 @@
   Treat it as a sandbox, not a validated reconstruction.
 * Rules are frozen at 1992/93: 22 Premier League clubs forever, no Conference relegation, no FA Cup replays
   (COMPETITIONS.md).
-* Ownership ambition edited through *What-if* only changes development when the experimental ownership
-  dynamics setting is on. Injected events always apply their immediate effects.
+* Ownership ambition edited through *What-if* shapes development from the next season end. It has no
+  structural effect at clubs whose reputation is above the elite threshold (81). Injected events always
+  apply their immediate effects.
 * Comparing needs timeline B stored in this browser (IndexedDB). Worlds from different start seasons cannot
   be compared.
 

@@ -4,6 +4,8 @@ import { chooseEvent, type EventContext } from './events.ts';
 import { addEvent, pushNews } from './history.ts';
 
 const AMBITION_NOISE = 0.05;
+/** Reputation span over which the relative ownership effect fades out below ambRepRef. */
+const AMB_HEAD_SPAN = 35;
 /** Takeover/sell-off text by tone (shown in timelines and news). */
 const TAKEOVER_TEXT = 'Takeover: new owners arrive with major investment plans';
 const SELLOFF_TEXT = 'Sold to new owners who strip assets and cut spending';
@@ -93,7 +95,13 @@ export function evolveClubs(world: World, rt: Runtime): void {
       c.ownerSince = s.year + 1;
     }
     const amb = c.ambition;
-    const T = p.repWeight * c.reputation + (1 - p.repWeight) * econ + p.ambTarget * amb;
+    // 0.7 relative ownership: owners decide how far the squad sits from what the club's standing
+    // supports. The effect scales with the club's headroom below the elite (reputation
+    // ambRepRef and above: none), so established giants are shielded both from sell-offs and
+    // from takeovers changing much, while funded smaller clubs can rise far above their level.
+    const head = clamp((p.ambRepRef - c.reputation) / AMB_HEAD_SPAN, 0, 1);
+    const own = head * (p.ambLift * Math.max(0, amb) + p.ambDrop * Math.min(0, amb));
+    const T = p.repWeight * c.reputation + (1 - p.repWeight) * econ + p.ambTarget * amb + own;
     // Development cycles: stable institutions swing less; promotion brings momentum; ambitious
     // owners skew the shock toward the upside (a big spending spree can transform a club) while
     // keeping its mean: z + u * (max(z, 0) - E[max(z, 0)]), E[max(z, 0)] = 1/sqrt(2 pi).
@@ -115,7 +123,7 @@ export function evolveClubs(world: World, rt: Runtime): void {
       c.fatigue += p.fatigueTitle + p.fatigueStreak * Math.max(0, streak - 1);
       dQ -= p.fatigueQuality;
     }
-    const ceiling = p.ceiling + p.ambTarget * Math.max(0, amb);
+    const ceiling = p.ceiling + p.ambTarget * Math.max(0, amb) + Math.max(0, own);
     if (Q > ceiling) dQ -= p.ceilingCost * (Q - ceiling);
 
     // ---- Ownership changes are reported; asset-stripping erodes institutional stability.

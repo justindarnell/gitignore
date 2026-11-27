@@ -2,9 +2,12 @@ import type { Settings } from './types.ts';
 
 /**
  * Engine parameters. DEFAULT_PARAMS holds the calibrated model selected by the
- * calibration framework (tools/calibrate, docs/CALIBRATION.md): finalist 1 of the
- * second holdout validation (calibration/results/validate.json). User settings act as
- * multipliers on top of these values; 1.0 everywhere reproduces the calibrated model.
+ * calibration framework (tools/calibrate, docs/CALIBRATION.md): the 0.5 model (finalist 1 of the
+ * second holdout validation, calibration/results/validate.json) plus 0.7 relative ownership
+ * (finalist 1 of calibration/results/own-validate.json, adopted on the fresh holdout4- seeds, which
+ * also re-tuned promoBoost, relegHit, revert, eraSD, promoEra, repWeight, rankEconomics, ceiling and
+ * ceilingCost). User settings act as multipliers on top of these values; 1.0 everywhere reproduces
+ * the calibrated model.
  */
 export interface EngineParams {
   // ---- match model
@@ -58,6 +61,10 @@ export interface EngineParams {
   ambPromo: number;         // relative change of promotion investment per unit of ambition
   ambUpside: number;        // extra upside of positive development shocks at ambition +1
   ownerEventRate: number;   // probability of an ownership change (takeover or sell-off) per club-season
+  // ---- 0.7 relative ownership: effects scale with headroom below the elite (giants are shielded)
+  ambLift: number;          // rating points a fully ambitious owner adds to the target of a club with full headroom
+  ambDrop: number;          // rating points asset-stripping (ambition -1) removes from the target of a club with full headroom
+  ambRepRef: number;        // reputation at and above which ownership no longer shifts the target (headroom 0)
 }
 
 export const DEFAULT_PARAMS: EngineParams = {
@@ -78,48 +85,58 @@ export const DEFAULT_PARAMS: EngineParams = {
   formSD: 0.35,
   formPersist: 0.9,
   initialFormWeight: 1,
-  revert: 0.1356,
+  revert: 0.1403,
   recoverBoost: 1.0272,
   stabilityDamping: 1.0083,
-  promoEra: 0.3686,
-  repWeight: 0.5822,
-  rankEconomics: 0.8695,
+  promoEra: 0.4541,
+  repWeight: 0.59,
+  rankEconomics: 0.8724,
   eraPersist: 0.7282,
-  eraSD: 0.8359,
+  eraSD: 0.8346,
   qualityNoise: 0.3804,
   perfEffect: 0.0234,
-  promoBoost: 2.1842,
-  relegHit: 4.0939,
+  promoBoost: 2.0071,
+  relegHit: 4.0147,
   fatigueTitle: 0.893,
   fatigueDecay: 0.5,
   fatigueStreak: 1.4665,
   promoVar: 0,
   fatigueQuality: 0.2999,
-  ceiling: 91.2541,
-  ceilingCost: 0.1973,
+  ceiling: 91.4192,
+  ceilingCost: 0.1829,
   repRate: 0.0388,
   repDecayFactor: 1,
   repTitleBonus: 3,
   stabRate: 0.08,
   eventRate: 0.1589,
   eventScale: 1,
-  ambPersist: 0.9,
+  ambPersist: 0.8309,
   ambTarget: 0,
-  ambPromo: 0,
-  ambUpside: 0,
-  ownerEventRate: 0,
+  ambPromo: 1.1449,
+  ambUpside: 1.3909,
+  ownerEventRate: 0.0278,
+  ambLift: 1.8291,
+  ambDrop: 7.515,
+  ambRepRef: 81.4162,
+};
+
+/**
+ * The 0.6 shipped model, as overrides of DEFAULT_PARAMS: the values 0.7 re-tuned, with ownership off.
+ * Saves from before 0.7 keep their stored parameters; this is the baseline of the 0.7 search and validation.
+ */
+export const MODEL_06: Partial<EngineParams> = {
+  revert: 0.1356, promoEra: 0.3686, repWeight: 0.5822, rankEconomics: 0.8695, eraSD: 0.8359, promoBoost: 2.1842, relegHit: 4.0939,
+  ceiling: 91.2541, ceilingCost: 0.1973, ambPersist: 0.9, ambTarget: 0, ambPromo: 0, ambUpside: 0, ownerEventRate: 0, ambLift: 0, ambDrop: 0, ambRepRef: 90,
 };
 
 /** The ownership-ambition mechanism switched off (the pre-0.6 model, used as a calibration baseline). */
-export const AMBITION_OFF: Partial<EngineParams> = { ambTarget: 0, ambPromo: 0, ambUpside: 0, ownerEventRate: 0 };
+export const AMBITION_OFF: Partial<EngineParams> = { ambTarget: 0, ambPromo: 0, ambUpside: 0, ownerEventRate: 0, ambLift: 0, ambDrop: 0 };
 
 /**
- * Experimental ownership dynamics (not adopted by calibration, see docs/CALIBRATION.md): the best
- * ownership-ambition finalist (rank 2 of calibration/results/amb-validate.json). It improved the
- * combined holdout score but worsened the short-term group and over-relegated giants, so it is
- * offered only as an opt-in setting. Setting `ownership` scales these effects (1 = finalist values).
+ * The 0.6 experimental ownership dynamics (not adopted, see docs/CALIBRATION.md). Only used to migrate
+ * saves from before 0.7, whose `ownership` setting added k x these values on top of their parameters.
  */
-export const OWNERSHIP_EXPERIMENTAL = { ambPersist: 0.8797, ambTarget: 6.842, ambPromo: 1.0836, ambUpside: 1.8888, ownerEventRate: 0.0202 };
+export const OWNERSHIP_EXPERIMENTAL_06 = { ambPersist: 0.8797, ambTarget: 6.842, ambPromo: 1.0836, ambUpside: 1.8888, ownerEventRate: 0.0202 };
 
 /** Display bands for the ambition trait. */
 export function ambitionLabel(a: number): 'Wealthy & ambitious' | 'Steady' | 'Cautious' | 'Asset-stripping' {
@@ -128,7 +145,7 @@ export function ambitionLabel(a: number): 'Wealthy & ambitious' | 'Steady' | 'Ca
 
 export const DEFAULT_SETTINGS: Settings = {
   realism: 1, upsets: 1, homeAdvantage: 1, seasonalVariability: 1, growth: 1,
-  events: 1, relegationImpact: 1, reputationProtection: 1, championshipFatigue: 1, ownership: 0,
+  events: 1, relegationImpact: 1, reputationProtection: 1, championshipFatigue: 1, ownership: 1,
   storage: 'standard',
 };
 
@@ -149,17 +166,16 @@ export function effectiveParams(base: EngineParams, s: Settings): EngineParams {
     repDecayFactor: Math.min(1, base.repDecayFactor / Math.max(0.25, s.reputationProtection)),
     fatigueTitle: base.fatigueTitle * s.championshipFatigue,
     fatigueQuality: base.fatigueQuality * s.championshipFatigue,
-    ...ownershipParams(base, s.ownership ?? 0),
+    ...ownershipParams(base, s.ownership ?? 1),
   };
 }
 
+/** The `ownership` setting scales every ownership effect (0 = owners never matter, 1 = calibrated). */
 function ownershipParams(base: EngineParams, k: number): Partial<EngineParams> {
-  if (!(k > 0)) return {};
-  const E = OWNERSHIP_EXPERIMENTAL;
+  if (k === 1) return {};
   return {
-    ambPersist: base.ownerEventRate > 0 ? base.ambPersist : E.ambPersist,
-    ambTarget: base.ambTarget + k * E.ambTarget, ambPromo: base.ambPromo + k * E.ambPromo,
-    ambUpside: base.ambUpside + k * E.ambUpside, ownerEventRate: base.ownerEventRate + k * E.ownerEventRate,
+    ambTarget: base.ambTarget * k, ambLift: base.ambLift * k, ambDrop: base.ambDrop * k,
+    ambPromo: base.ambPromo * k, ambUpside: base.ambUpside * k, ownerEventRate: base.ownerEventRate * k,
   };
 }
 

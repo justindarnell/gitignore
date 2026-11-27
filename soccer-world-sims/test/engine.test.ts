@@ -374,13 +374,13 @@ describe('ownership ambition (0.6)', () => {
     assert.ok(q(amb, 'ipswich-town') > q(base, 'ipswich-town'), 'Ipswich (wealthy owners) invests more');
     assert.equal(q(amb, 'arsenal'), q(base, 'arsenal'), 'non-promoted clubs unchanged');
   });
-  test('calibrated default has no ownership changes; the experimental setting enables them', () => {
+  test('ownership changes happen in the calibrated default and the setting scales them (0 = off)', () => {
     const def = createWorld({ seed: 'own-setting', settings: { storage: 'essential' } });
     simulate(def, { kind: 'seasons', n: 10 });
-    assert.ok(!Object.values(def.history.clubs).some(h => h.events.some(e => e.kind === 'owner')), 'not adopted: off by default');
-    const exp = createWorld({ seed: 'own-setting', settings: { storage: 'essential', ownership: 1 } });
-    simulate(exp, { kind: 'seasons', n: 10 });
-    assert.ok(Object.values(exp.history.clubs).some(h => h.events.some(e => e.kind === 'owner')));
+    assert.ok(Object.values(def.history.clubs).some(h => h.events.some(e => e.kind === 'owner')), 'adopted in 0.7: on by default');
+    const off = createWorld({ seed: 'own-setting', settings: { storage: 'essential', ownership: 0 } });
+    simulate(off, { kind: 'seasons', n: 10 });
+    assert.ok(!Object.values(off.history.clubs).some(h => h.events.some(e => e.kind === 'owner')));
   });
   test('schema 1 saves migrate: ambition neutral, schema bumped', () => {
     const w = createWorld({ seed: 'migrate' });
@@ -391,8 +391,49 @@ describe('ownership ambition (0.6)', () => {
     const up = importWorld(JSON.stringify(raw));
     assert.equal(up.schema, SAVE_SCHEMA);
     for (const c of up.clubs) { assert.equal(c.ambition, 0); assert.equal(c.ownerSince, null); }
-    assert.equal(up.settings.ownership, 0);
+    assert.equal(up.settings.ownership, 1);
     step(up); // migrated worlds simulate
+  });
+});
+
+describe('relative ownership (0.7)', () => {
+  test('the ownership target shift acts only below the elite: giants are shielded', () => {
+    // Same seed and stream, an asset-stripping owner (ambition -1): switching the target shift (ambDrop)
+    // off changes nothing at a club whose reputation is above ambRepRef, but changes a smaller club.
+    // (Negative ownership also erodes stability at every club; that path is the same in both runs.)
+    const run = (id: string, ambDrop: number) => {
+      const w = createWorld({ seed: 'own-shield', params: { ownerEventRate: 0, ambPersist: 1, ambDrop }, settings: { storage: 'essential' } });
+      w.clubs.find(x => x.id === id)!.ambition = -1;
+      simulate(w, { kind: 'seasons', n: 1 }); step(w);
+      return w.clubs.find(x => x.id === id)!;
+    };
+    const giant = w0().clubs.filter(c => c.reputation >= DEFAULT_PARAMS.ambRepRef + 1).sort((a, b) => b.reputation - a.reputation)[0];
+    assert.ok(giant, 'a club above the elite threshold exists');
+    const q = (c: { attack: number; midfield: number; defence: number }) => c.attack + c.midfield + c.defence;
+    assert.equal(q(run(giant.id, DEFAULT_PARAMS.ambDrop)), q(run(giant.id, 0)), 'no target shift at an elite club');
+    const mid = w0().clubs.find(c => c.league === 'ENG2' && c.reputation < 60)!;
+    assert.ok(q(run(mid.id, DEFAULT_PARAMS.ambDrop)) < q(run(mid.id, 0)), 'asset-stripping lowers a smaller club\'s target');
+  });
+  const w0 = (() => { let w: World | null = null; return () => (w ??= createWorld({ seed: 'own-shield' })); })();
+
+  test('schema 4 saves keep their model: ownership off, old experimental setting folded into the parameters', () => {
+    const w = createWorld({ seed: 'mig-07' });
+    const raw = JSON.parse(exportWorld(w));
+    raw.schema = 4;
+    for (const k of ['ambLift', 'ambDrop', 'ambRepRef']) delete raw.params[k];
+    Object.assign(raw.params, { ambTarget: 0, ambPromo: 0, ambUpside: 0, ownerEventRate: 0, ambPersist: 0.9 });
+    raw.settings.ownership = 0.5;
+    const up = importWorld(JSON.stringify(raw));
+    assert.equal(up.schema, SAVE_SCHEMA);
+    assert.equal(up.params.ambLift, 0); assert.equal(up.params.ambDrop, 0);
+    assert.equal(up.settings.ownership, 1);
+    assert.ok(Math.abs(up.params.ambTarget - 0.5 * 6.842) < 1e-9 && Math.abs(up.params.ownerEventRate - 0.5 * 0.0202) < 1e-9);
+    assert.equal(up.params.ambPersist, 0.8797);
+    const plain = JSON.parse(exportWorld(w)); plain.schema = 4; plain.settings.ownership = 0;
+    for (const k of ['ambLift', 'ambDrop', 'ambRepRef']) delete plain.params[k];
+    const up0 = importWorld(JSON.stringify(plain));
+    assert.equal(up0.params.ambLift, 0); assert.equal(up0.params.ambTarget, 0);
+    step(up);
   });
 });
 
@@ -629,3 +670,4 @@ describe('historical start: 1992/93 (0.6)', () => {
     assert.equal(strip(b2), strip(a));
   });
 });
+
