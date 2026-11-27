@@ -15,6 +15,7 @@
             │ stories.ts    story-of-the-season detection, matchday tracks (no RNG)      │
             │ eras.ts       eras, dynasties, golden ages, decade rankings (derived)      │
             │ sandbox.ts    what-if interventions, forks (deterministic, no RNG)         │
+            │ experiments.ts multi-fork experiments: re-seeded forks, outcome odds      │
             │ sim.ts        simulation targets (matchday … N seasons), bulk loop        │
             │ runtime.ts    non-serialised caches + live RNG                             │
             └───────────────────────────────────────────────────────────────────────────┘
@@ -161,6 +162,27 @@ toward reputation and asymmetric reversion stop irreversible collapse.
   interventions and the first season where the final tables differ. If the saved timeline is behind, it can be
   simulated to the same date in a separate worker and saved back to its slot.
 
+## Experiments (0.7)
+
+`src/engine/experiments.ts` runs many alternative futures of one world and summarises them.
+
+* **Run i** is a copy of the base world (clubs, history, settings, interventions) whose RNG is re-seeded from
+  `seed | lineage | year.slot.complete | exp<i>`. The label does **not** include interventions, so running the
+  same experiment again after a what-if change gives every run the same random stream as before (common random
+  numbers): the difference between the two summaries comes from the change, not from different luck. Streams
+  stay aligned as long as the change does not alter the number of draws. Rating edits do not; anything that
+  changes who meets whom in a cup gradually decorrelates them.
+* Runs simulate at the Essential storage level (storage never changes results, tested) and return compact typed
+  arrays per season: combined pyramid position, league, promotion/relegation flag, league champions and cup
+  winners. `summarise` turns them into per-club odds (at least one title, mean titles, top-four finish, each cup,
+  promoted, relegated, league after the horizon, final position percentiles), the likeliest champions per season,
+  and pyramid-position percentiles per season for fan charts (`clubFan`).
+* A run is exactly `forkWorld` + re-seed + `simulate(n seasons)` (tested). The base world is never changed (tested).
+* The UI (`#/experiments`) splits the run indices over up to four web workers (hardware threads − 1) and merges
+  the results. A 10-season run takes about 0.1 s from a new world and 0.16 s after a century of history (the copy
+  of the world costs most of the difference), so 40 runs × 10 seasons take about 1.5–2 s.
+* Results are kept in memory for the session (current and previous experiment), not in the save.
+
 ## Club database pipeline
 
 See [DATA-SOURCES.md](DATA-SOURCES.md). In short, `fit.mjs` fits a recency-weighted, ridge-regularised
@@ -260,7 +282,7 @@ Standard and 1.94 s · 16.66 MB (2.38 MB gz) at Full: no measurable cost; the sa
 ownership news).
 
 Goal 3 adds no per-step cost; a 1992/93 world simulates 100 seasons in 2.3 s (Standard, 5.8 MB).
-`dist/app.js` is 305 KB (both club databases once, without the provenance strings). Before the build
+`dist/app.js` is 271 KB in 0.7 (305 KB in 0.6; both club databases once, without the provenance strings). Before the build
 change, the 1992 database pushed it to 665 KB because a module-level property access kept a second
 and third copy of the data in the worker bundle.
 
@@ -275,12 +297,12 @@ min/max decimation, so matchday-level histories (~4,600 points per century) rend
 
 ## Testing
 
-* `npm test`: 53 engine tests covering database integrity, fixture counts and uniqueness, home/away
+* `npm test`: 57 engine tests covering database integrity, fixture counts and uniqueness, home/away
   balance, clash-free calendar, scoring, tiebreakers, promotion/relegation counts, play-off brackets
   (including the six-team Championship format), FA Cup and EFL Cup structure, single winners,
   history consistency, graph data, best/worst ranking rules, attribute bounds, determinism,
   save/load equivalence, bulk vs step-by-step equivalence, and pause/resume equivalence.
-* `node tools/browser-test.mjs`: 56 end-to-end checks in headless Chromium against `dist/` opened via
+* `node tools/browser-test.mjs`: 61 end-to-end checks in headless Chromium against `dist/` opened via
   `file://`, with all network requests blocked. Covers navigation, club links, graph hover and tooltips,
   decimal formatting, badge loading, matchday controls, competitions, history pages, settings, saves
   and reload, a 100-season bulk run with pause/resume and cancel, responsiveness, memory, phone-width

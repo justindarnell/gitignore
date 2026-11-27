@@ -75,6 +75,11 @@ The same seed and settings always produce the same history, however you split th
 * **Compare** (menu): pick a saved world as timeline B for champions side by side, final tables, a club's
   path in both timelines and where they first diverged. *Fork current world & compare* does both in one
   click; *Simulate B to …* brings a timeline that is behind up to date.
+* **Experiments** (menu): run many alternative futures from the current point (2–500 runs, 1–100 seasons),
+  each with different luck, without changing your world. You get each club's title odds, top-four, cup and
+  relegation chances, the likeliest risers into the top flight, the likeliest champion of each season, and a
+  fan chart of any club's possible paths. Run it again after a what-if change: the runs reuse the same random
+  streams, and Δ columns show how much your change moved the odds. Results last until you reload the page.
 * **Start season** (Saves → New world): the present day (2026/27, 116 clubs) or **1992/93**, the first
   Premier League season: 92 clubs rated from 1988–92 results and that era's rules (22-club Premier League,
   First/Second/Third Division, League Cup with away goals). See COMPETITIONS.md for what differs from

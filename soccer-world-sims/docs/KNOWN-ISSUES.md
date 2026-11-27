@@ -49,6 +49,9 @@
 * Ownership ambition edited through *What-if* shapes development from the next season end. It has no
   structural effect at clubs whose reputation is above the elite threshold (81). Injected events always
   apply their immediate effects.
+* Experiment results are not saved with the world; they last until the page is reloaded. The common random
+  numbers that make before/after comparisons fair only stay aligned while a change keeps the number of random
+  draws the same (cup draws involving the changed club eventually decorrelate the runs).
 * Comparing needs timeline B stored in this browser (IndexedDB). Worlds from different start seasons cannot
   be compared.
 

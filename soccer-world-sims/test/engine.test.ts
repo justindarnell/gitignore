@@ -16,6 +16,7 @@ import type { Match, TableRow, World } from '../src/engine/types.ts';
 import clubsDb from '../src/data/england/clubs.json' with { type: 'json' };
 import clubs1992 from '../src/data/england/clubs-1992.json' with { type: 'json' };
 import { applyIntervention, forkWorld, EVENT_EFFECTS } from '../src/engine/sandbox.ts';
+import { runExperiment, summarise, clubFan, runSeedLabel } from '../src/engine/experiments.ts';
 
 const SIZES: Record<string, number> = { ENG1: 20, ENG2: 24, ENG3: 24, ENG4: 24, ENG5: 24 };
 
@@ -671,3 +672,59 @@ describe('historical start: 1992/93 (0.6)', () => {
   });
 });
 
+describe('multi-fork experiments (0.7)', () => {
+  const base = createWorld({ seed: 'exp-test', settings: { storage: 'essential' } });
+  simulate(base, { kind: 'matchday' });
+  const before = exportWorld(base);
+  const outs = [0, 1, 2, 3, 4, 5].map(i => runExperiment(base, i, 3));
+
+  test('runs are deterministic, independent, and never change the base world', () => {
+    assert.equal(exportWorld(base), before, 'base world unchanged');
+    const again = runExperiment(base, 2, 3);
+    assert.deepEqual([...again.pyramid], [...outs[2].pyramid]);
+    assert.deepEqual([...again.champions], [...outs[2].champions]);
+    assert.notDeepEqual([...outs[0].pyramid], [...outs[1].pyramid], 'different runs have different luck');
+    // A run is exactly a fork of the base world with a re-seeded random stream, simulated n seasons.
+    const manual = forkWorld(base);
+    manual.rng = Rng.fromSeed(runSeedLabel(base, 4)).state();
+    simulate(manual, absoluteTarget(manual, { kind: 'seasons', n: 3 }));
+    assert.deepEqual(manual.history.snapshots.map(s => s.pyramid), [0, 1, 2].map(s => [...outs[4].pyramid.slice(s * base.clubs.length, (s + 1) * base.clubs.length)]));
+  });
+
+  test('a mid-season start counts the current season as the first of the horizon', () => {
+    assert.deepEqual(outs[0].years, [base.season.year, base.season.year + 1, base.season.year + 2]);
+  });
+
+  test('summary probabilities are consistent', () => {
+    const S = summarise(base, outs);
+    assert.equal(S.runs, 6); assert.equal(S.seasons, 3);
+    for (const c of S.clubs) {
+      for (const v of [c.title, c.top4, c.relegated, c.promoted, ...Object.values(c.cup)]) assert.ok(v >= 0 && v <= 1);
+      assert.ok(Math.abs(c.endLeague.reduce((a, b) => a + b, 0) - 1) < 1e-9, 'each run ends in exactly one league');
+      assert.ok(c.endP10 <= c.endP50 && c.endP50 <= c.endP90);
+    }
+    // Exactly one champion per season and run.
+    const total = S.clubs.reduce((a, c) => a + c.titlesMean, 0);
+    assert.ok(Math.abs(total - 3) < 1e-9);
+    for (const s of S.champions) assert.ok(s.top.reduce((a, t) => a + t.p, 0) <= 1 + 1e-9);
+    // Relegations and promotions balance across the pyramid in every run (closed pyramid).
+    const rel = S.clubs.reduce((a, c) => a + c.relegated, 0), pro = S.clubs.reduce((a, c) => a + c.promoted, 0);
+    assert.ok(rel > 0 && pro > 0);
+    const fan = clubFan(base, outs, 'arsenal');
+    assert.equal(fan.length, 3);
+    for (const f of fan) assert.ok(f.p10 <= f.p25 && f.p25 <= f.p50 && f.p50 <= f.p75 && f.p75 <= f.p90);
+  });
+
+  test('an intervention keeps the random streams (common random numbers), so summaries compare', () => {
+    const w = cloneWorld(base);
+    const keyBefore = summarise(w, outs).key;
+    applyIntervention(w, 'arsenal', { kind: 'crisis' });
+    assert.equal(runSeedLabel(w, 0), runSeedLabel(base, 0));
+    const after = [0, 1, 2, 3, 4, 5].map(i => runExperiment(w, i, 3));
+    const S = summarise(w, after);
+    assert.equal(S.key, keyBefore);
+    assert.equal(S.interventions, 1);
+    const arsenalEnd = (o: typeof outs) => o.reduce((a, r) => a + r.pyramid[2 * base.clubs.length + base.clubs.findIndex(c => c.id === 'arsenal')], 0);
+    assert.ok(arsenalEnd(after) > arsenalEnd(outs), 'a crisis lowers the expected final position');
+  });
+});

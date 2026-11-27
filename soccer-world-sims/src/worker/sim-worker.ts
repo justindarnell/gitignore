@@ -6,6 +6,7 @@
 import { step } from '../engine/world.ts';
 import { estimateSteps, targetReached, type SimTarget } from '../engine/sim.ts';
 import { upgradeWorld } from '../persistence/save.ts';
+import { runExperiment, type RunOutcome } from '../engine/experiments.ts';
 import type { World } from '../engine/types.ts';
 
 let stopRequested: 'pause' | 'cancel' | null = null;
@@ -14,7 +15,27 @@ self.onmessage = (e: MessageEvent) => {
   const msg = e.data;
   if (msg.type === 'pause' || msg.type === 'cancel') { stopRequested = msg.type; return; }
   if (msg.type === 'run') run(upgradeWorld(msg.world), msg.target as SimTarget);
+  if (msg.type === 'experiment') experiment(upgradeWorld(msg.world), msg.indices as number[], msg.seasons as number);
 };
+
+/** Multi-fork experiment: run the given fork indices one per task, so cancel is handled between runs. */
+function experiment(base: World, indices: number[], seasons: number): void {
+  stopRequested = null;
+  const done: RunOutcome[] = [];
+  const t0 = performance.now();
+  const next = () => {
+    if (stopRequested) { (self as unknown as Worker).postMessage({ type: 'exp-result', status: 'cancelled', outcomes: [] }); return; }
+    if (done.length === indices.length) {
+      const buffers = done.flatMap(o => [o.pyramid.buffer, o.league.buffer, o.moved.buffer, o.champions.buffer, o.cups.buffer]);
+      (self as unknown as Worker).postMessage({ type: 'exp-result', status: 'done', outcomes: done, elapsed: performance.now() - t0 }, buffers as ArrayBuffer[]);
+      return;
+    }
+    done.push(runExperiment(base, indices[done.length], seasons));
+    (self as unknown as Worker).postMessage({ type: 'exp-progress', done: done.length, total: indices.length });
+    setTimeout(next, 0);
+  };
+  next();
+}
 
 function run(world: World, target: SimTarget): void {
   stopRequested = null;

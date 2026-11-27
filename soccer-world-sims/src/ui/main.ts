@@ -14,6 +14,8 @@ import { historyPage } from './pages/history.ts';
 import { newsPage, settingsPage, savesPage } from './pages/misc.ts';
 import { seasonPage, h2hPage } from './pages/stories.ts';
 import { comparePage, type CompareState } from './pages/sandbox.ts';
+import { experimentsPage, positionKey, type ExperimentState } from './pages/experiments.ts';
+import { summarise, MAX_RUNS, MAX_SEASONS, type RunOutcome } from '../engine/experiments.ts';
 import { applyIntervention, forkWorld, EDITABLE, type InterventionSpec } from '../engine/sandbox.ts';
 import { STARTS } from '../data/england/starts.ts';
 import * as store from './store.ts';
@@ -21,6 +23,9 @@ import type { SaveMeta } from '../persistence/save.ts';
 
 declare const __WORKER_SOURCE__: string;
 declare const __APP_VERSION__: string;
+// Referenced once: esbuild inlines the embedded worker source at every use of the define.
+const WORKER_URL = URL.createObjectURL(new Blob([__WORKER_SOURCE__], { type: 'text/javascript' }));
+const newWorker = () => new Worker(WORKER_URL);
 
 // ------------------------------------------------------------------ state
 const ls = {
@@ -41,6 +46,8 @@ let cleanup: (() => void) | void;
 let newSeed = '';
 let newStart = '2026';
 const cmp: CompareState = { id: null, world: null, loading: false, error: null, club: 'liverpool', year: null };
+const exp: ExperimentState = { runs: 40, seasons: 10, club: '', running: null, result: null, previous: null };
+let expWorkers: Worker[] = [];
 
 const $ = <T extends HTMLElement>(sel: string) => document.querySelector(sel) as T;
 
@@ -49,7 +56,7 @@ const PAGES: Record<string, Page> = {
   overview: overviewPage, standings: standingsPage, fixtures: fixturesPage, cups: cupsPage, clubs: clubsPage, club: clubPage,
   history: historyPage, news: newsPage, settings: settingsPage, season: seasonPage, h2h: h2hPage,
 };
-const NAV = [['overview', 'Overview'], ['standings', 'Standings'], ['fixtures', 'Fixtures'], ['cups', 'Cups'], ['clubs', 'Clubs'], ['history', 'History'], ['compare', 'Compare'], ['news', 'News'], ['settings', 'Settings'], ['saves', 'Saves']];
+const NAV = [['overview', 'Overview'], ['standings', 'Standings'], ['fixtures', 'Fixtures'], ['cups', 'Cups'], ['clubs', 'Clubs'], ['history', 'History'], ['compare', 'Compare'], ['experiments', 'Experiments'], ['news', 'News'], ['settings', 'Settings'], ['saves', 'Saves']];
 
 function route(): { page: string; args: string[] } {
   const parts = location.hash.replace(/^#\/?/, '').split('/').filter(Boolean).map(decodeURIComponent);
@@ -62,7 +69,8 @@ function render(keepScroll = false): void {
   cleanup = undefined;
   const r = route();
   if (r.page === 'compare') syncCompare(r.args[0] ?? null);
-  const page = r.page === 'saves' ? savesPage(saves, store.storageError, autosave, newStart) : r.page === 'compare' ? comparePage(saves, cmp) : PAGES[r.page] ?? overviewPage;
+  const page = r.page === 'saves' ? savesPage(saves, store.storageError, autosave, newStart) : r.page === 'compare' ? comparePage(saves, cmp)
+    : r.page === 'experiments' ? experimentsPage(exp) : PAGES[r.page] ?? overviewPage;
   const main = $<HTMLElement>('#main');
   let res;
   try { res = page({ world, args: r.args, state }); }
@@ -93,7 +101,7 @@ function syncCompare(id: string | null): void {
 function compareCatchUp(): void {
   if (!cmp.world || !cmp.id || busy) return;
   const target: SimTarget = world.season.complete ? { kind: 'untilComplete', year: world.season.year } : { kind: 'until', year: world.season.year, slot: world.season.slotIndex };
-  const w = new Worker(URL.createObjectURL(new Blob([__WORKER_SOURCE__], { type: 'text/javascript' })));
+  const w = newWorker();
   setBusy(true); toast('Simulating timeline B…');
   const id = cmp.id;
   w.onmessage = e => {
@@ -104,6 +112,58 @@ function compareCatchUp(): void {
       .catch(err => { setBusy(false); toast('Saving timeline B failed: ' + err.message); });
   };
   w.postMessage({ type: 'run', world: cmp.world, target });
+}
+
+/** Run a multi-fork experiment in parallel workers (the current world is only read). */
+function runExperimentUI(): void {
+  if (busy) return;
+  const base = world, runs = exp.runs, seasons = exp.seasons, at = positionKey(base);
+  const k = Math.max(1, Math.min(4, (navigator.hardwareConcurrency || 2) - 1, runs));
+  const outcomes: RunOutcome[] = [];
+  const progress = new Array(k).fill(0);
+  const t0 = performance.now();
+  let finished = 0;
+  setBusy(true);
+  exp.running = { done: 0, total: runs };
+  render(true);
+  expWorkers = Array.from({ length: k }, (_, j) => {
+    const w = newWorker();
+    w.onmessage = e => {
+      const m = e.data;
+      if (m.type === 'exp-progress') {
+        progress[j] = m.done;
+        exp.running = { done: progress.reduce((a, b) => a + b, 0), total: runs };
+        const fill = document.querySelector<HTMLElement>('#exp-fill'), text = document.querySelector<HTMLElement>('#exp-text');
+        if (fill) fill.style.width = (100 * exp.running.done / runs).toFixed(1) + '%';
+        if (text) text.textContent = `${exp.running.done} of ${runs} runs`;
+        return;
+      }
+      if (m.type !== 'exp-result') return;
+      w.terminate();
+      if (m.status !== 'done') return;
+      outcomes.push(...m.outcomes);
+      if (++finished < k) return;
+      outcomes.sort((a, b) => a.index - b.index);
+      const summary = summarise(base, outcomes);
+      if (exp.result && exp.result.summary.key === summary.key) exp.previous = exp.result;
+      else exp.previous = null;
+      exp.result = { summary, outcomes, at, elapsed: performance.now() - t0 };
+      exp.running = null; expWorkers = [];
+      setBusy(false);
+      toast(`Experiment finished: ${runs} runs × ${seasons} seasons in ${((performance.now() - t0) / 1000).toFixed(1)} s.`);
+      if (route().page === 'experiments') render(true);
+    };
+    w.postMessage({ type: 'experiment', world: base, seasons, indices: Array.from({ length: runs }, (_, i) => i).filter(i => i % k === j) });
+    return w;
+  });
+}
+
+function cancelExperiment(): void {
+  for (const w of expWorkers) w.terminate();
+  expWorkers = []; exp.running = null;
+  setBusy(false);
+  toast('Experiment cancelled.');
+  render(true);
 }
 
 function go(hash: string) { if (location.hash === hash) render(true); else location.hash = hash; }
@@ -132,7 +192,7 @@ const labelFor = (t: SimTarget) => t.kind === 'seasons' ? `${t.n} season${t.n > 
 
 let worker: Worker | null = null;
 function getWorker(): Worker {
-  if (!worker) worker = new Worker(URL.createObjectURL(new Blob([__WORKER_SOURCE__], { type: 'text/javascript' })));
+  if (!worker) worker = newWorker();
   return worker;
 }
 
@@ -259,6 +319,8 @@ const actions: Record<string, (el: HTMLElement) => void | Promise<void>> = {
     go(`#/compare/${id}`);
   },
   'compare-catchup': () => compareCatchUp(),
+  'exp-run': () => runExperimentUI(),
+  'exp-cancel': () => cancelExperiment(),
   'new-world': () => { if (busy || !confirm(`Start a new world from ${seasonLabel(STARTS[newStart].year)}? Unsaved progress in the current world will be lost (the autosave is replaced).`)) return; world = createWorld({ seed: newSeed || String(Date.now()), start: newStart, name: 'New world', settings: { storage: world.settings.storage } }); afterSim(); go('#/overview'); },
 };
 
@@ -280,6 +342,9 @@ document.addEventListener('change', e => {
   else if (k === 'compare-pick') go(el.value ? `#/compare/${el.value}` : '#/compare');
   else if (k === 'compare-year') { cmp.year = Number(el.value); render(true); }
   else if (k === 'compare-club') { cmp.club = el.value; render(true); }
+  else if (k === 'exp-runs') exp.runs = Math.max(2, Math.min(MAX_RUNS, Math.round(Number(el.value)) || 40));
+  else if (k === 'exp-seasons') exp.seasons = Math.max(1, Math.min(MAX_SEASONS, Math.round(Number(el.value)) || 10));
+  else if (k === 'exp-club') { exp.club = el.value; render(true); }
   else if (k === 'new-start') { newStart = el.value; }
   else if (k === 'season-review') go(`#/season/${el.value}`);
   else if (k === 'h2h-a' || k === 'h2h-b') { const r = route(); const ids = [r.args[0] ?? '', r.args[1] ?? '']; const sel = [...document.querySelectorAll<HTMLSelectElement>('.h2h-pick select')].map(x => x.value); go(`#/h2h/${sel[0] ?? ids[0]}/${sel[1] ?? ids[1]}`); }

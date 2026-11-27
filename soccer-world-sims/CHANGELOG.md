@@ -20,6 +20,17 @@
 * Calibration phases `own-refine`, `own-validate`, `sensitivity --source own`. Search bases are explicit
   (`MODEL_06`), so the 0.6 and 0.7 phases reproduce after adoption.
 
+### Goal 2: multi-fork experiments
+* New **Experiments** page: run 2–500 alternative futures of the current world (1–100 seasons) in parallel
+  background workers, then see title, top-four, cup, promotion and relegation odds, final-position ranges, the
+  likeliest champions per season and a fan chart for any club. The world itself is untouched.
+* Runs are re-seeded forks whose streams do not depend on interventions, so rerunning after a what-if change
+  compares like with like (Δ columns against the previous experiment from the same point).
+* Engine module `experiments.ts` (`runExperiment`, `summarise`, `clubFan`); 4 engine tests and 5 browser checks.
+* The embedded worker source is now referenced once: `dist/app.js` shrinks from 306 KB to 271 KB (esbuild
+  inlined it at every use).
+* Toasts no longer exceed the viewport at phone width; experiment tables scroll inside their cards.
+
 ## 0.6.0 (2026-11-27)
 
 ### Goal 1: ownership ambition (realism experiment, not adopted)

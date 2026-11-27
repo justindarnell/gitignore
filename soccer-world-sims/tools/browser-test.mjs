@@ -252,6 +252,34 @@ check('compare: the other timeline catches up in a worker and both are compared 
 check('compare: club graph shows both timelines', !!(await page.$('#chart-compare canvas')));
 await shot('09-compare');
 
+// ---- multi-fork experiments (0.7)
+await page.goto(url + '#/experiments');
+await page.waitForSelector('[data-action="exp-run"]');
+await page.fill('[data-change="exp-runs"]', '8'); await page.press('[data-change="exp-runs"]', 'Tab');
+await page.fill('[data-change="exp-seasons"]', '3'); await page.press('[data-change="exp-seasons"]', 'Tab');
+const expMs = await t(async () => {
+  await page.click('[data-action="exp-run"]');
+  await page.waitForSelector('#chart-exp canvas', { timeout: 120000 });
+});
+const expRows = await page.$$eval('#main table:first-of-type tbody tr', r => r.length);
+const expNote = await page.textContent('#main');
+check('experiments: runs forks in background workers and shows title odds', expRows > 0 && expNote.includes('8 runs × 3 seasons'), `${expRows} clubs with title chances, ${expMs} ms`);
+const favourite = await page.$eval('#main table tbody tr td a.club', a => a.getAttribute('href').split('/').pop());
+await page.selectOption('[data-change="exp-club"]', favourite);
+await page.waitForSelector('#chart-exp canvas');
+check('experiments: club outlook fan chart for a chosen club', (await page.inputValue('[data-change="exp-club"]')) === favourite);
+await page.goto(url + '#/club/' + favourite);
+await page.waitForSelector('.whatif');
+await page.click('.whatif summary');
+await page.click('[data-action="whatif-event"][data-kind="crisis"]');
+await page.goto(url + '#/experiments');
+check('experiments: results are flagged as stale after a change', (await page.textContent('#main')).includes('The world has changed since'));
+await page.click('[data-action="exp-run"]');
+await page.waitForFunction(() => !document.querySelector('#exp-fill') && document.querySelector('#chart-exp canvas') && !document.querySelector('.notice'), null, { timeout: 120000 });
+const deltas = await page.$$eval('#main th', h => h.filter(x => x.textContent.trim() === 'Δ').length);
+check('experiments: rerun after an intervention compares with the previous result (same random streams)', deltas >= 2 && /(\d+) interventions? then, (\d+) now/.test(await page.textContent('#main')), `${deltas} Δ columns; ${(await page.textContent('#main')).match(/\d+ interventions? then, \d+ now/)?.[0]}`);
+await shot('10-experiments');
+
 // ---- memory
 const mem = await page.evaluate(() => performance.memory ? Math.round(performance.memory.usedJSHeapSize / 1e6) : null);
 check('JS heap after 101 seasons', mem === null || mem < 400, `${mem} MB`);
@@ -265,6 +293,14 @@ await page.goto(url + '#/standings/ENG1');
 await page.waitForSelector('table.standings');
 const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
 check('no horizontal page scroll at phone width', !overflow);
+await page.goto(url + '#/experiments');
+await page.waitForSelector('[data-action="exp-run"]');
+const expOverflow = await page.evaluate(() => {
+  const W = window.innerWidth;
+  if (document.documentElement.scrollWidth <= W + 1) return null;
+  return [...document.querySelectorAll('#main *')].filter(el => el.getBoundingClientRect().right > W + 1).slice(0, 4).map(el => `${el.tagName.toLowerCase()}.${el.className}`).join(', ') || `scrollWidth ${document.documentElement.scrollWidth}`;
+});
+check('experiments page has no horizontal page scroll at phone width', !expOverflow, expOverflow ?? '');
 await shot('07-mobile-standings');
 
 // ---- historical start: 1992/93 (0.6)
